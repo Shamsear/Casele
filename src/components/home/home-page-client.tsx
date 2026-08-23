@@ -167,11 +167,10 @@ export function HomePageClient({ featured, models, categories }: HomePageClientP
                     </div>
                   )}
                   {featured[0].comparePrice && (
-                    <div className="absolute -bottom-3 -left-3 rounded-xl border border-dark-border bg-dark-surface/80 px-3 py-2 backdrop-blur-sm">
-                      <p className="text-xs text-emerald-400 font-medium">
+                    <div className="absolute top-3 left-3 z-10">
+                      <span className="inline-flex items-center rounded-full bg-red-500 px-2.5 py-1 text-xs font-bold text-white shadow-lg">
                         {getDiscountPercent(featured[0].price, featured[0].comparePrice)}% OFF
-                      </p>
-                      <p className="text-[10px] text-warm-gray">Limited time</p>
+                      </span>
                     </div>
                   )}
                 </div>

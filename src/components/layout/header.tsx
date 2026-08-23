@@ -22,11 +22,9 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-40 hidden md:block border-b border-dark-border/50 bg-black/80 backdrop-blur-xl">
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 lg:px-8">
+      <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-4 lg:px-8">
         {/* Logo */}
-        <Link href="/">
-          <Logo size="sm" />
-        </Link>
+        <Logo size="sm" />
 
         {/* Nav */}
         <nav className="flex items-center gap-8">

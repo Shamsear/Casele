@@ -96,9 +96,9 @@ export function AdminSidebar() {
   return (
     <aside className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-64 lg:flex-col">
       <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-black border-r border-dark-border px-4 py-4">
-        <Link href="/admin">
+        <div className="flex items-center">
           <Logo size="sm" />
-        </Link>
+        </div>
 
         <nav className="flex flex-1 flex-col gap-1">
           {navItems.map((item) => {

@@ -150,10 +150,10 @@ export function FlashSale({
                 {/* Price */}
                 <div className="mt-2 flex items-baseline gap-2">
                   <span className="text-lg font-bold text-gold">
-                    QR {product.price}
+                    {formatPrice(product.price)}
                   </span>
                   <span className="text-sm text-warm-gray line-through">
-                    QR {product.comparePrice}
+                    {formatPrice(product.comparePrice)}
                   </span>
                 </div>
 

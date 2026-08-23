@@ -9,23 +9,23 @@ interface LogoProps {
 }
 
 const sizes = {
-  sm: { width: 120, height: 40 },
-  md: { width: 160, height: 53 },
-  lg: { width: 240, height: 80 },
+  sm: { height: 32, maxWidth: 120 },
+  md: { height: 40, maxWidth: 160 },
+  lg: { height: 56, maxWidth: 240 },
 };
 
 export function Logo({ className, size = "md", href = "/" }: LogoProps) {
-  const { width, height } = sizes[size];
+  const { height, maxWidth } = sizes[size];
 
   return (
     <Link href={href} className={cn("flex items-center shrink-0", className)}>
       <Image
         src="/logo.png"
         alt="CASELÉ"
-        width={width}
-        height={height}
-        className="h-auto w-auto max-h-full"
-        style={{ maxWidth: width }}
+        width={maxWidth}
+        height={height * 2}
+        className="w-auto object-contain"
+        style={{ height, maxWidth }}
         priority
       />
     </Link>

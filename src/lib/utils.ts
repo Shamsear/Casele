@@ -12,8 +12,12 @@ export function formatPrice(price: number | string, locale: "en" | "ar" = "en"):
     currency: "QAR",
     maximumFractionDigits: 0,
   }).format(num);
-  // Always use English numerals (0-9), never Arabic-Indic (٠-٩)
-  return formatted.replace(/[٠-٩]/g, (d) => String("٠١٢٣٤٥٦٧٨٩".indexOf(d)));
+  // English locale: force Western numerals (0-9)
+  // Arabic locale: keep Arabic-Indic numerals (٠-٩) as-is
+  if (locale === "en") {
+    return formatted.replace(/[\u0660-\u0669]/g, (d) => String(d.charCodeAt(0) - 0x0660));
+  }
+  return formatted;
 }
 
 export function slugify(text: string): string {
