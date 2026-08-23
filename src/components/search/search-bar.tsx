@@ -6,6 +6,7 @@ import Image from "next/image";
 import { PRODUCTS, MODELS } from "@/lib/data";
 import { PhoneIcon } from "@/components/ui/icons";
 import { useI18n } from "@/lib/i18n/context";
+import { Price } from "@/components/ui/price";
 
 export function SearchBar() {
   const { formatPrice } = useI18n();
@@ -181,7 +182,7 @@ export function SearchBar() {
                           <p className="text-sm font-medium text-white">{product.name}</p>
                           <p className="text-xs text-warm-gray">{product.modelName}</p>
                         </div>
-                        <p className="text-sm font-bold text-gold">{formatPrice(product.price)}</p>
+                        <Price price={product.price} size="sm" showBadge={false} />
                       </Link>
                     ))}
                   </div>

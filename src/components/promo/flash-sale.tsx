@@ -7,6 +7,7 @@ import { getDiscountPercent } from "@/lib/utils";
 import { useCartStore } from "@/lib/store/cart";
 import { useToast } from "@/components/ui/toast";
 import { useI18n } from "@/lib/i18n/context";
+import { Price } from "@/components/ui/price";
 
 interface FlashSaleProduct {
   id: string;
@@ -148,13 +149,8 @@ export function FlashSale({
                 </h3>
 
                 {/* Price */}
-                <div className="mt-2 flex items-baseline gap-2">
-                  <span className="text-lg font-bold text-gold">
-                    {formatPrice(product.price)}
-                  </span>
-                  <span className="text-sm text-warm-gray line-through">
-                    {formatPrice(product.comparePrice)}
-                  </span>
+                <div className="mt-2">
+                  <Price price={product.price} comparePrice={product.comparePrice} size="sm" />
                 </div>
 
                 {/* Stock Progress Bar */}

@@ -6,6 +6,7 @@ import { useCartStore } from "@/lib/store/cart";
 import { useHaptic } from "@/hooks/use-haptic";
 import { useToast } from "@/components/ui/toast";
 import { useI18n } from "@/lib/i18n/context";
+import { Price } from "@/components/ui/price";
 import { buildWhatsAppMessage, openWhatsApp } from "@/lib/whatsapp";
 import { getWhatsAppNumber } from "@/lib/settings";
 
@@ -85,7 +86,7 @@ export function StickyAddToCart({
         <div className="flex-1 min-w-0">
           <p className="text-xs text-warm-gray truncate">{modelName}</p>
           <p className="text-sm font-semibold text-white truncate">{name}</p>
-          <p className="text-sm font-bold text-gold">{formatPrice(price)}</p>
+          <Price price={price} size="sm" showBadge={false} />
         </div>
         <Button variant="cta" size="sm" onClick={handleBuyNow} className="flex-shrink-0">
           Buy Now

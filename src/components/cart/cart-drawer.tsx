@@ -8,6 +8,7 @@ import { useI18n } from "@/lib/i18n/context";
 import { getWhatsAppNumber } from "@/lib/settings";
 import { buildWhatsAppMessage, openWhatsApp } from "@/lib/whatsapp";
 import { TruckIcon, CartIcon } from "@/components/ui/icons";
+import { Price } from "@/components/ui/price";
 
 export function CartDrawer() {
   const { items, isOpen, setOpen, removeItem, updateQuantity, total, subtotal, tierDiscount, promoDiscount } = useCartStore();
@@ -169,7 +170,7 @@ export function CartDrawer() {
                   <div className="flex flex-1 flex-col">
                     <p className="text-[10px] text-warm-gray/60 uppercase">{item.modelName}</p>
                     <p className="text-sm font-medium text-white line-clamp-1">{item.name}</p>
-                    <p className="text-sm font-bold text-gold">{formatPrice(item.price)}</p>
+                    <Price price={item.price} size="sm" showBadge={false} />
 
                     {/* Quantity Controls */}
                     <div className="mt-auto flex items-center justify-between">

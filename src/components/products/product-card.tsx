@@ -5,6 +5,7 @@ import Image from "next/image";
 import { cn, getDiscountPercent } from "@/lib/utils";
 import { useI18n } from "@/lib/i18n/context";
 import { ProductBadge } from "@/components/ui/badge";
+import { Price } from "@/components/ui/price";
 import { useCartStore } from "@/lib/store/cart";
 import { useWishlistStore } from "@/lib/store/wishlist";
 import { useHaptic } from "@/hooks/use-haptic";
@@ -122,15 +123,8 @@ export function ProductCard({ product, className }: ProductCardProps) {
           {product.name}
         </h3>
 
-        <div className="mt-auto flex items-baseline gap-2">
-          <span className="font-display text-lg font-semibold text-gold">
-            {formatPrice(product.price)}
-          </span>
-          {product.comparePrice && (
-            <span className="text-xs text-warm-gray line-through">
-              {formatPrice(product.comparePrice)}
-            </span>
-          )}
+        <div className="mt-auto">
+          <Price price={product.price} comparePrice={product.comparePrice} size="sm" />
         </div>
 
         {/* Quick add button */}

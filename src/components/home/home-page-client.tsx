@@ -8,6 +8,7 @@ import { useToast } from "@/components/ui/toast";
 import { useHaptic } from "@/hooks/use-haptic";
 import { getDiscountPercent } from "@/lib/utils";
 import { ProductBadge } from "@/components/ui/badge";
+import { Price } from "@/components/ui/price";
 import type { ProductWithRelations, ModelWithCount, CategoryWithCount } from "@/lib/db/products";
 import { ShieldIcon, TruckIcon, ChatIcon, StarIcon, FireIcon, EyeIcon, CartIcon, PhoneIcon } from "@/components/ui/icons";
 import { useI18n } from "@/lib/i18n/context";
@@ -146,9 +147,7 @@ export function HomePageClient({ featured, models, categories }: HomePageClientP
                         <p className="font-display text-lg font-semibold text-white">
                           {featured[0].name}
                         </p>
-                        <p className="font-display text-xl font-bold text-gold">
-                          {formatPrice(featured[0].price)}
-                        </p>
+                        <Price price={featured[0].price} comparePrice={featured[0].comparePrice} size="md" />
                       </div>
                       <Link
                         href={`/shop/${featured[0].modelSlug}/${featured[0].slug}`}
@@ -469,17 +468,8 @@ function ProductCardHome({
           {product.name}
         </h3>
 
-        <div className="mt-auto pt-3 flex items-end justify-between">
-          <div className="flex items-baseline gap-2">
-            <span className="font-display text-xl font-bold text-gold">
-              {formatPrice(product.price)}
-            </span>
-            {product.comparePrice && (
-              <span className="text-xs text-warm-gray line-through">
-                {formatPrice(product.comparePrice)}
-              </span>
-            )}
-          </div>
+        <div className="mt-auto pt-3">
+          <Price price={product.price} comparePrice={product.comparePrice} size="md" />
         </div>
 
         <button
