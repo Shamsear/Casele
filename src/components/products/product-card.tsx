@@ -76,12 +76,12 @@ export function ProductCard({ product, className }: ProductCardProps) {
       )}
     >
       {/* Image */}
-      <div className="relative aspect-square overflow-hidden rounded-lg bg-cream/5">
+      <div className="relative aspect-square overflow-hidden rounded-lg bg-white">
         <Image
           src={imageUrl}
-          alt={`${product.name} — ${product.modelName} phone case by CASELÉ`}
+          alt={`${product.name} — ${product.modelName} phone case by CASELE`}
           fill
-          className="object-contain p-4 transition-transform duration-300 group-hover:scale-105"
+          className="object-contain p-2 transition-transform duration-300 group-hover:scale-105"
           sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, 25vw"
         />
 

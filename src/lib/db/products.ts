@@ -56,7 +56,7 @@ const FALLBACK_PRODUCTS: ProductWithRelations[] = [
   {
     id: "1", name: "Midnight Black Premium Case", slug: "midnight-black-premium-case",
     description: "Crafted from premium materials, this case offers exceptional protection without compromising on style.",
-    price: "79", comparePrice: "99",    images: ["https://images.unsplash.com/photo-1601784551446-20c9e07cdbdb?w=800&q=80&auto=format", "https://images.unsplash.com/photo-1603313011110-adc0e1b40ee3?w=800&q=80&auto=format", "https://images.unsplash.com/photo-1592899677977-9c10ca588bbd?w=800&q=80&auto=format"],
+    price: "79", comparePrice: "99", images: ["/images/products/midnight-black.jpg", "/images/products/midnight-black-angle.jpg"],
     badge: "bestseller", isFeatured: true, isActive: true, sortOrder: 1,
     viewCount: 234, orderCount: 89, lastSoldAt: new Date(Date.now() - 2 * 60 * 60 * 1000),
     metaTitle: null, metaDescription: null, createdAt: new Date(), updatedAt: new Date(),
@@ -70,7 +70,7 @@ const FALLBACK_PRODUCTS: ProductWithRelations[] = [
   {
     id: "2", name: "Gold Edge Luxe Case", slug: "gold-edge-luxe-case",
     description: "A statement piece for those who appreciate the finer things. Gold accents frame this premium case.",
-    price: "129", comparePrice: null,    images: ["https://images.unsplash.com/photo-1591488320449-011701bb6704?w=800&q=80&auto=format", "https://images.unsplash.com/photo-1605236453806-6ff36851218e?w=800&q=80&auto=format", "https://images.unsplash.com/photo-1603313011110-adc0e1b40ee3?w=800&q=80&auto=format"],
+    price: "129", comparePrice: null,    images: ["/images/products/gold-edge.jpg", "/images/products/gold-edge-angle.jpg"],
     badge: "new", isFeatured: true, isActive: true, sortOrder: 2,
     viewCount: 156, orderCount: 34, lastSoldAt: new Date(Date.now() - 5 * 60 * 60 * 1000),
     metaTitle: null, metaDescription: null, createdAt: new Date(), updatedAt: new Date(),
@@ -83,7 +83,7 @@ const FALLBACK_PRODUCTS: ProductWithRelations[] = [
   {
     id: "3", name: "Royal Blue Classic Case", slug: "royal-blue-classic-case",
     description: "Classic design meets modern protection. The deep royal blue color gives your phone a regal look.",
-    price: "59", comparePrice: "79",    images: ["https://images.unsplash.com/photo-1616400619175-5beda3a17896?w=800&q=80&auto=format", "https://images.unsplash.com/photo-1586953208448-b95a79798f07?w=800&q=80&auto=format"],
+    price: "59", comparePrice: "79",    images: ["/images/products/royal-blue.jpg", "/images/products/royal-blue-angle.jpg"],
     badge: "sale", isFeatured: false, isActive: true, sortOrder: 3,
     viewCount: 189, orderCount: 67, lastSoldAt: new Date(Date.now() - 1 * 60 * 60 * 1000),
     metaTitle: null, metaDescription: null, createdAt: new Date(), updatedAt: new Date(),
@@ -97,7 +97,7 @@ const FALLBACK_PRODUCTS: ProductWithRelations[] = [
   {
     id: "4", name: "Matte Carbon Fiber Case", slug: "matte-carbon-fiber-case",
     description: "Lightweight yet incredibly strong. The carbon fiber texture adds a sporty, tech-forward aesthetic.",
-    price: "89", comparePrice: null,    images: ["https://images.unsplash.com/photo-1586953208448-b95a79798f07?w=800&q=80&auto=format", "https://images.unsplash.com/photo-1601784551446-20c9e07cdbdb?w=800&q=80&auto=format", "https://images.unsplash.com/photo-1592899677977-9c10ca588bbd?w=800&q=80&auto=format"],
+    price: "89", comparePrice: null,    images: ["/images/products/carbon-fiber.jpg", "/images/products/carbon-fiber-angle.jpg"],
     badge: null, isFeatured: true, isActive: true, sortOrder: 4,
     viewCount: 145, orderCount: 45, lastSoldAt: new Date(Date.now() - 8 * 60 * 60 * 1000),
     metaTitle: null, metaDescription: null, createdAt: new Date(), updatedAt: new Date(),
@@ -110,7 +110,7 @@ const FALLBACK_PRODUCTS: ProductWithRelations[] = [
   {
     id: "5", name: "Clear Crystal Case", slug: "clear-crystal-case",
     description: "Show off your phone's original design while keeping it protected. Crystal clear, anti-yellowing material.",
-    price: "49", comparePrice: null,    images: ["https://images.unsplash.com/photo-1603313011110-adc0e1b40ee3?w=800&q=80&auto=format", "https://images.unsplash.com/photo-1592899677977-9c10ca588bbd?w=800&q=80&auto=format"],
+    price: "49", comparePrice: null,    images: ["/images/products/clear-crystal.jpg"],
     badge: null, isFeatured: false, isActive: true, sortOrder: 5,
     viewCount: 210, orderCount: 112, lastSoldAt: new Date(Date.now() - 30 * 60 * 1000),
     metaTitle: null, metaDescription: null, createdAt: new Date(), updatedAt: new Date(),
@@ -124,7 +124,7 @@ const FALLBACK_PRODUCTS: ProductWithRelations[] = [
   {
     id: "6", name: "Rose Gold Slim Case", slug: "rose-gold-slim-case",
     description: "Ultra-slim profile with a stunning rose gold finish. Elegant protection that slips easily into your pocket.",
-    price: "69", comparePrice: "89",    images: ["https://images.unsplash.com/photo-1591488320449-011701bb6704?w=800&q=80&auto=format", "https://images.unsplash.com/photo-1605236453806-6ff36851218e?w=800&q=80&auto=format", "https://images.unsplash.com/photo-1592899677977-9c10ca588bbd?w=800&q=80&auto=format"],
+    price: "69", comparePrice: "89",    images: ["/images/products/rose-gold.jpg"],
     badge: "sale", isFeatured: false, isActive: true, sortOrder: 6,
     viewCount: 167, orderCount: 52, lastSoldAt: new Date(Date.now() - 4 * 60 * 60 * 1000),
     metaTitle: null, metaDescription: null, createdAt: new Date(), updatedAt: new Date(),
@@ -137,7 +137,7 @@ const FALLBACK_PRODUCTS: ProductWithRelations[] = [
   {
     id: "7", name: "Forest Green Leather Case", slug: "forest-green-leather-case",
     description: "Premium leather with a rich forest green hue. Ages beautifully over time, developing a unique patina.",
-    price: "119", comparePrice: null,    images: ["https://images.unsplash.com/photo-1586953208448-b95a79798f07?w=800&q=80&auto=format", "https://images.unsplash.com/photo-1601784551446-20c9e07cdbdb?w=800&q=80&auto=format"],
+    price: "119", comparePrice: null,    images: ["/images/products/forest-green.jpg"],
     badge: "new", isFeatured: true, isActive: true, sortOrder: 7,
     viewCount: 98, orderCount: 23, lastSoldAt: new Date(Date.now() - 12 * 60 * 60 * 1000),
     metaTitle: null, metaDescription: null, createdAt: new Date(), updatedAt: new Date(),
@@ -150,7 +150,7 @@ const FALLBACK_PRODUCTS: ProductWithRelations[] = [
   {
     id: "8", name: "Matte Black Armor Case", slug: "matte-black-armor-case",
     description: "Maximum protection with a tactical look. Reinforced corners and raised edges for ultimate device safety.",
-    price: "99", comparePrice: null,    images: ["https://images.unsplash.com/photo-1601784551446-20c9e07cdbdb?w=800&q=80&auto=format", "https://images.unsplash.com/photo-1603313011110-adc0e1b40ee3?w=800&q=80&auto=format", "https://images.unsplash.com/photo-1592899677977-9c10ca588bbd?w=800&q=80&auto=format"],
+    price: "99", comparePrice: null, images: ["/images/products/matte-black.jpg"],
     badge: "bestseller", isFeatured: true, isActive: true, sortOrder: 8,
     viewCount: 178, orderCount: 61, lastSoldAt: new Date(Date.now() - 6 * 60 * 60 * 1000),
     metaTitle: null, metaDescription: null, createdAt: new Date(), updatedAt: new Date(),

@@ -72,7 +72,7 @@ export function ProductGallery({ images, alt, badge, discount }: ProductGalleryP
       <div
         ref={imageRef}
         className={cn(
-          "relative aspect-square overflow-hidden rounded-xl bg-black",
+          "relative aspect-square overflow-hidden rounded-xl bg-white",
           isZoomed ? "cursor-zoom-out" : "cursor-zoom-in"
         )}
         onClick={handleImageClick}
