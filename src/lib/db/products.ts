@@ -56,7 +56,7 @@ const FALLBACK_PRODUCTS: ProductWithRelations[] = [
   {
     id: "1", name: "Midnight Black Premium Case", slug: "midnight-black-premium-case",
     description: "Crafted from premium materials, this case offers exceptional protection without compromising on style.",
-    price: "79", comparePrice: "99", images: ["/images/products/midnight-black.svg"],
+    price: "79", comparePrice: "99", images: ["/images/products/midnight-black.svg", "/images/products/midnight-black-angle.svg", "/images/products/midnight-black-detail.svg"],
     badge: "bestseller", isFeatured: true, isActive: true, sortOrder: 1,
     viewCount: 234, orderCount: 89, lastSoldAt: new Date(Date.now() - 2 * 60 * 60 * 1000),
     metaTitle: null, metaDescription: null, createdAt: new Date(), updatedAt: new Date(),
@@ -70,7 +70,7 @@ const FALLBACK_PRODUCTS: ProductWithRelations[] = [
   {
     id: "2", name: "Gold Edge Luxe Case", slug: "gold-edge-luxe-case",
     description: "A statement piece for those who appreciate the finer things. Gold accents frame this premium case.",
-    price: "129", comparePrice: null, images: ["/images/products/gold-edge.svg"],
+    price: "129", comparePrice: null, images: ["/images/products/gold-edge.svg", "/images/products/gold-edge-angle.svg", "/images/products/gold-edge-detail.svg"],
     badge: "new", isFeatured: true, isActive: true, sortOrder: 2,
     viewCount: 156, orderCount: 34, lastSoldAt: new Date(Date.now() - 5 * 60 * 60 * 1000),
     metaTitle: null, metaDescription: null, createdAt: new Date(), updatedAt: new Date(),
@@ -83,7 +83,7 @@ const FALLBACK_PRODUCTS: ProductWithRelations[] = [
   {
     id: "3", name: "Royal Blue Classic Case", slug: "royal-blue-classic-case",
     description: "Classic design meets modern protection. The deep royal blue color gives your phone a regal look.",
-    price: "59", comparePrice: "79", images: ["/images/products/royal-blue.svg"],
+    price: "59", comparePrice: "79", images: ["/images/products/royal-blue.svg", "/images/products/royal-blue-angle.svg"],
     badge: "sale", isFeatured: false, isActive: true, sortOrder: 3,
     viewCount: 189, orderCount: 67, lastSoldAt: new Date(Date.now() - 1 * 60 * 60 * 1000),
     metaTitle: null, metaDescription: null, createdAt: new Date(), updatedAt: new Date(),
@@ -97,7 +97,7 @@ const FALLBACK_PRODUCTS: ProductWithRelations[] = [
   {
     id: "4", name: "Matte Carbon Fiber Case", slug: "matte-carbon-fiber-case",
     description: "Lightweight yet incredibly strong. The carbon fiber texture adds a sporty, tech-forward aesthetic.",
-    price: "89", comparePrice: null, images: ["/images/products/carbon-fiber.svg"],
+    price: "89", comparePrice: null, images: ["/images/products/carbon-fiber.svg", "/images/products/carbon-fiber-angle.svg", "/images/products/carbon-fiber-detail.svg"],
     badge: null, isFeatured: true, isActive: true, sortOrder: 4,
     viewCount: 145, orderCount: 45, lastSoldAt: new Date(Date.now() - 8 * 60 * 60 * 1000),
     metaTitle: null, metaDescription: null, createdAt: new Date(), updatedAt: new Date(),
@@ -110,7 +110,7 @@ const FALLBACK_PRODUCTS: ProductWithRelations[] = [
   {
     id: "5", name: "Clear Crystal Case", slug: "clear-crystal-case",
     description: "Show off your phone's original design while keeping it protected. Crystal clear, anti-yellowing material.",
-    price: "49", comparePrice: null, images: ["/images/products/clear-crystal.svg"],
+    price: "49", comparePrice: null, images: ["/images/products/clear-crystal.svg", "/images/products/clear-crystal-angle.svg"],
     badge: null, isFeatured: false, isActive: true, sortOrder: 5,
     viewCount: 210, orderCount: 112, lastSoldAt: new Date(Date.now() - 30 * 60 * 1000),
     metaTitle: null, metaDescription: null, createdAt: new Date(), updatedAt: new Date(),
@@ -124,7 +124,7 @@ const FALLBACK_PRODUCTS: ProductWithRelations[] = [
   {
     id: "6", name: "Rose Gold Slim Case", slug: "rose-gold-slim-case",
     description: "Ultra-slim profile with a stunning rose gold finish. Elegant protection that slips easily into your pocket.",
-    price: "69", comparePrice: "89", images: ["/images/products/rose-gold.svg"],
+    price: "69", comparePrice: "89", images: ["/images/products/rose-gold.svg", "/images/products/rose-gold-angle.svg", "/images/products/rose-gold-detail.svg"],
     badge: "sale", isFeatured: false, isActive: true, sortOrder: 6,
     viewCount: 167, orderCount: 52, lastSoldAt: new Date(Date.now() - 4 * 60 * 60 * 1000),
     metaTitle: null, metaDescription: null, createdAt: new Date(), updatedAt: new Date(),
@@ -137,7 +137,7 @@ const FALLBACK_PRODUCTS: ProductWithRelations[] = [
   {
     id: "7", name: "Forest Green Leather Case", slug: "forest-green-leather-case",
     description: "Premium leather with a rich forest green hue. Ages beautifully over time, developing a unique patina.",
-    price: "119", comparePrice: null, images: ["/images/products/forest-green.svg"],
+    price: "119", comparePrice: null, images: ["/images/products/forest-green.svg", "/images/products/forest-green-angle.svg"],
     badge: "new", isFeatured: true, isActive: true, sortOrder: 7,
     viewCount: 98, orderCount: 23, lastSoldAt: new Date(Date.now() - 12 * 60 * 60 * 1000),
     metaTitle: null, metaDescription: null, createdAt: new Date(), updatedAt: new Date(),
@@ -150,7 +150,7 @@ const FALLBACK_PRODUCTS: ProductWithRelations[] = [
   {
     id: "8", name: "Matte Black Armor Case", slug: "matte-black-armor-case",
     description: "Maximum protection with a tactical look. Reinforced corners and raised edges for ultimate device safety.",
-    price: "99", comparePrice: null, images: ["/images/products/matte-black.svg"],
+    price: "99", comparePrice: null, images: ["/images/products/matte-black.svg", "/images/products/matte-black-angle.svg", "/images/products/matte-black-detail.svg"],
     badge: "bestseller", isFeatured: true, isActive: true, sortOrder: 8,
     viewCount: 178, orderCount: 61, lastSoldAt: new Date(Date.now() - 6 * 60 * 60 * 1000),
     metaTitle: null, metaDescription: null, createdAt: new Date(), updatedAt: new Date(),

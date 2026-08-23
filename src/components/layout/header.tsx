@@ -6,16 +6,19 @@ import { Logo } from "@/components/brand/logo";
 import { CartBubble } from "@/components/cart/cart-bubble";
 import { SearchBar } from "@/components/search/search-bar";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
+import { LanguageToggle } from "@/components/layout/language-toggle";
+import { useI18n } from "@/lib/i18n/context";
 import { cn } from "@/lib/utils";
-
-const navLinks = [
-  { href: "/", label: "Home" },
-  { href: "/shop", label: "Shop" },
-  { href: "/track", label: "Track Order" },
-];
 
 export function Header() {
   const pathname = usePathname();
+  const { t } = useI18n();
+
+  const navLinks = [
+    { href: "/", label: t("nav_home") },
+    { href: "/shop", label: t("nav_shop") },
+    { href: "/track", label: t("nav_track") },
+  ];
 
   return (
     <header className="sticky top-0 z-40 hidden md:block border-b border-dark-border/50 bg-black/80 backdrop-blur-xl">
@@ -46,6 +49,7 @@ export function Header() {
         {/* Actions */}
         <div className="flex items-center gap-3">
           <SearchBar />
+          <LanguageToggle />
           <ThemeToggle />
           <CartBubble />
         </div>

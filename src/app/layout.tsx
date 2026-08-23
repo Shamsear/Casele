@@ -36,6 +36,10 @@ export const metadata: Metadata = {
   authors: [{ name: SITE.name }],
   creator: SITE.name,
   publisher: SITE.name,
+  icons: {
+    icon: "/icon.svg",
+    apple: "/apple-icon.png",
+  },
 
   // Open Graph
   openGraph: {
@@ -100,13 +104,18 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${cormorant.variable} ${inter.variable}`}>
+    <html lang="en" className={`${cormorant.variable} ${inter.variable}`} suppressHydrationWarning>
       <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var t=localStorage.getItem('casele_theme');if(t==='light'){document.documentElement.classList.add('light')}else if(t==='dark'){document.documentElement.classList.remove('light')}else if(!window.matchMedia('(prefers-color-scheme: dark)').matches){document.documentElement.classList.add('light')}}catch(e){}})()`,
+          }}
+        />
         <LocalBusinessSchema />
         <WebsiteSchema />
         <OrganizationSchema />
       </head>
-      <body className="min-h-screen bg-black text-white font-body antialiased">
+      <body className="min-h-screen font-body antialiased">
         {children}
       </body>
     </html>

@@ -1,4 +1,5 @@
-import { cn, formatPrice, getDiscountPercent } from "@/lib/utils";
+import { cn, getDiscountPercent } from "@/lib/utils";
+import { useI18n } from "@/lib/i18n/context";
 
 interface PriceDisplayProps {
   price: number | string;
@@ -15,6 +16,7 @@ export function PriceDisplay({
   showBadge = true,
   className,
 }: PriceDisplayProps) {
+  const { formatPrice } = useI18n();
   const discount = getDiscountPercent(price, comparePrice ?? null);
   const hasDiscount = discount > 0 && comparePrice;
 

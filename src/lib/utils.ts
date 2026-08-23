@@ -5,13 +5,15 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export function formatPrice(price: number | string): string {
+export function formatPrice(price: number | string, locale: "en" | "ar" = "en"): string {
   const num = typeof price === "string" ? parseFloat(price) : price;
-  return new Intl.NumberFormat("ar-QA", {
+  const formatted = new Intl.NumberFormat(locale === "ar" ? "ar-QA" : "en-QA", {
     style: "currency",
     currency: "QAR",
     maximumFractionDigits: 0,
   }).format(num);
+  // Always use English numerals (0-9), never Arabic-Indic (٠-٩)
+  return formatted.replace(/[٠-٩]/g, (d) => String("٠١٢٣٤٥٦٧٨٩".indexOf(d)));
 }
 
 export function slugify(text: string): string {

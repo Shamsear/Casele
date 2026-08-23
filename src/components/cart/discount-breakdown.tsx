@@ -1,4 +1,6 @@
-import { formatPrice } from "@/lib/utils";
+"use client";
+
+import { useI18n } from "@/lib/i18n/context";
 import { Separator } from "@/components/ui/separator";
 
 interface DiscountBreakdownProps {
@@ -28,6 +30,7 @@ export function DiscountBreakdown({
   total,
   savings,
 }: DiscountBreakdownProps) {
+  const { formatPrice } = useI18n();
   const hasDiscounts =
     tierDiscount > 0 ||
     flashDiscount > 0 ||

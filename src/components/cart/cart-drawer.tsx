@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useCartStore } from "@/lib/store/cart";
-import { formatPrice } from "@/lib/utils";
+import { useI18n } from "@/lib/i18n/context";
 import { getWhatsAppNumber } from "@/lib/settings";
 import { buildWhatsAppMessage, openWhatsApp } from "@/lib/whatsapp";
 import { TruckIcon, CartIcon } from "@/components/ui/icons";
@@ -13,6 +13,7 @@ export function CartDrawer() {
   const { items, isOpen, setOpen, removeItem, updateQuantity, total, subtotal, tierDiscount, promoDiscount } = useCartStore();
   const itemCount = useCartStore((s) => s.itemCount());
   const [whatsappNumber, setWhatsappNumber] = useState("+97455364455");
+  const { formatPrice } = useI18n();
 
   // Fetch WhatsApp number on mount
   useEffect(() => {

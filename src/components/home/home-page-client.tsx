@@ -6,10 +6,11 @@ import { useEffect, useState } from "react";
 import { useCartStore } from "@/lib/store/cart";
 import { useToast } from "@/components/ui/toast";
 import { useHaptic } from "@/hooks/use-haptic";
-import { formatPrice, getDiscountPercent } from "@/lib/utils";
+import { getDiscountPercent } from "@/lib/utils";
 import { ProductBadge } from "@/components/ui/badge";
 import type { ProductWithRelations, ModelWithCount, CategoryWithCount } from "@/lib/db/products";
 import { ShieldIcon, TruckIcon, ChatIcon, StarIcon, FireIcon, EyeIcon, CartIcon, PhoneIcon } from "@/components/ui/icons";
+import { useI18n } from "@/lib/i18n/context";
 
 interface HomePageClientProps {
   featured: ProductWithRelations[];
@@ -19,6 +20,7 @@ interface HomePageClientProps {
 
 export function HomePageClient({ featured, models, categories }: HomePageClientProps) {
   const [mounted, setMounted] = useState(false);
+  const { t, formatPrice } = useI18n();
 
   useEffect(() => {
     setMounted(true);
@@ -49,7 +51,7 @@ export function HomePageClient({ featured, models, categories }: HomePageClientP
               >
                 <span className="inline-flex items-center gap-2 rounded-full border border-gold/20 bg-gold/5 px-4 py-1.5 text-xs font-medium text-gold tracking-wider uppercase">
                   <span className="h-1.5 w-1.5 rounded-full bg-gold animate-pulse" />
-                  Premium Mobile Cases
+                  {t("hero_eyebrow")}
                 </span>
               </div>
 
@@ -59,11 +61,11 @@ export function HomePageClient({ featured, models, categories }: HomePageClientP
                 }`}
               >
                 <h1 className="font-display text-[3.5rem] leading-[1.05] font-bold text-white md:text-[4.5rem]">
-                  Protect.
+                  {t("hero_title_1")}
                   <br />
-                  <span className="text-gold">Express.</span>
+                  <span className="text-gold">{t("hero_title_2")}</span>
                   <br />
-                  Elevate.
+                  {t("hero_title_3")}
                 </h1>
               </div>
 
@@ -73,8 +75,7 @@ export function HomePageClient({ featured, models, categories }: HomePageClientP
                 }`}
               >
                 <p className="max-w-md text-lg leading-relaxed text-warm-gray">
-                  Premium phone cases crafted for those who refuse to choose
-                  between style and protection. Every case tells a story.
+                  {t("hero_subtitle")}
                 </p>
               </div>
 
@@ -87,7 +88,7 @@ export function HomePageClient({ featured, models, categories }: HomePageClientP
                   href="/shop"
                   className="group inline-flex items-center gap-2 rounded-xl bg-gold px-7 py-3.5 text-sm font-semibold text-black transition-all hover:bg-gold-light hover:shadow-lg hover:shadow-gold/20 active:scale-[0.98]"
                 >
-                  Shop the Collection
+                  {t("hero_cta")}
                   <svg viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4 transition-transform group-hover:translate-x-0.5">
                     <path fillRule="evenodd" d="M3 10a.75.75 0 01.75-.75h10.638L10.23 5.29a.75.75 0 111.04-1.08l5.5 5.25a.75.75 0 010 1.08l-5.5 5.25a.75.75 0 11-1.04-1.08l4.158-3.96H3.75A.75.75 0 013 10z" clipRule="evenodd" />
                   </svg>
@@ -96,7 +97,7 @@ export function HomePageClient({ featured, models, categories }: HomePageClientP
                   href="/track"
                   className="inline-flex items-center gap-2 rounded-xl border border-dark-border px-7 py-3.5 text-sm font-medium text-warm-gray transition-all hover:border-gold/30 hover:text-white"
                 >
-                  Track Order
+                  {t("hero_track")}
                 </Link>
               </div>
 
@@ -106,9 +107,9 @@ export function HomePageClient({ featured, models, categories }: HomePageClientP
                 }`}
               >
                 {[
-                  { icon: <ShieldIcon size={16} className="text-warm-gray/70" />, label: "Premium Protection" },
-                  { icon: <TruckIcon size={16} className="text-warm-gray/70" />, label: "Fast Delivery" },
-                  { icon: <ChatIcon size={16} className="text-warm-gray/70" />, label: "WhatsApp Orders" },
+                  { icon: <ShieldIcon size={16} className="text-warm-gray/70" />, label: t("hero_trust_protection") },
+                  { icon: <TruckIcon size={16} className="text-warm-gray/70" />, label: t("hero_trust_delivery") },
+                  { icon: <ChatIcon size={16} className="text-warm-gray/70" />, label: t("hero_trust_whatsapp") },
                 ].map((item) => (
                   <div key={item.label} className="flex items-center gap-2 text-xs text-warm-gray/70">
                     <span>{item.icon}</span>
@@ -185,9 +186,9 @@ export function HomePageClient({ featured, models, categories }: HomePageClientP
         <div className="mx-auto max-w-7xl px-4 py-6 lg:px-8">
           <div className="grid grid-cols-3 gap-4 text-center">
             {[
-              { value: "500+", label: "Happy Customers" },
-              { value: `${featured.length > 0 ? featured.length * 6 : "50+"}`, label: "Premium Cases" },
-              { value: "4.9", label: "Average Rating" },
+              { value: "500+", label: t("stat_customers") },
+              { value: `${featured.length > 0 ? featured.length * 6 : "50+"}`, label: t("stat_cases") },
+              { value: "4.9", label: t("stat_rating") },
             ].map((stat) => (
               <div key={stat.label}>
                 <p className="font-display text-2xl font-bold text-gold md:text-3xl">{stat.value}</p>
@@ -201,12 +202,12 @@ export function HomePageClient({ featured, models, categories }: HomePageClientP
       {/* ═══════ SHOP BY MODEL ═══════ */}
       <section className="mx-auto max-w-7xl px-4 py-20 lg:px-8">
         <div className="text-center mb-12">
-          <p className="text-xs font-medium text-gold tracking-widest uppercase mb-3">Find Your Fit</p>
+          <p className="text-xs font-medium text-gold tracking-widest uppercase mb-3">{t("shop_by_model_eyebrow")}</p>
           <h2 className="font-display text-4xl font-bold text-white md:text-5xl">
-            Shop by Device
+            {t("shop_by_model_title")}
           </h2>
           <p className="mt-3 text-warm-gray max-w-md mx-auto">
-            Select your phone model and discover cases made to fit perfectly.
+            {t("shop_by_model_subtitle")}
           </p>
         </div>
 
@@ -227,7 +228,7 @@ export function HomePageClient({ featured, models, categories }: HomePageClientP
                 {model.name}
               </p>
               <p className="mt-1 text-[10px] text-warm-gray">
-                {model.count} cases
+                {model.count} {t("cases_count")}
               </p>
             </Link>
           ))}
@@ -239,16 +240,16 @@ export function HomePageClient({ featured, models, categories }: HomePageClientP
         <section className="mx-auto max-w-7xl px-4 py-20 lg:px-8">
           <div className="flex items-end justify-between mb-12">
             <div>
-              <p className="text-xs font-medium text-gold tracking-widest uppercase mb-3">Curated for You</p>
+              <p className="text-xs font-medium text-gold tracking-widest uppercase mb-3">{t("featured_eyebrow")}</p>
               <h2 className="font-display text-4xl font-bold text-white md:text-5xl">
-                Featured Cases
+                {t("featured_title")}
               </h2>
             </div>
             <Link
               href="/shop"
               className="hidden sm:inline-flex items-center gap-2 rounded-xl border border-dark-border px-5 py-2.5 text-sm font-medium text-warm-gray transition-all hover:border-gold/30 hover:text-white"
             >
-              View all
+              {t("featured_view_all")}
               <svg viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
                 <path fillRule="evenodd" d="M3 10a.75.75 0 01.75-.75h10.638L10.23 5.29a.75.75 0 111.04-1.08l5.5 5.25a.75.75 0 010 1.08l-5.5 5.25a.75.75 0 11-1.04-1.08l4.158-3.96H3.75A.75.75 0 013 10z" clipRule="evenodd" />
               </svg>
@@ -276,9 +277,9 @@ export function HomePageClient({ featured, models, categories }: HomePageClientP
       {categories.length > 0 && (
         <section className="mx-auto max-w-7xl px-4 py-20 lg:px-8">
           <div className="text-center mb-12">
-            <p className="text-xs font-medium text-gold tracking-widest uppercase mb-3">Browse</p>
+            <p className="text-xs font-medium text-gold tracking-widest uppercase mb-3">{t("collections_eyebrow")}</p>
             <h2 className="font-display text-4xl font-bold text-white md:text-5xl">
-              Collections
+              {t("collections_title")}
             </h2>
           </div>
 
@@ -313,9 +314,9 @@ export function HomePageClient({ featured, models, categories }: HomePageClientP
       <section className="border-t border-dark-border/50">
         <div className="mx-auto max-w-7xl px-4 py-20 lg:px-8">
           <div className="text-center mb-14">
-            <p className="text-xs font-medium text-gold tracking-widest uppercase mb-3">Why CASELÉ</p>
+            <p className="text-xs font-medium text-gold tracking-widest uppercase mb-3">{t("promise_eyebrow")}</p>
             <h2 className="font-display text-4xl font-bold text-white md:text-5xl">
-              Our Promise
+              {t("promise_title")}
             </h2>
           </div>
 
@@ -327,8 +328,8 @@ export function HomePageClient({ featured, models, categories }: HomePageClientP
                     <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
                   </svg>
                 ),
-                title: "Premium Protection",
-                desc: "Military-grade materials engineered to absorb impact. Your device stays safe, no matter what life throws at it.",
+                title: t("promise_protection_title"),
+                desc: t("promise_protection_desc"),
               },
               {
                 icon: (
@@ -336,8 +337,8 @@ export function HomePageClient({ featured, models, categories }: HomePageClientP
                     <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.455 2.456L21.75 6l-1.036.259a3.375 3.375 0 00-2.455 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183-.394-1.183.394a2.25 2.25 0 00-1.423-1.423z" />
                   </svg>
                 ),
-                title: "Express Yourself",
-                desc: "From minimalist elegance to bold statements. Every case is designed to reflect who you are.",
+                title: t("promise_express_title"),
+                desc: t("promise_express_desc"),
               },
               {
                 icon: (
@@ -345,8 +346,8 @@ export function HomePageClient({ featured, models, categories }: HomePageClientP
                     <path strokeLinecap="round" strokeLinejoin="round" d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.555-.337A5.972 5.972 0 015.41 20.97a5.969 5.969 0 01-.474-.065 4.48 4.48 0 00.978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25z" />
                   </svg>
                 ),
-                title: "Order on WhatsApp",
-                desc: "No complicated checkout. Pick your case, send us a message on WhatsApp, and we handle the rest.",
+                title: t("promise_whatsapp_title"),
+                desc: t("promise_whatsapp_desc"),
               },
             ].map((item, i) => (
               <div
@@ -377,18 +378,18 @@ export function HomePageClient({ featured, models, categories }: HomePageClientP
           <div className="relative overflow-hidden rounded-3xl border border-gold/20 bg-gradient-to-br from-gold/[0.08] via-gold/[0.03] to-transparent p-12 text-center md:p-16">
             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] rounded-full bg-gold/[0.05] blur-[100px]" />
             <div className="relative z-10">
-              <p className="text-xs font-medium text-gold tracking-widest uppercase mb-4">Ready to upgrade?</p>
+              <p className="text-xs font-medium text-gold tracking-widest uppercase mb-4">{t("cta_ready")}</p>
               <h2 className="font-display text-4xl font-bold text-white md:text-5xl">
-                Find Your Perfect Case
+                {t("cta_title")}
               </h2>
               <p className="mx-auto mt-4 max-w-lg text-warm-gray">
-                Browse our collection of premium cases. Fast delivery, easy WhatsApp checkout, and protection that lasts.
+                {t("cta_desc")}
               </p>
               <Link
                 href="/shop"
                 className="mt-8 inline-flex items-center gap-2 rounded-xl bg-gold px-8 py-4 text-sm font-semibold text-black transition-all hover:bg-gold-light hover:shadow-lg hover:shadow-gold/20"
               >
-                Shop Now
+                {t("cta_shop")}
                 <svg viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
                   <path fillRule="evenodd" d="M3 10a.75.75 0 01.75-.75h10.638L10.23 5.29a.75.75 0 111.04-1.08l5.5 5.25a.75.75 0 010 1.08l-5.5 5.25a.75.75 0 11-1.04-1.08l4.158-3.96H3.75A.75.75 0 013 10z" clipRule="evenodd" />
                 </svg>
@@ -414,6 +415,7 @@ function ProductCardHome({
   const addItem = useCartStore((s) => s.addItem);
   const { toast } = useToast();
   const { vibrate } = useHaptic();
+  const { formatPrice } = useI18n();
   const discount = getDiscountPercent(product.price, product.comparePrice);
 
   const handleAdd = (e: React.MouseEvent) => {

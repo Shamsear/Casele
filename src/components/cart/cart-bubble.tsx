@@ -1,12 +1,13 @@
 "use client";
 
 import { useCartStore } from "@/lib/store/cart";
-import { formatPrice } from "@/lib/utils";
+import { useI18n } from "@/lib/i18n/context";
 
 export function CartBubble() {
   const itemCount = useCartStore((s) => s.itemCount());
   const total = useCartStore((s) => s.total());
   const toggleCart = useCartStore((s) => s.toggleCart);
+  const { formatPrice } = useI18n();
 
   if (itemCount === 0) return null;
 

@@ -4,10 +4,11 @@ import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { PRODUCTS, MODELS } from "@/lib/data";
-import { formatPrice } from "@/lib/utils";
 import { PhoneIcon } from "@/components/ui/icons";
+import { useI18n } from "@/lib/i18n/context";
 
 export function SearchBar() {
+  const { formatPrice } = useI18n();
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);

@@ -3,8 +3,8 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { formatPrice } from "@/lib/utils";
 import { SearchIcon } from "@/components/ui/icons";
+import { useI18n } from "@/lib/i18n/context";
 
 interface OrderItem {
   name: string;
@@ -29,6 +29,7 @@ export default function TrackPage() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(false);
   const [searched, setSearched] = useState(false);
+  const { formatPrice } = useI18n();
 
   const handleTrack = async (e: React.FormEvent) => {
     e.preventDefault();

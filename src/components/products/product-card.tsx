@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { cn, formatPrice, getDiscountPercent } from "@/lib/utils";
+import { cn, getDiscountPercent } from "@/lib/utils";
+import { useI18n } from "@/lib/i18n/context";
 import { ProductBadge } from "@/components/ui/badge";
 import { useCartStore } from "@/lib/store/cart";
 import { useWishlistStore } from "@/lib/store/wishlist";
@@ -30,6 +31,7 @@ export function ProductCard({ product, className }: ProductCardProps) {
   const isWishlisted = useWishlistStore((s) => s.hasItem(product.id));
   const { vibrate } = useHaptic();
   const { toast } = useToast();
+  const { formatPrice } = useI18n();
 
   const discount = getDiscountPercent(product.price, product.comparePrice ?? null);
   const modelSlug = product.modelSlug || "iphone-15-pro";

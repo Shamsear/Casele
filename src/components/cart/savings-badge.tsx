@@ -1,10 +1,13 @@
-import { formatPrice } from "@/lib/utils";
+"use client";
+
+import { useI18n } from "@/lib/i18n/context";
 
 interface SavingsBadgeProps {
   savings: number;
 }
 
 export function SavingsBadge({ savings }: SavingsBadgeProps) {
+  const { formatPrice } = useI18n();
   if (savings <= 0) return null;
 
   return (

@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { ProductBadge } from "@/components/ui/badge";
 import { ProductCard } from "@/components/products/product-card";
 import { Reveal } from "@/components/ui/reveal";
+import { ProductGallery } from "@/components/products/product-gallery";
 import { Breadcrumbs } from "@/components/seo/breadcrumbs";
 import { FAQSchema, DEFAULT_FAQS } from "@/components/seo/faq-schema";
 import { ProductStructuredData } from "@/components/brand/structured-data";
@@ -13,7 +14,8 @@ import { useCartStore } from "@/lib/store/cart";
 import { useWishlistStore } from "@/lib/store/wishlist";
 import { useHaptic } from "@/hooks/use-haptic";
 import { useToast } from "@/components/ui/toast";
-import { formatPrice, getDiscountPercent } from "@/lib/utils";
+import { getDiscountPercent } from "@/lib/utils";
+import { useI18n } from "@/lib/i18n/context";
 import { addRecentlyViewed } from "@/lib/recently-viewed";
 import { StickyAddToCart } from "@/components/products/sticky-add-to-cart";
 import { buildWhatsAppMessage, openWhatsApp } from "@/lib/whatsapp";
@@ -45,6 +47,7 @@ export function ProductDetailClient({
   const isWishlisted = useWishlistStore((s) => s.hasItem(product.id));
   const { vibrate } = useHaptic();
   const { toast } = useToast();
+  const { formatPrice } = useI18n();
 
   const discount = getDiscountPercent(product.price, product.comparePrice);
 
@@ -116,26 +119,14 @@ export function ProductDetailClient({
         />
 
         <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
-          {/* Image */}
+          {/* Image Gallery */}
           <Reveal>
-            <div className="relative aspect-square overflow-hidden rounded-xl bg-black">
-              <Image
-                src={product.images[0]}
-                alt={`${product.name} — ${selectedModel.name} phone case by CASELÉ in Qatar`}
-                fill
-                className="object-contain p-8"
-                priority
-                sizes="(max-width: 768px) 100vw, 50vw"
-              />
-              <div className="absolute top-4 left-4 flex gap-2">
-                <ProductBadge badge={product.badge} />
-                {discount > 0 && (
-                  <span className="inline-flex items-center rounded-full bg-red-500 px-2.5 py-0.5 text-xs font-bold text-white">
-                    {discount}% OFF
-                  </span>
-                )}
-              </div>
-            </div>
+            <ProductGallery
+              images={product.images}
+              alt={`${product.name} — ${selectedModel.name} phone case by CASELÉ in Qatar`}
+              badge={product.badge}
+              discount={discount}
+            />
           </Reveal>
 
           {/* Details */}

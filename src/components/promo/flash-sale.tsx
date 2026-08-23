@@ -3,9 +3,10 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { formatPrice, getDiscountPercent } from "@/lib/utils";
+import { getDiscountPercent } from "@/lib/utils";
 import { useCartStore } from "@/lib/store/cart";
 import { useToast } from "@/components/ui/toast";
+import { useI18n } from "@/lib/i18n/context";
 
 interface FlashSaleProduct {
   id: string;
@@ -32,6 +33,7 @@ export function FlashSale({
   const [timeLeft, setTimeLeft] = useState({ hours: 0, minutes: 0, seconds: 0 });
   const addItem = useCartStore((s) => s.addItem);
   const { toast } = useToast();
+  const { formatPrice } = useI18n();
 
   // Countdown timer
   useEffect(() => {

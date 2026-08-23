@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useCartStore } from "@/lib/store/cart";
 import { useHaptic } from "@/hooks/use-haptic";
 import { useToast } from "@/components/ui/toast";
-import { formatPrice } from "@/lib/utils";
+import { useI18n } from "@/lib/i18n/context";
 import { buildWhatsAppMessage, openWhatsApp } from "@/lib/whatsapp";
 import { getWhatsAppNumber } from "@/lib/settings";
 
@@ -35,6 +35,7 @@ export function StickyAddToCart({
   const addItem = useCartStore((s) => s.addItem);
   const { vibrate } = useHaptic();
   const { toast } = useToast();
+  const { formatPrice } = useI18n();
 
   useEffect(() => {
     const handleScroll = () => {
