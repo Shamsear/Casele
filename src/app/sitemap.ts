@@ -1,10 +1,16 @@
 import { MetadataRoute } from "next";
-import { PRODUCTS, MODELS, CATEGORIES } from "@/lib/data";
+import { getAllProducts, getAllModels, getAllCategories } from "@/lib/db/products";
 
 const BASE_URL = "https://casele.qa";
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
+
+  const [products, models, categories] = await Promise.all([
+    getAllProducts(),
+    getAllModels(),
+    getAllCategories(),
+  ]);
 
   // Static pages with highest priority
   const staticPages: MetadataRoute.Sitemap = [
@@ -26,18 +32,36 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly",
       priority: 0.5,
     },
+    {
+      url: `${BASE_URL}/about`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.6,
+    },
+    {
+      url: `${BASE_URL}/contact`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.6,
+    },
+    {
+      url: `${BASE_URL}/faq`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.7,
+    },
   ];
 
-  // Model pages — high priority for device-specific searches
-  const modelPages: MetadataRoute.Sitemap = MODELS.map((model) => ({
+  // Model pages
+  const modelPages: MetadataRoute.Sitemap = models.map((model) => ({
     url: `${BASE_URL}/shop/${model.slug}`,
     lastModified: now,
     changeFrequency: "weekly" as const,
     priority: 0.8,
   }));
 
-  // Product pages — highest priority for transactional searches
-  const productPages: MetadataRoute.Sitemap = PRODUCTS.map((product) => ({
+  // Product pages
+  const productPages: MetadataRoute.Sitemap = products.map((product) => ({
     url: `${BASE_URL}/shop/${product.modelSlug}/${product.slug}`,
     lastModified: now,
     changeFrequency: "weekly" as const,
@@ -45,7 +69,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   }));
 
   // Category pages
-  const categoryPages: MetadataRoute.Sitemap = CATEGORIES.map((cat) => ({
+  const categoryPages: MetadataRoute.Sitemap = categories.map((cat) => ({
     url: `${BASE_URL}/category/${cat.slug}`,
     lastModified: now,
     changeFrequency: "weekly" as const,

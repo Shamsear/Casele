@@ -27,7 +27,7 @@ interface FlashSaleProps {
 export function FlashSale({
   products,
   endsAt,
-  title = "⚡ FLASH SALE",
+  title = "FLASH SALE",
 }: FlashSaleProps) {
   const [timeLeft, setTimeLeft] = useState({ hours: 0, minutes: 0, seconds: 0 });
   const addItem = useCartStore((s) => s.addItem);
@@ -123,8 +123,7 @@ export function FlashSale({
               {/* Low Stock Warning */}
               {product.stock < 10 && (
                 <div className="absolute top-3 right-3 z-10">
-                  <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/90 px-2 py-1 text-[10px] font-bold text-black">
-                    🔥 Only {product.stock} left!
+                  <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/90 px-2 py-1 text-[10px] font-bold text-black">                     Only {product.stock} left!
                   </span>
                 </div>
               )}

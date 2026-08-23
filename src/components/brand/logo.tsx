@@ -18,13 +18,14 @@ export function Logo({ className, size = "md", href = "/" }: LogoProps) {
   const { width, height } = sizes[size];
 
   return (
-    <Link href={href} className={cn("flex items-center", className)}>
+    <Link href={href} className={cn("flex items-center shrink-0", className)}>
       <Image
         src="/logo.png"
-        alt="CASELÉ — Premium Phone Cases in Qatar"
+        alt="CASELÉ"
         width={width}
         height={height}
-        className="h-auto w-auto"
+        className="h-auto w-auto max-h-full"
+        style={{ maxWidth: width }}
         priority
       />
     </Link>

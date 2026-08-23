@@ -48,12 +48,12 @@ export function FlashSaleBanner({
   const discountLabel =
     discountType === "percentage"
       ? `${discountValue}% OFF`
-      : `₹${discountValue} OFF`;
+      : `QR ${discountValue} OFF`;
 
   return (
     <div className="flex items-center justify-center gap-3 bg-gold/10 px-4 py-2 text-sm">
       <span className="font-semibold text-gold animate-pulse-gold">
-        🔥 {name}
+        {name}
       </span>
       <span className="rounded-full bg-gold px-2 py-0.5 text-xs font-bold text-black">
         {discountLabel}

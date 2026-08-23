@@ -24,6 +24,8 @@ export function Footer() {
               {[
                 { href: "/shop", label: "Shop All" },
                 { href: "/track", label: "Track Order" },
+                { href: "/about", label: "About Us" },
+                { href: "/faq", label: "FAQ" },
               ].map((link) => (
                 <li key={link.href}>
                   <a
@@ -71,9 +73,11 @@ export function Footer() {
           <p className="text-xs text-warm-gray/60">
             © {new Date().getFullYear()} CASELÉ. All rights reserved.
           </p>
-          <p className="text-xs text-warm-gray/60">
-            Delivering Style. Delivering Trust.
-          </p>
+          <div className="flex items-center gap-4 text-xs text-warm-gray/60">
+            <a href="/privacy" className="hover:text-white transition-colors">Privacy</a>
+            <a href="/terms" className="hover:text-white transition-colors">Terms</a>
+            <a href="/contact" className="hover:text-white transition-colors">Contact</a>
+          </div>
         </div>
       </div>
     </footer>

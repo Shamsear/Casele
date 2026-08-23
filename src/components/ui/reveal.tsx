@@ -20,11 +20,15 @@ export function Reveal({ children, className, delay = 0 }: RevealProps) {
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
-          setTimeout(() => setIsVisible(true), delay);
+          if (delay > 0) {
+            setTimeout(() => setIsVisible(true), delay);
+          } else {
+            setIsVisible(true);
+          }
           observer.unobserve(el);
         }
       },
-      { threshold: 0.1 }
+      { threshold: 0.05, rootMargin: "50px" }
     );
 
     observer.observe(el);
@@ -35,10 +39,10 @@ export function Reveal({ children, className, delay = 0 }: RevealProps) {
     <div
       ref={ref}
       className={cn(
-        "transition-all duration-700 ease-out",
+        "transition-all duration-500 ease-out",
         isVisible
           ? "opacity-100 translate-y-0"
-          : "opacity-0 translate-y-6",
+          : "opacity-0 translate-y-3",
         className
       )}
     >
@@ -59,7 +63,7 @@ export function StaggeredGrid({
     <div className={cn("grid", className)}>
       {Array.isArray(children)
         ? children.map((child, i) => (
-            <Reveal key={i} delay={i * 80}>
+            <Reveal key={i} delay={i * 60}>
               {child}
             </Reveal>
           ))

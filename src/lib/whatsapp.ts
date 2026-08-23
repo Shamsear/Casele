@@ -24,7 +24,7 @@ interface WhatsAppOrder {
 export function buildWhatsAppMessage(order: WhatsAppOrder): string {
   const lines: string[] = [];
 
-  lines.push("CASELÉ Order 🛍️");
+  lines.push("CASELÉ Order");
   lines.push("");
   lines.push(`Name: ${order.customerName}`);
   lines.push(`Phone: ${order.customerPhone}`);
@@ -61,7 +61,7 @@ export function buildWhatsAppMessage(order: WhatsAppOrder): string {
   lines.push("─────────────");
   lines.push(`Total: ${formatPrice(order.total)}`);
   lines.push("");
-  lines.push("Thank you for choosing CASELÉ! ✨");
+  lines.push("Thank you for choosing CASELÉ!");
 
   return lines.join("\n");
 }

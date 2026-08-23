@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { cn, formatPrice, getDiscountPercent } from "@/lib/utils";
 import { ProductBadge } from "@/components/ui/badge";
 import { useCartStore } from "@/lib/store/cart";
@@ -32,6 +33,7 @@ export function ProductCard({ product, className }: ProductCardProps) {
 
   const discount = getDiscountPercent(product.price, product.comparePrice ?? null);
   const modelSlug = product.modelSlug || "iphone-15-pro";
+  const imageUrl = product.images[0] || "/images/products/midnight-black.svg";
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -40,7 +42,7 @@ export function ProductCard({ product, className }: ProductCardProps) {
     addItem({
       productId: product.id,
       name: product.name,
-      image: product.images[0] || "/placeholder-case.jpg",
+      image: imageUrl,
       price: parseFloat(product.price),
       comparePrice: product.comparePrice
         ? parseFloat(product.comparePrice)
@@ -65,19 +67,20 @@ export function ProductCard({ product, className }: ProductCardProps) {
       className={cn(
         "group relative flex flex-col rounded-xl bg-cream/5 p-2 transition-all duration-300",
         "hover:bg-cream/10",
-        // Gold border trace on hover (desktop)
-        "before:absolute before:inset-0 before:rounded-xl before:border before:border-transparent before:transition-all before:duration-500",
+        "before:absolute before:inset-0 before:rounded-xl before:border before:border-transparent before:transition-all before:duration-300",
         "hover:before:border-gold/30",
         className
       )}
     >
       {/* Image */}
       <div className="relative aspect-square overflow-hidden rounded-lg bg-cream/5">
-        <div className="flex h-full items-center justify-center text-warm-gray/30">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="0.5" className="w-16 h-16">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 1.5H8.25A2.25 2.25 0 006 3.75v16.5a2.25 2.25 0 002.25 2.25h7.5A2.25 2.25 0 0018 20.25V3.75a2.25 2.25 0 00-2.25-2.25H13.5m-3 0V3h3V1.5m-3 0h3m-3 18.75h3" />
-          </svg>
-        </div>
+        <Image
+          src={imageUrl}
+          alt={`${product.name} — ${product.modelName} phone case by CASELÉ`}
+          fill
+          className="object-contain p-4 transition-transform duration-300 group-hover:scale-105"
+          sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, 25vw"
+        />
 
         {/* Badges */}
         <div className="absolute top-2 left-2 flex flex-col gap-1">

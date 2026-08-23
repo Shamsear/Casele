@@ -75,6 +75,146 @@ async function main() {
 
   console.log("✅ Phone models created");
 
+  // Create default products
+  const classicCat = await prisma.category.findUnique({ where: { slug: "classic" } });
+  const premiumCat = await prisma.category.findUnique({ where: { slug: "premium" } });
+  const sportCat = await prisma.category.findUnique({ where: { slug: "sport" } });
+  const designerCat = await prisma.category.findUnique({ where: { slug: "designer" } });
+
+  const iphone15Pro = await prisma.phoneModel.findUnique({ where: { slug: "iphone-15-pro" } });
+  const iphone15ProMax = await prisma.phoneModel.findUnique({ where: { slug: "iphone-15-pro-max" } });
+  const samsungS24 = await prisma.phoneModel.findUnique({ where: { slug: "samsung-galaxy-s24" } });
+  const samsungS24Ultra = await prisma.phoneModel.findUnique({ where: { slug: "samsung-galaxy-s24-ultra" } });
+  const pixel8Pro = await prisma.phoneModel.findUnique({ where: { slug: "google-pixel-8-pro" } });
+  const iphone15 = await prisma.phoneModel.findUnique({ where: { slug: "iphone-15" } });
+
+  const products = [
+    {
+      name: "Midnight Black Premium Case", slug: "midnight-black-premium-case",
+      description: "Crafted from premium materials, this case offers exceptional protection without compromising on style. The midnight black finish adds a touch of sophistication to your device.",
+      price: 79, comparePrice: 99, images: ["/images/products/midnight-black.svg"],
+      badge: "bestseller", isFeatured: true, categoryId: premiumCat?.id,
+    },
+    {
+      name: "Gold Edge Luxe Case", slug: "gold-edge-luxe-case",
+      description: "A statement piece for those who appreciate the finer things. Gold accents frame this premium case, making your device stand out from the crowd.",
+      price: 129, comparePrice: null, images: ["/images/products/gold-edge.svg"],
+      badge: "new", isFeatured: true, categoryId: premiumCat?.id,
+    },
+    {
+      name: "Royal Blue Classic Case", slug: "royal-blue-classic-case",
+      description: "Classic design meets modern protection. The deep royal blue color gives your phone a regal look while keeping it safe from daily wear.",
+      price: 59, comparePrice: 79, images: ["/images/products/royal-blue.svg"],
+      badge: "sale", isFeatured: false, categoryId: classicCat?.id,
+    },
+    {
+      name: "Matte Carbon Fiber Case", slug: "matte-carbon-fiber-case",
+      description: "Lightweight yet incredibly strong. The carbon fiber texture adds a sporty, tech-forward aesthetic to your device.",
+      price: 89, comparePrice: null, images: ["/images/products/carbon-fiber.svg"],
+      badge: null, isFeatured: true, categoryId: sportCat?.id,
+    },
+    {
+      name: "Clear Crystal Case", slug: "clear-crystal-case",
+      description: "Show off your phone's original design while keeping it protected. Crystal clear, anti-yellowing material.",
+      price: 49, comparePrice: null, images: ["/images/products/clear-crystal.svg"],
+      badge: null, isFeatured: false, categoryId: classicCat?.id,
+    },
+    {
+      name: "Rose Gold Slim Case", slug: "rose-gold-slim-case",
+      description: "Ultra-slim profile with a stunning rose gold finish. Elegant protection that slips easily into your pocket.",
+      price: 69, comparePrice: 89, images: ["/images/products/rose-gold.svg"],
+      badge: "sale", isFeatured: false, categoryId: designerCat?.id,
+    },
+    {
+      name: "Forest Green Leather Case", slug: "forest-green-leather-case",
+      description: "Premium leather with a rich forest green hue. Ages beautifully over time, developing a unique patina.",
+      price: 119, comparePrice: null, images: ["/images/products/forest-green.svg"],
+      badge: "new", isFeatured: true, categoryId: premiumCat?.id,
+    },
+    {
+      name: "Matte Black Armor Case", slug: "matte-black-armor-case",
+      description: "Maximum protection with a tactical look. Reinforced corners and raised edges for ultimate device safety.",
+      price: 99, comparePrice: null, images: ["/images/products/matte-black.svg"],
+      badge: "bestseller", isFeatured: true, categoryId: sportCat?.id,
+    },
+  ];
+
+  for (const product of products) {
+    const created = await prisma.product.upsert({
+      where: { slug: product.slug },
+      update: {},
+      create: {
+        name: product.name,
+        slug: product.slug,
+        description: product.description,
+        price: product.price,
+        comparePrice: product.comparePrice,
+        images: product.images,
+        badge: product.badge,
+        isFeatured: product.isFeatured,
+        categoryId: product.categoryId,
+      },
+    });
+
+    // Link to phone models
+    const modelLinks: { productId: string; modelId: string; stock: number }[] = [];
+    if (product.slug === "midnight-black-premium-case" && iphone15Pro && iphone15ProMax && samsungS24) {
+      modelLinks.push(
+        { productId: created.id, modelId: iphone15Pro.id, stock: 50 },
+        { productId: created.id, modelId: iphone15ProMax.id, stock: 30 },
+        { productId: created.id, modelId: samsungS24.id, stock: 20 },
+      );
+    } else if (product.slug === "gold-edge-luxe-case" && iphone15ProMax && iphone15Pro) {
+      modelLinks.push(
+        { productId: created.id, modelId: iphone15ProMax.id, stock: 25 },
+        { productId: created.id, modelId: iphone15Pro.id, stock: 25 },
+      );
+    } else if (product.slug === "royal-blue-classic-case" && samsungS24 && samsungS24Ultra && iphone15) {
+      modelLinks.push(
+        { productId: created.id, modelId: samsungS24.id, stock: 40 },
+        { productId: created.id, modelId: samsungS24Ultra.id, stock: 20 },
+        { productId: created.id, modelId: iphone15.id, stock: 15 },
+      );
+    } else if (product.slug === "matte-carbon-fiber-case" && pixel8Pro && iphone15Pro) {
+      modelLinks.push(
+        { productId: created.id, modelId: pixel8Pro.id, stock: 30 },
+        { productId: created.id, modelId: iphone15Pro.id, stock: 20 },
+      );
+    } else if (product.slug === "clear-crystal-case" && iphone15Pro && iphone15 && samsungS24) {
+      modelLinks.push(
+        { productId: created.id, modelId: iphone15Pro.id, stock: 60 },
+        { productId: created.id, modelId: iphone15.id, stock: 40 },
+        { productId: created.id, modelId: samsungS24.id, stock: 30 },
+      );
+    } else if (product.slug === "rose-gold-slim-case" && samsungS24Ultra && iphone15ProMax) {
+      modelLinks.push(
+        { productId: created.id, modelId: samsungS24Ultra.id, stock: 35 },
+        { productId: created.id, modelId: iphone15ProMax.id, stock: 20 },
+      );
+    } else if (product.slug === "forest-green-leather-case" && iphone15ProMax && iphone15Pro) {
+      modelLinks.push(
+        { productId: created.id, modelId: iphone15ProMax.id, stock: 15 },
+        { productId: created.id, modelId: iphone15Pro.id, stock: 15 },
+      );
+    } else if (product.slug === "matte-black-armor-case" && pixel8Pro && samsungS24Ultra && iphone15Pro) {
+      modelLinks.push(
+        { productId: created.id, modelId: pixel8Pro.id, stock: 25 },
+        { productId: created.id, modelId: samsungS24Ultra.id, stock: 20 },
+        { productId: created.id, modelId: iphone15Pro.id, stock: 30 },
+      );
+    }
+
+    for (const link of modelLinks) {
+      await prisma.productModel.upsert({
+        where: { productId_modelId: { productId: link.productId, modelId: link.modelId } },
+        update: {},
+        create: link,
+      });
+    }
+  }
+
+  console.log("✅ Products created and linked to models");
+
   // Create default settings (Qatar)
   const defaultSettings = [
     { key: "store_name", value: "CASELÉ" },

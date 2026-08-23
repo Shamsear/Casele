@@ -5,6 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { PRODUCTS, MODELS } from "@/lib/data";
 import { formatPrice } from "@/lib/utils";
+import { PhoneIcon } from "@/components/ui/icons";
 
 export function SearchBar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -140,7 +141,7 @@ export function SearchBar() {
                         }}
                         className="flex items-center gap-3 rounded-lg px-3 py-2 transition-colors hover:bg-black/50"
                       >
-                        <span className="text-lg">📱</span>
+                        <span className="text-lg text-warm-gray"><PhoneIcon size={20} /></span>
                         <div>
                           <p className="text-sm font-medium text-white">{model.name}</p>
                           <p className="text-xs text-warm-gray">{model.count} cases available</p>

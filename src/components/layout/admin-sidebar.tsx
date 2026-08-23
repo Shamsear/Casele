@@ -95,7 +95,7 @@ export function AdminSidebar() {
 
   return (
     <aside className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-64 lg:flex-col">
-      <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-black border-r border-dark-border px-6 py-4">
+      <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-black border-r border-dark-border px-4 py-4">
         <Link href="/admin">
           <Logo size="sm" />
         </Link>

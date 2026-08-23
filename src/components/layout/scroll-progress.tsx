@@ -1,16 +1,31 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 export function ScrollProgress() {
-  const [progress, setProgress] = useState(0);
+  const barRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const handleScroll = () => {
+    const bar = barRef.current;
+    if (!bar) return;
+
+    let ticking = false;
+
+    const updateProgress = () => {
       const totalHeight =
         document.documentElement.scrollHeight - window.innerHeight;
-      const current = window.scrollY;
-      setProgress(totalHeight > 0 ? (current / totalHeight) * 100 : 0);
+      if (totalHeight > 0) {
+        const progress = (window.scrollY / totalHeight) * 100;
+        bar.style.width = `${Math.min(100, progress)}%`;
+      }
+      ticking = false;
+    };
+
+    const handleScroll = () => {
+      if (!ticking) {
+        requestAnimationFrame(updateProgress);
+        ticking = true;
+      }
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });
@@ -18,10 +33,11 @@ export function ScrollProgress() {
   }, []);
 
   return (
-    <div className="fixed top-0 left-0 right-0 z-[60] h-0.5">
+    <div className="fixed top-0 left-0 right-0 z-[60] h-0.5 pointer-events-none">
       <div
-        className="h-full bg-gold transition-[width] duration-100 ease-out"
-        style={{ width: `${progress}%` }}
+        ref={barRef}
+        className="h-full bg-gold will-change-[width]"
+        style={{ width: "0%" }}
       />
     </div>
   );

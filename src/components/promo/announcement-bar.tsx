@@ -4,15 +4,15 @@ import { useState, useEffect } from "react";
 
 const ANNOUNCEMENTS = [
   {
-    text: "🎉 20% OFF First Order — Use Code: WELCOME20",
+    text: "20% OFF First Order — Use Code: WELCOME20",
     link: "/shop",
   },
   {
-    text: "🚚 FREE Delivery on orders over QR 100!",
+    text: "FREE Delivery on orders over QR 100!",
     link: "/shop",
   },
   {
-    text: "⚡ Flash Sale: Up to 40% OFF — Limited Time Only!",
+    text: "Flash Sale: Up to 40% OFF — Limited Time Only!",
     link: "/shop",
   },
 ];
@@ -38,7 +38,7 @@ export function AnnouncementBar() {
           href={ANNOUNCEMENTS[current].link}
           className="flex items-center gap-2 text-sm font-medium transition-opacity hover:opacity-80"
         >
-          <span className="hidden sm:inline">✨</span>
+
           <span>{ANNOUNCEMENTS[current].text}</span>
           <svg
             viewBox="0 0 20 20"
