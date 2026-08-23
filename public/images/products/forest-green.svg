@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" fill="none">
+  <rect width="400" height="400" fill="#0D0D0D"/>
+  <rect x="120" y="40" width="160" height="320" rx="24" fill="#1A2E1A" stroke="#2D5A2D" stroke-width="1.5"/>
+  <rect x="140" y="60" width="50" height="50" rx="12" fill="#2D4A2D"/>
+  <circle cx="155" cy="75" r="8" fill="#3D6A3D" opacity="0.5"/>
+  <circle cx="175" cy="75" r="8" fill="#3D6A3D" opacity="0.5"/>
+  <circle cx="155" cy="95" r="8" fill="#3D6A3D" opacity="0.5"/>
+  <rect x="140" y="180" width="120" height="1" fill="#D4AF37" opacity="0.4"/>
+  <text x="200" y="220" text-anchor="middle" font-family="serif" font-size="32" fill="#D4AF37" opacity="0.3">É</text>
+  <text x="200" y="300" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#D4AF37" letter-spacing="4" opacity="0.4">CASELÉ</text>
+</svg>

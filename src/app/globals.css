@@ -1,0 +1,180 @@
+@import "tailwindcss";
+
+@theme inline {
+  /* CASELÉ Brand Colors */
+  --color-black: #0D0D0D;
+  --color-gold: #D4AF37;
+  --color-cream: #F5EBDD;
+  --color-white: #FAFAF8;
+  --color-warm-gray: #A89B8C;
+  --color-gold-light: #E8D5A3;
+  --color-dark-surface: #1A1A1A;
+  --color-dark-border: #2A2A2A;
+
+  /* Semantic colors */
+  --color-background: var(--color-black);
+  --color-foreground: var(--color-white);
+  --color-muted: var(--color-warm-gray);
+  --color-card: var(--color-dark-surface);
+  --color-card-border: var(--color-dark-border);
+
+  /* Typography */
+  --font-display: "Cormorant Garamond", Georgia, serif;
+  --font-body: "Inter", system-ui, sans-serif;
+
+  /* Type scale */
+  --text-hero: 3rem;
+  --text-h1: 2.25rem;
+  --text-h2: 1.5rem;
+  --text-h3: 1.125rem;
+  --text-price: 1.75rem;
+
+  /* Animations */
+  --animate-fade-up: fade-up 0.5s ease-out forwards;
+  --animate-slide-up: slide-up 0.3s ease-out;
+  --animate-slide-down: slide-down 0.3s ease-out;
+  --animate-pulse-gold: pulse-gold 2s ease-in-out infinite;
+  --animate-shimmer: shimmer 2s infinite;
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slide-up {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes slide-down {
+  from {
+    transform: translateY(-100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse-gold {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(212, 175, 55, 0);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* Base styles */
+:root {
+  color-scheme: dark;
+}
+
+body {
+  background: var(--color-black);
+  color: var(--color-white);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-black);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-dark-border);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-warm-gray);
+}
+
+/* Selection */
+::selection {
+  background: rgba(212, 175, 55, 0.3);
+  color: var(--color-white);
+}
+
+/* Focus ring */
+*:focus-visible {
+  outline: 2px solid var(--color-gold);
+  outline-offset: 2px;
+}
+
+/* Light mode */
+.light {
+  color-scheme: light;
+}
+
+.light body,
+.light {
+  background: var(--color-cream);
+  color: var(--color-black);
+}
+
+/* Product card gold border trace */
+@keyframes border-trace {
+  0% {
+    clip-path: inset(0 100% 100% 0);
+  }
+  25% {
+    clip-path: inset(0 0 100% 0);
+  }
+  50% {
+    clip-path: inset(0 0 0 0);
+  }
+  75% {
+    clip-path: inset(0 0 0 0);
+  }
+  100% {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+/* Skeleton loading */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--color-dark-surface) 25%,
+    var(--color-dark-border) 50%,
+    var(--color-dark-surface) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+}
+
+.light .skeleton {
+  background: linear-gradient(
+    90deg,
+    #e8e0d4 25%,
+    #f0e8dc 50%,
+    #e8e0d4 75%
+  );
+  background-size: 200% 100%;
+}

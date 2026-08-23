@@ -1,0 +1,31 @@
+# robots.txt for CASELÉ — https://casele.qa
+
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /api/
+Disallow: /_next/
+
+# Google-specific
+User-agent: Googlebot
+Allow: /
+Disallow: /admin
+Disallow: /api/
+
+# Bing-specific
+User-agent: Bingbot
+Allow: /
+Disallow: /admin
+Disallow: /api/
+
+# Block AI crawlers from scraping product data
+User-agent: GPTBot
+Disallow: /
+
+User-agent: ChatGPT-User
+Disallow: /
+
+User-agent: CCBot
+Disallow: /
+
+Sitemap: https://casele.qa/sitemap.xml
