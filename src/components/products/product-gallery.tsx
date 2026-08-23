@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 
@@ -19,22 +19,63 @@ export function ProductGallery({ images, alt, badge, discount }: ProductGalleryP
 
   const allImages = images.length > 0 ? images : ["/images/products/midnight-black.svg"];
 
-  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+  // Close zoom when clicking outside the image
+  useEffect(() => {
+    if (!isZoomed) return;
+
+    const handleClickOutside = (e: MouseEvent | TouchEvent) => {
+      if (imageRef.current && !imageRef.current.contains(e.target as Node)) {
+        setIsZoomed(false);
+      }
+    };
+
+    // Use setTimeout to avoid catching the same click that opened the zoom
+    const timer = setTimeout(() => {
+      document.addEventListener("click", handleClickOutside);
+      document.addEventListener("touchstart", handleClickOutside);
+    }, 0);
+
+    return () => {
+      clearTimeout(timer);
+      document.removeEventListener("click", handleClickOutside);
+      document.removeEventListener("touchstart", handleClickOutside);
+    };
+  }, [isZoomed]);
+
+  const handleImageClick = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
     if (!imageRef.current) return;
+
+    if (isZoomed) {
+      // Already zoomed — clicking the image closes it
+      setIsZoomed(false);
+    } else {
+      // Not zoomed — clicking opens zoom and sets position to click point
+      const rect = imageRef.current.getBoundingClientRect();
+      const x = ((e.clientX - rect.left) / rect.width) * 100;
+      const y = ((e.clientY - rect.top) / rect.height) * 100;
+      setZoomPos({ x, y });
+      setIsZoomed(true);
+    }
+  }, [isZoomed]);
+
+  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    if (!isZoomed || !imageRef.current) return;
     const rect = imageRef.current.getBoundingClientRect();
     const x = ((e.clientX - rect.left) / rect.width) * 100;
     const y = ((e.clientY - rect.top) / rect.height) * 100;
     setZoomPos({ x, y });
-  }, []);
+  }, [isZoomed]);
 
   return (
     <div className="flex flex-col gap-4">
       {/* Main Image */}
       <div
         ref={imageRef}
-        className="relative aspect-square overflow-hidden rounded-xl bg-black cursor-crosshair"
-        onMouseEnter={() => setIsZoomed(true)}
-        onMouseLeave={() => setIsZoomed(false)}
+        className={cn(
+          "relative aspect-square overflow-hidden rounded-xl bg-black",
+          isZoomed ? "cursor-zoom-out" : "cursor-zoom-in"
+        )}
+        onClick={handleImageClick}
         onMouseMove={handleMouseMove}
       >
         <Image
@@ -42,8 +83,8 @@ export function ProductGallery({ images, alt, badge, discount }: ProductGalleryP
           alt={`${alt} — image ${activeIndex + 1} of ${allImages.length}`}
           fill
           className={cn(
-            "object-contain p-8 transition-transform duration-200",
-            isZoomed && "scale-150"
+            "object-contain p-8 transition-transform duration-300 ease-out",
+            isZoomed && "scale-[2.5]"
           )}
           style={
             isZoomed
@@ -83,9 +124,14 @@ export function ProductGallery({ images, alt, badge, discount }: ProductGalleryP
         )}
 
         {/* Zoom hint */}
+        {!isZoomed && (
+          <div className="absolute bottom-4 left-4 rounded-full bg-black/60 px-3 py-1 text-xs text-white/70 backdrop-blur-sm z-10">
+            Click to zoom
+          </div>
+        )}
         {isZoomed && (
           <div className="absolute bottom-4 left-4 rounded-full bg-black/60 px-3 py-1 text-xs text-white backdrop-blur-sm z-10">
-            Zoomed — move mouse to pan
+            Move mouse to pan — click to close
           </div>
         )}
       </div>
@@ -96,7 +142,11 @@ export function ProductGallery({ images, alt, badge, discount }: ProductGalleryP
           {allImages.map((image, index) => (
             <button
               key={index}
-              onClick={() => setActiveIndex(index)}
+              onClick={(e) => {
+                e.stopPropagation();
+                setActiveIndex(index);
+                setIsZoomed(false);
+              }}
               className={cn(
                 "relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-lg border-2 transition-all",
                 activeIndex === index

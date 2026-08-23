@@ -35,7 +35,7 @@ const securityHeaders = [
       "default-src 'self'",
       "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://js.stripe.com",
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-      "img-src 'self' data: blob: https://ik.imagekit.io https://*.r2.cloudflarestorage.com",
+      "img-src 'self' data: blob: https://ik.imagekit.io https://*.r2.cloudflarestorage.com https://images.unsplash.com",
       "font-src 'self' https://fonts.gstatic.com",
       "connect-src 'self' https://upload.imagekit.io https://*.r2.cloudflarestorage.com",
       "frame-src 'self' https://js.stripe.com",
@@ -75,6 +75,10 @@ const nextConfig: NextConfig = {
       {
         protocol: "https",
         hostname: "*.r2.cloudflarestorage.com",
+      },
+      {
+        protocol: "https",
+        hostname: "images.unsplash.com",
       },
     ],
   },
