@@ -1,11 +1,10 @@
 "use client";
 
-import { useState, useRef, useCallback } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { cn, getDiscountPercent } from "@/lib/utils";
 import { useI18n } from "@/lib/i18n/context";
-import { ProductBadge } from "@/components/ui/badge";
 import { Price } from "@/components/ui/price";
 import { useCartStore } from "@/lib/store/cart";
 import { useWishlistStore } from "@/lib/store/wishlist";
@@ -35,28 +34,14 @@ export function ProductCard({ product, className, index = 0 }: ProductCardProps)
   const isWishlisted = useWishlistStore((s) => s.hasItem(product.id));
   const { vibrate } = useHaptic();
   const { toast } = useToast();
-  const { formatPrice } = useI18n();
-  const cardRef = useRef<HTMLAnchorElement>(null);
 
   const [isAdded, setIsAdded] = useState(false);
-  const [heartAnim, setHeartAnim] = useState(false);
 
   const discount = getDiscountPercent(product.price, product.comparePrice ?? null);
   const modelSlug = product.modelSlug || "iphone-15-pro";
   const imageUrl = product.images[0] || "/images/products/midnight-black.svg";
   const hasSecondImage = product.images.length > 1;
   const secondImageUrl = hasSecondImage ? product.images[1] : null;
-  const isTrending = (product.orderCount ?? 0) > 5;
-
-  // Spotlight mouse tracking
-  const handleMouseMove = useCallback((e: React.MouseEvent) => {
-    if (!cardRef.current) return;
-    const rect = cardRef.current.getBoundingClientRect();
-    const x = ((e.clientX - rect.left) / rect.width) * 100;
-    const y = ((e.clientY - rect.top) / rect.height) * 100;
-    cardRef.current.style.setProperty("--mouse-x", `${x}%`);
-    cardRef.current.style.setProperty("--mouse-y", `${y}%`);
-  }, []);
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -76,7 +61,7 @@ export function ProductCard({ product, className, index = 0 }: ProductCardProps)
 
     vibrate(10);
     setIsAdded(true);
-    toast(`${product.name} added to cart`);
+    toast(`${product.name} added to bag`);
 
     setTimeout(() => setIsAdded(false), 1500);
   };
@@ -85,79 +70,70 @@ export function ProductCard({ product, className, index = 0 }: ProductCardProps)
     e.preventDefault();
     e.stopPropagation();
     toggleWishlist(product.id);
-    setHeartAnim(true);
     vibrate(5);
-    setTimeout(() => setHeartAnim(false), 400);
   };
 
   return (
-    <Link
-      ref={cardRef}
-      href={`/shop/${modelSlug}/${product.slug}`}
-      onMouseMove={handleMouseMove}
+    <div
       className={cn(
-        "spotlight-card group relative flex flex-col rounded-2xl border border-dark-border/40 bg-dark-surface/40 overflow-hidden transition-all duration-300",
-        "hover:border-gold/30 hover:bg-dark-surface/70 hover:shadow-xl hover:shadow-gold/5",
-        "active:scale-[0.99]",
+        "group relative flex flex-col border border-dark-border bg-[#0E0E0E] transition-colors hover:border-white/30",
         className
       )}
     >
-      {/* ═══ Image Area ═══ */}
-      <div className="relative aspect-square w-full overflow-hidden bg-black/40">
-        {/* Primary image */}
+      {/* ═══ Image Frame ═══ */}
+      <Link
+        href={`/shop/${modelSlug}/${product.slug}`}
+        className="relative aspect-square w-full overflow-hidden bg-[#141414] block"
+      >
+        {/* Primary Product Image */}
         <Image
           src={imageUrl}
-          alt={`${product.name} — ${product.modelName} phone case by CASELE`}
+          alt={product.name}
           fill
           className={cn(
-            "object-contain p-4 transition-all duration-500 ease-out",
-            "group-hover:scale-105",
+            "object-contain p-6 transition-all duration-300 ease-out",
             hasSecondImage && "group-hover:opacity-0"
           )}
-          sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, 25vw"
+          sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
         />
 
-        {/* Second image — crossfade on hover */}
+        {/* Secondary Angle on Hover */}
         {secondImageUrl && (
           <Image
             src={secondImageUrl}
-            alt={`${product.name} — alternate view`}
+            alt={`${product.name} alternate view`}
             fill
-            className="object-contain p-4 transition-all duration-500 ease-out opacity-0 scale-100 group-hover:opacity-100 group-hover:scale-105"
-            sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, 25vw"
+            className="object-contain p-6 transition-all duration-300 ease-out opacity-0 group-hover:opacity-100"
+            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
           />
         )}
 
-        {/* Badges */}
-        <div className="absolute top-2.5 left-2.5 flex flex-col gap-1.5 z-10 pointer-events-none">
-          <ProductBadge badge={product.badge} />
-          {discount > 0 && (
-            <span className="inline-flex items-center rounded-full bg-red-500/90 px-2 py-0.5 text-[10px] font-bold text-white shadow-sm">
-              {discount}% OFF
+        {/* Minimal Badges */}
+        <div className="absolute top-3 left-3 flex flex-col gap-1 z-10 pointer-events-none">
+          {product.badge && (
+            <span className="bg-black/90 border border-white/10 px-2 py-0.5 text-[9px] font-semibold tracking-widest text-white uppercase">
+              {product.badge}
             </span>
           )}
-          {isTrending && !product.badge && (
-            <span className="inline-flex items-center rounded-full bg-gold/20 border border-gold/40 px-2 py-0.5 text-[10px] font-bold text-gold">
-              TRENDING
+          {discount > 0 && (
+            <span className="bg-[#B91C1C] px-2 py-0.5 text-[9px] font-semibold tracking-wider text-white uppercase">
+              -{discount}%
             </span>
           )}
         </div>
 
-        {/* Wishlist heart */}
+        {/* Wishlist Icon */}
         <button
           onClick={handleWishlist}
           aria-label="Wishlist"
-          className="absolute top-2.5 right-2.5 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-black/50 backdrop-blur-md transition-all duration-200 hover:bg-black/80 hover:scale-110"
+          className="absolute top-3 right-3 z-10 flex h-7 w-7 items-center justify-center bg-black/60 text-white/70 backdrop-blur-sm transition-colors hover:text-white hover:bg-black"
         >
           <svg
             viewBox="0 0 24 24"
-            fill={isWishlisted ? "#D4AF37" : "none"}
-            stroke={isWishlisted ? "#D4AF37" : "white"}
+            fill={isWishlisted ? "#C5A869" : "none"}
+            stroke={isWishlisted ? "#C5A869" : "currentColor"}
             strokeWidth="1.5"
-            className={cn(
-              "w-4 h-4 transition-all duration-300",
-              heartAnim && "animate-heart-pop"
-            )}
+            className="w-3.5 h-3.5"
           >
             <path
               strokeLinecap="round"
@@ -166,48 +142,37 @@ export function ProductCard({ product, className, index = 0 }: ProductCardProps)
             />
           </svg>
         </button>
-      </div>
+      </Link>
 
-      {/* ═══ Product Info ═══ */}
-      <div className="flex flex-1 flex-col p-3 sm:p-4">
-        <p className="text-[10px] text-warm-gray/60 tracking-widest uppercase font-medium">
+      {/* ═══ Details & Actions ═══ */}
+      <div className="flex flex-1 flex-col p-4">
+        <p className="text-[10px] text-warm-gray uppercase tracking-widest font-medium">
           {product.modelName}
         </p>
-        <h3 className="mt-1 text-sm font-medium text-white line-clamp-1 group-hover:text-gold transition-colors duration-200">
-          {product.name}
-        </h3>
 
-        <div className="mt-auto pt-2.5">
-          <Price price={product.price} comparePrice={product.comparePrice} size="sm" />
-        </div>
-
-        {/* Add to Cart button */}
-        <button
-          onClick={handleAddToCart}
-          className={cn(
-            "mt-2.5 flex h-9 items-center justify-center gap-1.5 rounded-xl text-xs font-semibold transition-all duration-200 active:scale-[0.97]",
-            isAdded
-              ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/40"
-              : "bg-dark-surface border border-dark-border text-white hover:border-gold/40 hover:text-gold"
-          )}
+        <Link
+          href={`/shop/${modelSlug}/${product.slug}`}
+          className="mt-1 font-display text-base text-white hover:text-gold transition-colors line-clamp-1"
         >
-          {isAdded ? (
-            <>
-              <svg viewBox="0 0 20 20" fill="currentColor" className="w-3.5 h-3.5">
-                <path fillRule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clipRule="evenodd" />
-              </svg>
-              Added
-            </>
-          ) : (
-            <>
-              <svg viewBox="0 0 20 20" fill="currentColor" className="w-3 h-3 text-gold">
-                <path d="M10.75 4.75a.75.75 0 00-1.5 0v4.5h-4.5a.75.75 0 000 1.5h4.5v4.5a.75.75 0 001.5 0v-4.5h4.5a.75.75 0 000-1.5h-4.5v-4.5z" />
-              </svg>
-              Add to Cart
-            </>
-          )}
-        </button>
+          {product.name}
+        </Link>
+
+        <div className="mt-auto pt-3 flex items-center justify-between">
+          <Price price={product.price} comparePrice={product.comparePrice} size="sm" showBadge={false} />
+
+          <button
+            onClick={handleAddToCart}
+            className={cn(
+              "px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wider transition-colors",
+              isAdded
+                ? "bg-white text-black"
+                : "border border-white/20 text-white hover:border-gold hover:text-gold"
+            )}
+          >
+            {isAdded ? "Added" : "+ Add"}
+          </button>
+        </div>
       </div>
-    </Link>
+    </div>
   );
 }

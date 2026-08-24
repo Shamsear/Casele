@@ -2,7 +2,6 @@
 
 import { useState, useMemo } from "react";
 import { ProductCard } from "@/components/products/product-card";
-import { Reveal, StaggeredGrid } from "@/components/ui/reveal";
 import { cn } from "@/lib/utils";
 import type { ProductWithRelations, ModelWithCount } from "@/lib/db/products";
 
@@ -13,16 +12,15 @@ interface ShopPageClientProps {
 }
 
 const SORT_OPTIONS = [
-  { value: "newest", label: "Newest" },
+  { value: "newest", label: "Newest Releases" },
   { value: "price-low", label: "Price: Low to High" },
   { value: "price-high", label: "Price: High to Low" },
-  { value: "popular", label: "Most Popular" },
+  { value: "popular", label: "Most In-Demand" },
 ];
 
 export function ShopPageClient({ products, models, brands }: ShopPageClientProps) {
   const [activeBrand, setActiveBrand] = useState("All");
   const [sort, setSort] = useState("newest");
-  const [layout, setLayout] = useState<"grid" | "large">("grid");
 
   const filtered = useMemo(() => {
     let result =
@@ -48,114 +46,75 @@ export function ShopPageClient({ products, models, brands }: ShopPageClientProps
   }, [products, activeBrand, sort]);
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-8 lg:px-8">
-      {/* Page header */}
-      <Reveal>
-        <div className="mb-8">
-          <p className="text-xs font-medium text-gold tracking-widest uppercase mb-2">Browse Collection</p>
-          <h1 className="font-display text-3xl font-bold text-white md:text-4xl">Shop All Cases</h1>
-          <p className="mt-2 text-warm-gray">
-            <span className="text-white font-semibold">{filtered.length}</span> cases available — find the perfect case for your phone
-          </p>
-        </div>
-      </Reveal>
+    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10 sm:py-16">
+      {/* Editorial Catalog Header */}
+      <div className="mb-12 pb-6 border-b border-dark-border">
+        <p className="text-[11px] font-semibold text-gold tracking-widest uppercase mb-1">
+          Catalog
+        </p>
+        <h1 className="font-display text-4xl sm:text-5xl font-normal text-white">
+          The Full Collection
+        </h1>
+        <p className="mt-2 text-xs sm:text-sm text-warm-gray">
+          Displaying {filtered.length} curated protection styles
+        </p>
+      </div>
 
-      {/* Filters bar */}
-      <Reveal delay={100}>
-        <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between rounded-2xl border border-dark-border/50 bg-dark-surface/30 p-4 backdrop-blur-sm">
-          {/* Brand filters */}
-          <div className="flex gap-2 flex-wrap">
-            {brands.map((brand) => (
-              <button
-                key={brand}
-                onClick={() => setActiveBrand(brand)}
-                className={cn(
-                  "rounded-xl px-4 py-2 text-sm font-medium transition-all duration-300 active:scale-95",
-                  activeBrand === brand
-                    ? "bg-gold text-black shadow-md shadow-gold/20"
-                    : "bg-dark-surface/50 text-warm-gray hover:text-white hover:bg-dark-surface"
-                )}
-              >
-                {brand}
-              </button>
-            ))}
-          </div>
-
-          <div className="flex items-center gap-3">
-            {/* Layout toggle */}
-            <div className="hidden sm:flex items-center gap-1 rounded-xl border border-dark-border p-1">
-              <button
-                onClick={() => setLayout("grid")}
-                className={cn(
-                  "flex h-8 w-8 items-center justify-center rounded-lg transition-all",
-                  layout === "grid" ? "bg-gold/10 text-gold" : "text-warm-gray hover:text-white"
-                )}
-              >
-                <svg viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
-                  <path fillRule="evenodd" d="M4.25 2A2.25 2.25 0 002 4.25v2.5A2.25 2.25 0 004.25 9h2.5A2.25 2.25 0 009 6.75v-2.5A2.25 2.25 0 006.75 2h-2.5zm0 9A2.25 2.25 0 002 13.25v2.5A2.25 2.25 0 004.25 18h2.5A2.25 2.25 0 009 15.75v-2.5A2.25 2.25 0 006.75 11h-2.5zm9-9A2.25 2.25 0 0011 4.25v2.5A2.25 2.25 0 0013.25 9h2.5A2.25 2.25 0 0018 6.75v-2.5A2.25 2.25 0 0015.75 2h-2.5zm0 9A2.25 2.25 0 0011 13.25v2.5A2.25 2.25 0 0013.25 18h2.5A2.25 2.25 0 0018 15.75v-2.5A2.25 2.25 0 0015.75 11h-2.5z" clipRule="evenodd" />
-                </svg>
-              </button>
-              <button
-                onClick={() => setLayout("large")}
-                className={cn(
-                  "flex h-8 w-8 items-center justify-center rounded-lg transition-all",
-                  layout === "large" ? "bg-gold/10 text-gold" : "text-warm-gray hover:text-white"
-                )}
-              >
-                <svg viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
-                  <path fillRule="evenodd" d="M2 3.75A.75.75 0 012.75 3h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 3.75zm0 4.167a.75.75 0 01.75-.75h14.5a.75.75 0 010 1.5H2.75a.75.75 0 01-.75-.75zm0 4.166a.75.75 0 01.75-.75h14.5a.75.75 0 010 1.5H2.75a.75.75 0 01-.75-.75zm0 4.167a.75.75 0 01.75-.75h14.5a.75.75 0 010 1.5H2.75a.75.75 0 01-.75-.75z" clipRule="evenodd" />
-                </svg>
-              </button>
-            </div>
-
-            {/* Sort */}
-            <select
-              value={sort}
-              onChange={(e) => setSort(e.target.value)}
-              className="h-10 rounded-xl border border-dark-border bg-dark-surface/50 px-3 text-sm text-white focus:border-gold/50 focus:outline-none cursor-pointer transition-colors"
+      {/* Filter & Sort Bar */}
+      <div className="mb-10 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between pb-4 border-b border-dark-border/40">
+        {/* Brand Tabs */}
+        <div className="flex gap-4 sm:gap-6 flex-wrap">
+          {brands.map((brand) => (
+            <button
+              key={brand}
+              onClick={() => setActiveBrand(brand)}
+              className={cn(
+                "text-xs font-semibold uppercase tracking-widest transition-colors py-1",
+                activeBrand === brand
+                  ? "text-white border-b-2 border-gold"
+                  : "text-warm-gray hover:text-white"
+              )}
             >
-              {SORT_OPTIONS.map((opt) => (
-                <option key={opt.value} value={opt.value}>{opt.label}</option>
-              ))}
-            </select>
-          </div>
+              {brand}
+            </button>
+          ))}
         </div>
-      </Reveal>
 
-      {/* Products grid */}
-      <div
-        className={cn(
-          "grid gap-4 md:gap-6 transition-all duration-300",
-          layout === "large"
-            ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
-            : "grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
-        )}
-      >
+        {/* Sort Select */}
+        <div className="flex items-center gap-2">
+          <span className="text-[11px] text-warm-gray uppercase tracking-widest font-medium">Sort:</span>
+          <select
+            value={sort}
+            onChange={(e) => setSort(e.target.value)}
+            className="border border-dark-border bg-black px-3 py-1.5 text-xs text-white uppercase tracking-wider focus:border-gold focus:outline-none cursor-pointer"
+          >
+            {SORT_OPTIONS.map((opt) => (
+              <option key={opt.value} value={opt.value} className="bg-black text-white">
+                {opt.label}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+
+      {/* Products Grid */}
+      <div className="grid grid-cols-2 gap-4 sm:gap-6 lg:grid-cols-4">
         {filtered.map((product, i) => (
-          <Reveal key={product.id} delay={Math.min(i * 50, 400)}>
-            <ProductCard product={product} index={i} />
-          </Reveal>
+          <ProductCard key={product.id} product={product} index={i} />
         ))}
       </div>
 
       {filtered.length === 0 && (
-        <Reveal>
-          <div className="py-20 text-center">
-            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-dark-surface text-warm-gray/30">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-8 h-8">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
-              </svg>
-            </div>
-            <p className="text-lg font-semibold text-white">No cases found</p>
-            <p className="mt-1 text-sm text-warm-gray">Try a different filter or browse all our cases</p>
-            <button
-              onClick={() => setActiveBrand("All")}
-              className="mt-4 rounded-xl bg-gold/10 px-6 py-2.5 text-sm font-medium text-gold transition-all hover:bg-gold/20"
-            >
-              Clear filters
-            </button>
-          </div>
-        </Reveal>
+        <div className="py-24 text-center border border-dark-border bg-[#0D0D0D]">
+          <p className="text-sm uppercase tracking-widest text-white font-medium">No items found</p>
+          <p className="mt-1 text-xs text-warm-gray">Try selecting a different brand category</p>
+          <button
+            onClick={() => setActiveBrand("All")}
+            className="mt-6 border border-white/20 px-6 py-2.5 text-xs uppercase tracking-widest text-white hover:border-white hover:bg-white/5 transition-colors"
+          >
+            Reset Filters
+          </button>
+        </div>
       )}
     </div>
   );
