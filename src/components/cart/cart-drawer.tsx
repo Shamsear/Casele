@@ -76,11 +76,16 @@ export function CartDrawer() {
     openWhatsApp(whatsappNumber, message);
   };
 
+  const deliveryThreshold = 100;
+  const currentSubtotal = subtotal();
+  const progressPercent = Math.min(100, (currentSubtotal / deliveryThreshold) * 100);
+  const qualifiesForFreeDelivery = currentSubtotal >= deliveryThreshold;
+
   return (
     <>
       {/* Backdrop */}
       <div
-        className={`fixed inset-0 z-50 bg-black/60 backdrop-blur-sm transition-opacity duration-300 ${
+        className={`fixed inset-0 z-50 bg-black/70 backdrop-blur-md transition-opacity duration-400 ${
           isOpen ? "opacity-100" : "pointer-events-none opacity-0"
         }`}
         onClick={() => setOpen(false)}
@@ -88,19 +93,19 @@ export function CartDrawer() {
 
       {/* Drawer */}
       <div
-        className={`fixed right-0 top-0 z-50 flex h-full w-full max-w-md flex-col bg-dark-surface shadow-2xl transition-transform duration-300 ease-out ${
+        className={`fixed right-0 top-0 z-50 flex h-full w-full max-w-md flex-col bg-dark-surface shadow-2xl shadow-black/50 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
           isOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-dark-border px-6 py-4">
+        <div className="flex items-center justify-between border-b border-dark-border px-6 py-5">
           <div>
-            <h2 className="font-display text-lg font-bold text-white">Your Cart</h2>
-            <p className="text-xs text-warm-gray">{itemCount} {itemCount === 1 ? "item" : "items"}</p>
+            <h2 className="font-display text-xl font-bold text-white">Your Cart</h2>
+            <p className="text-xs text-warm-gray mt-0.5">{itemCount} {itemCount === 1 ? "item" : "items"}</p>
           </div>
           <button
             onClick={() => setOpen(false)}
-            className="flex h-8 w-8 items-center justify-center rounded-lg text-warm-gray transition-colors hover:text-white"
+            className="flex h-9 w-9 items-center justify-center rounded-xl text-warm-gray transition-all hover:text-white hover:bg-dark-surface active:scale-90"
           >
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-5 h-5">
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -108,55 +113,67 @@ export function CartDrawer() {
           </button>
         </div>
 
-        {/* Free Delivery Threshold */}
-        {subtotal() < 100 && (
-          <div className="mx-6 mt-4 rounded-xl bg-emerald-500/10 p-3">
+        {/* Free Delivery Progress */}
+        <div className="mx-6 mt-4 rounded-2xl bg-dark-surface/80 border border-dark-border/50 p-4">
+          {qualifiesForFreeDelivery ? (
             <div className="flex items-center gap-2 text-sm text-emerald-400">
-              <TruckIcon size={16} />
-              <span className="font-medium">
-                Add QR {Math.ceil(100 - subtotal())} more for FREE delivery!
-              </span>
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-500/20">
+                <svg viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
+                  <path fillRule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <span className="font-semibold">🎉 You qualify for FREE delivery!</span>
             </div>
-            <div className="mt-2 h-2 overflow-hidden rounded-full bg-dark-border">
-              <div
-                className="h-full rounded-full bg-gradient-to-r from-emerald-500 to-emerald-400 transition-all duration-500"
-                style={{ width: `${Math.min(100, (subtotal() / 100) * 100)}%` }}
-              />
-            </div>
-            <p className="mt-1 text-[10px] text-warm-gray">
-              {formatPrice(subtotal())} of QR 100 threshold
-            </p>
-          </div>
-        )}
-        {subtotal() >= 100 && (
-          <div className="mx-6 mt-4 rounded-xl bg-emerald-500/10 p-3 text-center text-sm text-emerald-400">
-            You qualify for FREE delivery!
-          </div>
-        )}
+          ) : (
+            <>
+              <div className="flex items-center gap-2 text-sm">
+                <TruckIcon size={16} className="text-emerald-400" />
+                <span className="font-medium text-white">
+                  Add <span className="text-emerald-400 font-bold">QR {Math.ceil(deliveryThreshold - currentSubtotal)}</span> more for FREE delivery!
+                </span>
+              </div>
+              <div className="mt-3 h-2 overflow-hidden rounded-full bg-dark-border">
+                <div
+                  className="h-full rounded-full bg-gradient-to-r from-emerald-500 to-emerald-400 transition-all duration-700 ease-out"
+                  style={{ width: `${progressPercent}%` }}
+                />
+              </div>
+              <p className="mt-1.5 text-[10px] text-warm-gray">
+                {formatPrice(currentSubtotal)} of QR {deliveryThreshold} threshold
+              </p>
+            </>
+          )}
+        </div>
 
         {/* Items */}
         <div className="flex-1 overflow-y-auto px-6 py-4">
           {items.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full text-center">
-              <div className="mb-4 text-warm-gray/30"><CartIcon size={48} /></div>
-              <p className="text-warm-gray">Your cart is empty</p>
+              <div className="mb-4 text-warm-gray/20">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" className="w-16 h-16">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
+                </svg>
+              </div>
+              <p className="text-lg font-semibold text-white">Your cart is empty</p>
+              <p className="mt-1 text-sm text-warm-gray">Discover premium cases for your phone</p>
               <Link
                 href="/shop"
                 onClick={() => setOpen(false)}
-                className="mt-4 rounded-lg bg-gold px-6 py-2 text-sm font-medium text-black transition-colors hover:bg-gold-light"
+                className="mt-6 rounded-xl bg-gold px-6 py-3 text-sm font-semibold text-black transition-all hover:bg-gold-light hover:shadow-lg hover:shadow-gold/20 active:scale-95"
               >
                 Start Shopping
               </Link>
             </div>
           ) : (
-            <div className="space-y-4">
-              {items.map((item) => (
+            <div className="space-y-3">
+              {items.map((item, i) => (
                 <div
                   key={`${item.productId}-${item.modelId}`}
-                  className="flex gap-4 rounded-xl border border-dark-border bg-black/50 p-3"
+                  className="flex gap-4 rounded-2xl border border-dark-border/50 bg-black/30 p-3 transition-all duration-300 hover:border-dark-border"
+                  style={{ animationDelay: `${i * 50}ms` }}
                 >
                   {/* Image */}
-                  <div className="relative h-20 w-20 flex-shrink-0 overflow-hidden rounded-lg bg-black">
+                  <div className="relative h-20 w-20 flex-shrink-0 overflow-hidden rounded-xl bg-gradient-to-br from-black/60 to-black/30">
                     <Image
                       src={item.image}
                       alt={item.name}
@@ -167,31 +184,31 @@ export function CartDrawer() {
                   </div>
 
                   {/* Details */}
-                  <div className="flex flex-1 flex-col">
-                    <p className="text-[10px] text-warm-gray/60 uppercase">{item.modelName}</p>
-                    <p className="text-sm font-medium text-white line-clamp-1">{item.name}</p>
+                  <div className="flex flex-1 flex-col min-w-0">
+                    <p className="text-[10px] text-warm-gray/50 uppercase tracking-wider">{item.modelName}</p>
+                    <p className="text-sm font-semibold text-white line-clamp-1">{item.name}</p>
                     <Price price={item.price} size="sm" showBadge={false} />
 
                     {/* Quantity Controls */}
-                    <div className="mt-auto flex items-center justify-between">
-                      <div className="flex items-center gap-2">
+                    <div className="mt-auto flex items-center justify-between pt-1">
+                      <div className="flex items-center gap-1.5">
                         <button
                           onClick={() => updateQuantity(item.productId, item.modelId, item.quantity - 1)}
-                          className="flex h-6 w-6 items-center justify-center rounded border border-dark-border text-warm-gray transition-colors hover:border-gold/30 hover:text-white"
+                          className="flex h-7 w-7 items-center justify-center rounded-lg border border-dark-border text-warm-gray transition-all hover:border-gold/30 hover:text-white active:scale-90"
                         >
                           −
                         </button>
-                        <span className="w-6 text-center text-sm font-medium text-white">{item.quantity}</span>
+                        <span className="w-7 text-center text-sm font-semibold text-white">{item.quantity}</span>
                         <button
                           onClick={() => updateQuantity(item.productId, item.modelId, item.quantity + 1)}
-                          className="flex h-6 w-6 items-center justify-center rounded border border-dark-border text-warm-gray transition-colors hover:border-gold/30 hover:text-white"
+                          className="flex h-7 w-7 items-center justify-center rounded-lg border border-dark-border text-warm-gray transition-all hover:border-gold/30 hover:text-white active:scale-90"
                         >
                           +
                         </button>
                       </div>
                       <button
                         onClick={() => removeItem(item.productId, item.modelId)}
-                        className="text-xs text-warm-gray/60 transition-colors hover:text-red-400"
+                        className="text-xs text-warm-gray/50 transition-colors hover:text-red-400 font-medium"
                       >
                         Remove
                       </button>
@@ -205,28 +222,28 @@ export function CartDrawer() {
 
         {/* Footer with totals and WhatsApp button */}
         {items.length > 0 && (
-          <div className="border-t border-dark-border px-6 py-4 space-y-4">
+          <div className="border-t border-dark-border px-6 py-5 space-y-4">
             {/* Totals */}
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
                 <span className="text-warm-gray">Subtotal</span>
-                <span className="text-white">{formatPrice(subtotal())}</span>
+                <span className="text-white font-medium">{formatPrice(currentSubtotal)}</span>
               </div>
               {tierDiscount() > 0 && (
                 <div className="flex justify-between text-sm">
-                  <span className="text-emerald-400">Tier Discount</span>
-                  <span className="text-emerald-400">-{formatPrice(tierDiscount())}</span>
+                  <span className="text-emerald-400 font-medium">Tier Discount</span>
+                  <span className="text-emerald-400 font-medium">-{formatPrice(tierDiscount())}</span>
                 </div>
               )}
               {promoDiscount > 0 && (
                 <div className="flex justify-between text-sm">
-                  <span className="text-emerald-400">Promo Discount</span>
-                  <span className="text-emerald-400">-{formatPrice(promoDiscount)}</span>
+                  <span className="text-emerald-400 font-medium">Promo Discount</span>
+                  <span className="text-emerald-400 font-medium">-{formatPrice(promoDiscount)}</span>
                 </div>
               )}
-              <div className="flex justify-between border-t border-dark-border pt-2">
+              <div className="flex justify-between border-t border-dark-border pt-3">
                 <span className="font-semibold text-white">Total</span>
-                <span className="font-bold text-gold text-lg">{formatPrice(total())}</span>
+                <span className="font-display font-bold text-gold text-xl">{formatPrice(total())}</span>
               </div>
             </div>
 
@@ -237,16 +254,16 @@ export function CartDrawer() {
                 placeholder="Your name"
                 value={customerName}
                 onChange={(e) => setCustomerName(e.target.value)}
-                className="w-full rounded-lg border border-dark-border bg-black/50 px-3 py-2.5 text-sm text-white placeholder:text-warm-gray/40 focus:border-gold/50 focus:outline-none"
+                className="w-full rounded-xl border border-dark-border bg-black/50 px-4 py-3 text-sm text-white placeholder:text-warm-gray/40 focus:border-gold/50 focus:outline-none transition-colors"
               />
               <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-warm-gray/60">+974</span>
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm text-warm-gray/50 font-medium">+974</span>
                 <input
                   type="tel"
                   placeholder="Phone number"
                   value={customerPhone}
                   onChange={(e) => setCustomerPhone(e.target.value.replace(/\D/g, "").slice(0, 8))}
-                  className="w-full rounded-lg border border-dark-border bg-black/50 py-2.5 pl-12 pr-3 text-sm text-white placeholder:text-warm-gray/40 focus:border-gold/50 focus:outline-none"
+                  className="w-full rounded-xl border border-dark-border bg-black/50 py-3 pl-14 pr-4 text-sm text-white placeholder:text-warm-gray/40 focus:border-gold/50 focus:outline-none transition-colors"
                   inputMode="numeric"
                   maxLength={8}
                 />
@@ -256,7 +273,7 @@ export function CartDrawer() {
             {/* WhatsApp Order Button */}
             <button
               onClick={handleWhatsAppOrder}
-              className="flex w-full items-center justify-center gap-2 rounded-xl bg-gold px-6 py-4 text-sm font-semibold text-black transition-all hover:bg-gold-light active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex w-full items-center justify-center gap-2.5 rounded-xl bg-gold px-6 py-4 text-sm font-semibold text-black transition-all hover:bg-gold-light hover:shadow-xl hover:shadow-gold/20 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
               disabled={!customerName.trim() || customerPhone.length < 8}
             >
               <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
@@ -265,8 +282,8 @@ export function CartDrawer() {
               Order on WhatsApp
             </button>
 
-            <p className="text-center text-[10px] text-warm-gray/60">
-              Order via WhatsApp — fast and easy
+            <p className="text-center text-[10px] text-warm-gray/50">
+              Secure checkout via WhatsApp — fast and easy
             </p>
           </div>
         )}

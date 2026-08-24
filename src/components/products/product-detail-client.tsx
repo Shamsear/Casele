@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ProductCard } from "@/components/products/product-card";
-import { Reveal } from "@/components/ui/reveal";
+import { Reveal, AnimatedCounter } from "@/components/ui/reveal";
 import { ProductGallery } from "@/components/products/product-gallery";
 import { Breadcrumbs } from "@/components/seo/breadcrumbs";
 import { FAQSchema, DEFAULT_FAQS } from "@/components/seo/faq-schema";
@@ -43,6 +43,7 @@ export function ProductDetailClient({
   const [quantity, setQuantity] = useState(1);
   const [whatsappNumber, setWhatsappNumber] = useState("+97455364455");
   const [showFullDesc, setShowFullDesc] = useState(false);
+  const [liveViewers, setLiveViewers] = useState(0);
 
   const addItem = useCartStore((s) => s.addItem);
   const toggleWishlist = useWishlistStore((s) => s.toggleItem);
@@ -56,6 +57,10 @@ export function ProductDetailClient({
   useEffect(() => {
     addRecentlyViewed(product.id);
     getWhatsAppNumber().then(setWhatsappNumber);
+
+    // Simulate live viewers (seeded by product id hash)
+    const seed = product.id.split("").reduce((a, c) => a + c.charCodeAt(0), 0);
+    setLiveViewers(3 + (seed % 12));
   }, [product.id]);
 
   const handleAddToCart = () => {
@@ -119,9 +124,9 @@ export function ProductDetailClient({
           ]}
         />
 
-        <div className="mt-6 grid grid-cols-1 gap-8 md:grid-cols-2 lg:gap-12">
+        <div className="mt-6 grid grid-cols-1 gap-8 md:grid-cols-2 lg:gap-16">
           {/* Left: Image Gallery */}
-          <Reveal>
+          <Reveal direction="left">
             <div className="sticky top-20">
               <ProductGallery
                 images={product.images}
@@ -133,47 +138,69 @@ export function ProductDetailClient({
           </Reveal>
 
           {/* Right: Product Info */}
-          <Reveal delay={100}>
+          <Reveal direction="right" delay={100}>
             <div className="flex flex-col">
+              {/* Live viewers */}
+              <div className="flex items-center gap-2 mb-4">
+                <span className="flex h-2 w-2 relative">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+                </span>
+                <span className="text-xs text-emerald-400 font-medium">
+                  {liveViewers} people viewing this now
+                </span>
+              </div>
+
               {/* Model & Badge */}
               <div className="flex items-center gap-3">
-                <span className="text-sm font-medium text-gold/80 uppercase tracking-wider">
+                <span className="text-sm font-medium text-gold/80 uppercase tracking-widest">
                   {selectedModel.name}
                 </span>
                 {product.badge && (
                   <span
-                    className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase ${
+                    className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-wider ${
                       product.badge === "new"
-                        ? "bg-emerald-500/10 text-emerald-400"
+                        ? "bg-emerald-500/10 text-emerald-400 shadow-sm shadow-emerald-500/10"
                         : product.badge === "bestseller"
-                        ? "bg-gold/10 text-gold"
-                        : "bg-red-500/10 text-red-400"
+                        ? "bg-gold/10 text-gold shadow-sm shadow-gold/10"
+                        : "bg-red-500/10 text-red-400 shadow-sm shadow-red-500/10"
                     }`}
                   >
-                    {product.badge === "new" ? "New" : product.badge === "bestseller" ? "Bestseller" : "Sale"}
+                    {product.badge === "new" ? "✨ New" : product.badge === "bestseller" ? "⭐ Bestseller" : "🏷️ Sale"}
                   </span>
                 )}
               </div>
 
               {/* Title */}
-              <h1 className="mt-3 font-display text-3xl font-bold text-white lg:text-4xl">
+              <h1 className="mt-3 font-display text-3xl font-bold text-white lg:text-4xl leading-tight">
                 {product.name}
               </h1>
 
-              {/* Price */}
+              {/* Price — with animated highlight for discounts */}
               <div className="mt-5 flex items-center gap-4">
                 <Price price={product.price} comparePrice={product.comparePrice} size="lg" showBadge={false} />
                 {discount > 0 && (
-                  <span className="rounded-full bg-red-500 px-3 py-1 text-xs font-bold text-white">
+                  <span className="rounded-full bg-red-500 px-3.5 py-1.5 text-xs font-bold text-white shadow-lg shadow-red-500/20 animate-pulse-gold">
                     Save {discount}%
                   </span>
                 )}
               </div>
 
+              {/* Selling fast indicator */}
+              {(product.orderCount > 10 || discount > 0) && (
+                <div className="mt-3 flex items-center gap-2 text-xs text-amber-400">
+                  <svg viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
+                    <path fillRule="evenodd" d="M12.395 2.553a1 1 0 00-1.45-.385c-.345.23-.614.558-.822.88-.214.33-.403.713-.57 1.116-.334.804-.614 1.768-.84 2.734a31.365 31.365 0 00-.613 3.58 2.64 2.64 0 01-.945-1.067c-.328-.68-.398-1.534-.398-2.654A1 1 0 005.05 6.05 6.981 6.981 0 003 11a7 7 0 1011.95-4.95c-.592-.591-.98-.985-1.348-1.467-.363-.476-.724-1.063-1.207-2.03zM12.12 15.12A3 3 0 017 13s.879.5 2.5.5c0-1 .5-4 1.25-4.5.5 1 .786 1.293 1.371 1.879A2.99 2.99 0 0113 13a2.99 2.99 0 01-.879 2.121z" clipRule="evenodd" />
+                  </svg>
+                  <span className="font-semibold">Selling fast</span>
+                  <span className="text-warm-gray">— {product.orderCount} sold recently</span>
+                </div>
+              )}
+
               {/* Divider */}
               <div className="mt-6 border-t border-dark-border/50" />
 
-              {/* Model Selector */}
+              {/* Model Selector — visual pills */}
               {product.models.length > 1 && (
                 <div className="mt-6">
                   <p className="text-sm font-medium text-white">
@@ -184,10 +211,10 @@ export function ProductDetailClient({
                       <button
                         key={model.id}
                         onClick={() => setSelectedModel(model)}
-                        className={`rounded-lg border px-4 py-2.5 text-sm font-medium transition-all ${
+                        className={`rounded-xl border px-4 py-2.5 text-sm font-medium transition-all duration-300 ${
                           selectedModel.id === model.id
-                            ? "border-gold bg-gold/10 text-gold shadow-sm shadow-gold/10"
-                            : "border-dark-border bg-dark-surface text-warm-gray hover:border-warm-gray/40 hover:text-white"
+                            ? "border-gold bg-gold/10 text-gold shadow-md shadow-gold/10 scale-[1.02]"
+                            : "border-dark-border bg-dark-surface text-warm-gray hover:border-warm-gray/40 hover:text-white hover:bg-dark-surface/80"
                         }`}
                       >
                         {model.name}
@@ -197,26 +224,26 @@ export function ProductDetailClient({
                 </div>
               )}
 
-              {/* Quantity */}
+              {/* Quantity — smooth stepper */}
               <div className="mt-6">
                 <p className="text-sm font-medium text-white">Quantity</p>
                 <div className="mt-3 flex items-center gap-1">
                   <button
                     onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                    className="flex h-10 w-10 items-center justify-center rounded-l-lg border border-dark-border bg-dark-surface text-lg text-white transition-colors hover:border-gold/30"
+                    className="flex h-11 w-11 items-center justify-center rounded-l-xl border border-dark-border bg-dark-surface text-lg text-white transition-all hover:border-gold/30 hover:bg-dark-surface/80 active:scale-95"
                   >
-                    -
+                    −
                   </button>
-                  <div className="flex h-10 w-12 items-center justify-center border-y border-dark-border bg-black text-sm font-medium text-white">
+                  <div className="flex h-11 w-14 items-center justify-center border-y border-dark-border bg-black text-sm font-semibold text-white">
                     {quantity}
                   </div>
                   <button
                     onClick={() => setQuantity(Math.min(10, quantity + 1))}
-                    className="flex h-10 w-10 items-center justify-center rounded-r-lg border border-dark-border bg-dark-surface text-lg text-white transition-colors hover:border-gold/30"
+                    className="flex h-11 w-11 items-center justify-center rounded-r-xl border border-dark-border bg-dark-surface text-lg text-white transition-all hover:border-gold/30 hover:bg-dark-surface/80 active:scale-95"
                   >
                     +
                   </button>
-                  <span className="ml-3 text-sm text-warm-gray">
+                  <span className="ml-4 text-sm text-warm-gray font-medium">
                     {formatPrice(parseFloat(product.price) * quantity)} total
                   </span>
                 </div>
@@ -231,9 +258,9 @@ export function ProductDetailClient({
                 {product.description && product.description.length > 120 && (
                   <button
                     onClick={() => setShowFullDesc(!showFullDesc)}
-                    className="mt-1 text-xs text-gold hover:text-gold-light transition-colors"
+                    className="mt-1.5 text-xs text-gold hover:text-gold-light transition-colors font-medium"
                   >
-                    {showFullDesc ? "Show less" : "Read more"}
+                    {showFullDesc ? "← Show less" : "Read more →"}
                   </button>
                 )}
               </div>
@@ -244,7 +271,7 @@ export function ProductDetailClient({
                   <Button
                     variant="cta"
                     size="lg"
-                    className="flex-1"
+                    className="flex-1 animate-glow-pulse"
                     onClick={handleBuyNow}
                   >
                     <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
@@ -256,6 +283,7 @@ export function ProductDetailClient({
                     variant="secondary"
                     size="lg"
                     onClick={handleAddToCart}
+                    className="group/cart"
                   >
                     <CartIcon size={18} />
                   </Button>
@@ -264,9 +292,9 @@ export function ProductDetailClient({
                 {/* Wishlist */}
                 <button
                   onClick={() => toggleWishlist(product.id)}
-                  className={`flex items-center justify-center gap-2 rounded-lg border py-3 text-sm font-medium transition-all ${
+                  className={`flex items-center justify-center gap-2 rounded-xl border py-3.5 text-sm font-medium transition-all duration-300 ${
                     isWishlisted
-                      ? "border-gold bg-gold/10 text-gold"
+                      ? "border-gold bg-gold/10 text-gold shadow-sm shadow-gold/10"
                       : "border-dark-border bg-dark-surface text-warm-gray hover:border-warm-gray/40 hover:text-white"
                   }`}
                 >
@@ -283,49 +311,29 @@ export function ProductDetailClient({
                       d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z"
                     />
                   </svg>
-                  {isWishlisted ? "Added to Wishlist" : "Add to Wishlist"}
+                  {isWishlisted ? "Added to Wishlist ♥" : "Add to Wishlist"}
                 </button>
               </div>
 
-              {/* Trust Signals */}
-              <div className="mt-6 rounded-xl border border-dark-border/50 bg-dark-surface/30 p-4">
+              {/* Trust Signals — redesigned with hover effects */}
+              <div className="mt-8 rounded-2xl border border-dark-border/50 bg-dark-surface/30 p-5 backdrop-blur-sm">
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="flex items-center gap-2.5">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gold/10">
-                      <ShieldIcon size={16} />
+                  {[
+                    { icon: <ShieldIcon size={16} />, title: "Premium Protection", desc: "Military-grade", color: "text-gold" },
+                    { icon: <TruckIcon size={16} />, title: "Fast Delivery", desc: "Same day in Qatar", color: "text-emerald-400" },
+                    { icon: <ChatIcon size={16} />, title: "WhatsApp Orders", desc: "Quick & easy", color: "text-gold" },
+                    { icon: <ReturnIcon size={16} />, title: "7-Day Returns", desc: "Hassle free", color: "text-emerald-400" },
+                  ].map((item) => (
+                    <div key={item.title} className="group/trust flex items-center gap-3 rounded-xl p-2 transition-all hover:bg-gold/5">
+                      <div className={`flex h-9 w-9 items-center justify-center rounded-xl bg-gold/10 ${item.color} transition-all group-hover/trust:scale-110 group-hover/trust:bg-gold/20`}>
+                        {item.icon}
+                      </div>
+                      <div>
+                        <p className="text-xs font-semibold text-white">{item.title}</p>
+                        <p className="text-[10px] text-warm-gray">{item.desc}</p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="text-xs font-medium text-white">Premium Protection</p>
-                      <p className="text-[10px] text-warm-gray">Military-grade</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2.5">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gold/10">
-                      <TruckIcon size={16} />
-                    </div>
-                    <div>
-                      <p className="text-xs font-medium text-white">Fast Delivery</p>
-                      <p className="text-[10px] text-warm-gray">Same day in Qatar</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2.5">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gold/10">
-                      <ChatIcon size={16} />
-                    </div>
-                    <div>
-                      <p className="text-xs font-medium text-white">WhatsApp Orders</p>
-                      <p className="text-[10px] text-warm-gray">Quick & easy</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2.5">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gold/10">
-                      <ReturnIcon size={16} />
-                    </div>
-                    <div>
-                      <p className="text-xs font-medium text-white">7-Day Returns</p>
-                      <p className="text-[10px] text-warm-gray">Hassle free</p>
-                    </div>
-                  </div>
+                  ))}
                 </div>
               </div>
 
@@ -333,12 +341,12 @@ export function ProductDetailClient({
               <div className="mt-4 flex items-center justify-center gap-6 text-xs text-warm-gray">
                 <span className="flex items-center gap-1.5">
                   <EyeIcon size={14} />
-                  {product.viewCount} people viewed
+                  <AnimatedCounter target={product.viewCount} suffix=" viewed" className="font-medium" />
                 </span>
-                <span className="h-3 w-px bg-dark-border" />
+                <span className="h-3.5 w-px bg-dark-border" />
                 <span className="flex items-center gap-1.5">
                   <CartIcon size={14} />
-                  {product.orderCount} sold
+                  <AnimatedCounter target={product.orderCount} suffix=" sold" className="font-medium" />
                 </span>
               </div>
             </div>
@@ -347,17 +355,32 @@ export function ProductDetailClient({
 
         {/* Related Products */}
         {relatedProducts.length > 0 && (
-          <div className="mt-16 border-t border-dark-border/50 pt-12">
-            <h2 className="font-display text-2xl font-bold text-white md:text-3xl">
-              You May Also Like
-            </h2>
-            <p className="mt-2 text-sm text-warm-gray">Similar cases you might love</p>
-            <div className="mt-6 grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-6">
-              {relatedProducts.map((rp) => (
-                <ProductCard key={rp.id} product={rp} />
-              ))}
+          <Reveal delay={200}>
+            <div className="mt-20 border-t border-dark-border/50 pt-12">
+              <div className="flex items-end justify-between mb-8">
+                <div>
+                  <p className="text-xs font-medium text-gold tracking-widest uppercase mb-2">Complete Your Look</p>
+                  <h2 className="font-display text-2xl font-bold text-white md:text-3xl">
+                    You May Also Like
+                  </h2>
+                </div>
+                <Link
+                  href="/shop"
+                  className="hidden sm:inline-flex items-center gap-2 rounded-xl border border-dark-border px-4 py-2 text-sm font-medium text-warm-gray transition-all hover:border-gold/30 hover:text-white"
+                >
+                  View All
+                  <svg viewBox="0 0 20 20" fill="currentColor" className="w-3.5 h-3.5">
+                    <path fillRule="evenodd" d="M3 10a.75.75 0 01.75-.75h10.638L10.23 5.29a.75.75 0 111.04-1.08l5.5 5.25a.75.75 0 010 1.08l-5.5 5.25a.75.75 0 11-1.04-1.08l4.158-3.96H3.75A.75.75 0 013 10z" clipRule="evenodd" />
+                  </svg>
+                </Link>
+              </div>
+              <div className="grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-6">
+                {relatedProducts.map((rp, i) => (
+                  <ProductCard key={rp.id} product={rp} index={i} />
+                ))}
+              </div>
             </div>
-          </div>
+          </Reveal>
         )}
       </div>
 

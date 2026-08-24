@@ -1,6 +1,7 @@
 "use client";
 
 import { Header } from "@/components/layout/header";
+import { MobileHeader } from "@/components/layout/mobile-header";
 import { Footer } from "@/components/layout/footer";
 import { MobileNav } from "@/components/layout/mobile-nav";
 import { ScrollProgress } from "@/components/layout/scroll-progress";
@@ -20,6 +21,7 @@ export default function StorefrontLayout({
         <AnnouncementBar />
         <ScrollProgress />
         <Header />
+        <MobileHeader />
         <CartDrawer />
         <main className="flex-1 pb-20 md:pb-0">{children}</main>
         <Footer />

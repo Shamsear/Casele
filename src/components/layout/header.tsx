@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Logo } from "@/components/brand/logo";
@@ -13,6 +14,15 @@ import { cn } from "@/lib/utils";
 export function Header() {
   const pathname = usePathname();
   const { t } = useI18n();
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 20);
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const navLinks = [
     { href: "/", label: t("nav_home") },
@@ -21,21 +31,33 @@ export function Header() {
   ];
 
   return (
-    <header className="sticky top-0 z-40 hidden md:block border-b border-dark-border/50 bg-black/80 backdrop-blur-xl">
-      <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-4 lg:px-8">
+    <header
+      className={cn(
+        "sticky top-0 z-40 hidden md:block border-b backdrop-blur-xl transition-all duration-500",
+        scrolled
+          ? "border-dark-border/50 bg-black/90 shadow-lg shadow-black/10"
+          : "border-transparent bg-black/50"
+      )}
+    >
+      <div
+        className={cn(
+          "mx-auto flex max-w-7xl items-center justify-between px-4 lg:px-8 transition-all duration-500",
+          scrolled ? "h-14" : "h-16"
+        )}
+      >
         {/* Logo */}
         <Logo size="sm" />
 
-        {/* Nav */}
+        {/* Nav with animated underlines */}
         <nav className="flex items-center gap-8">
           {navLinks.map((link) => (
             <Link
               key={link.href}
               href={link.href}
               className={cn(
-                "text-sm font-medium transition-colors",
+                "animated-underline relative text-sm font-medium transition-colors duration-300 py-1",
                 pathname === link.href
-                  ? "text-white"
+                  ? "text-white active"
                   : "text-warm-gray hover:text-white"
               )}
             >
@@ -52,6 +74,12 @@ export function Header() {
           <CartBubble />
         </div>
       </div>
+
+      {/* Gold line at bottom */}
+      <div className={cn(
+        "h-px bg-gradient-to-r from-transparent via-gold/30 to-transparent transition-opacity duration-500",
+        scrolled ? "opacity-100" : "opacity-0"
+      )} />
     </header>
   );
 }

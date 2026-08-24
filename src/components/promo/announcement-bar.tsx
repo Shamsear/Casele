@@ -6,44 +6,70 @@ const ANNOUNCEMENTS = [
   {
     text: "20% OFF First Order — Use Code: WELCOME20",
     link: "/shop",
+    icon: "🎉",
   },
   {
     text: "FREE Delivery on orders over QR 100!",
     link: "/shop",
+    icon: "🚚",
   },
   {
     text: "Flash Sale: Up to 40% OFF — Limited Time Only!",
     link: "/shop",
+    icon: "⚡",
   },
 ];
 
 export function AnnouncementBar() {
   const [current, setCurrent] = useState(0);
   const [isVisible, setIsVisible] = useState(true);
+  const [isTransitioning, setIsTransitioning] = useState(false);
 
-  // Rotate announcements every 5 seconds
+  // Check sessionStorage for dismissal
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const dismissed = sessionStorage.getItem("announcement_dismissed");
+      if (dismissed) setIsVisible(false);
+    }
+  }, []);
+
+  // Rotate announcements with smooth transition
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrent((prev) => (prev + 1) % ANNOUNCEMENTS.length);
+      setIsTransitioning(true);
+      setTimeout(() => {
+        setCurrent((prev) => (prev + 1) % ANNOUNCEMENTS.length);
+        setIsTransitioning(false);
+      }, 300);
     }, 5000);
     return () => clearInterval(interval);
   }, []);
 
+  const handleDismiss = () => {
+    setIsVisible(false);
+    sessionStorage.setItem("announcement_dismissed", "true");
+  };
+
   if (!isVisible) return null;
 
   return (
-    <div className="relative bg-gold text-black">
-      <div className="mx-auto flex h-10 max-w-7xl items-center justify-center px-4">
+    <div className="relative overflow-hidden bg-gradient-to-r from-gold via-gold-light to-gold text-black">
+      {/* Shimmer overlay */}
+      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent animate-gold-shimmer" style={{ backgroundSize: "200% 100%" }} />
+
+      <div className="relative mx-auto flex h-10 max-w-7xl items-center justify-center px-4">
         <a
           href={ANNOUNCEMENTS[current].link}
-          className="flex items-center gap-2 text-sm font-medium transition-opacity hover:opacity-80"
+          className={`flex items-center gap-2 text-sm font-semibold transition-all duration-300 hover:opacity-80 ${
+            isTransitioning ? "opacity-0 translate-y-2" : "opacity-100 translate-y-0"
+          }`}
         >
-
+          <span>{ANNOUNCEMENTS[current].icon}</span>
           <span>{ANNOUNCEMENTS[current].text}</span>
           <svg
             viewBox="0 0 20 20"
             fill="currentColor"
-            className="w-4 h-4"
+            className="w-4 h-4 transition-transform hover:translate-x-0.5"
           >
             <path
               fillRule="evenodd"
@@ -58,9 +84,15 @@ export function AnnouncementBar() {
           {ANNOUNCEMENTS.map((_, i) => (
             <button
               key={i}
-              onClick={() => setCurrent(i)}
-              className={`h-1.5 rounded-full transition-all ${
-                i === current ? "w-4 bg-black" : "w-1.5 bg-black/30"
+              onClick={() => {
+                setIsTransitioning(true);
+                setTimeout(() => {
+                  setCurrent(i);
+                  setIsTransitioning(false);
+                }, 200);
+              }}
+              className={`rounded-full transition-all duration-300 ${
+                i === current ? "w-5 h-1.5 bg-black" : "w-1.5 h-1.5 bg-black/30 hover:bg-black/50"
               }`}
             />
           ))}
@@ -68,8 +100,8 @@ export function AnnouncementBar() {
 
         {/* Close button */}
         <button
-          onClick={() => setIsVisible(false)}
-          className="absolute right-3 flex h-6 w-6 items-center justify-center rounded-full text-black/60 transition-colors hover:text-black"
+          onClick={handleDismiss}
+          className="absolute right-3 flex h-6 w-6 items-center justify-center rounded-full text-black/50 transition-all hover:text-black hover:bg-black/10"
         >
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-3 h-3">
             <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
