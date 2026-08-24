@@ -37,7 +37,7 @@ export function LocalBusinessSchema() {
       closes: "23:59",
     },
     sameAs: [
-      "https://www.instagram.com/casele.qa",
+      "https://www.instagram.com/casele_premium_mobile_case?igsi=MW55cTM4MmN6dGF3ag%3D%3D&utm_source=qr",
     ],
   };
 

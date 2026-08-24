@@ -14,8 +14,8 @@ const DEFAULTS: Record<string, string> = {
   tax_rate: "0",
   meta_title: "CASELÉ — Premium Phone Cases in Qatar",
   meta_description: "Premium mobile phone cases designed for style and durability.",
-  instagram: "@casele.qa",
-  website: "www.casele.qa",
+  instagram: "https://www.instagram.com/casele_premium_mobile_case?igsi=MW55cTM4MmN6dGF3ag%3D%3D&utm_source=qr",
+  website: "www.casele.co",
 };
 
 // Cache for settings (expires after 5 minutes)

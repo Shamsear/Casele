@@ -3,8 +3,9 @@
 import { useCallback } from "react";
 import { Logo } from "@/components/brand/logo";
 import { Separator } from "@/components/ui/separator";
-import { Reveal } from "@/components/ui/reveal";
 import { useI18n } from "@/lib/i18n/context";
+
+const INSTAGRAM_URL = "https://www.instagram.com/casele_premium_mobile_case?igsi=MW55cTM4MmN6dGF3ag%3D%3D&utm_source=qr";
 
 export function Footer() {
   const { t } = useI18n();
@@ -18,7 +19,7 @@ export function Footer() {
       <div className="mx-auto max-w-7xl px-4 py-16 lg:px-8">
         <div className="grid grid-cols-1 gap-10 md:grid-cols-4">
           {/* Brand */}
-          <Reveal className="md:col-span-2">
+          <div className="md:col-span-2">
             <div>
               <Logo size="sm" />
               <p className="mt-4 text-sm text-warm-gray leading-relaxed max-w-sm">
@@ -31,7 +32,7 @@ export function Footer() {
               {/* Social links */}
               <div className="mt-6 flex items-center gap-3">
                 <a
-                  href="https://instagram.com/casele.co"
+                  href={INSTAGRAM_URL}
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="Instagram"
@@ -54,62 +55,58 @@ export function Footer() {
                 </a>
               </div>
             </div>
-          </Reveal>
+          </div>
 
           {/* Quick Links */}
-          <Reveal delay={80}>
-            <div>
-              <h3 className="text-xs font-semibold text-white uppercase tracking-wider">{t("footer_quick_links")}</h3>
-              <div className="mt-1 h-0.5 w-6 bg-gold/50" />
-              <ul className="mt-4 space-y-2.5">
-                {[
-                  { href: "/shop", label: t("footer_shop_all") },
-                  { href: "/track", label: t("footer_track_order") },
-                  { href: "/about", label: t("footer_about") },
-                  { href: "/faq", label: t("footer_faq") },
-                ].map((link) => (
-                  <li key={link.href}>
-                    <a
-                      href={link.href}
-                      className="text-xs text-warm-gray hover:text-white transition-colors inline-block"
-                    >
-                      {link.label}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </Reveal>
+          <div>
+            <h3 className="text-xs font-semibold text-white uppercase tracking-wider">{t("footer_quick_links")}</h3>
+            <div className="mt-1 h-0.5 w-6 bg-gold/50" />
+            <ul className="mt-4 space-y-2.5">
+              {[
+                { href: "/shop", label: t("footer_shop_all") },
+                { href: "/track", label: t("footer_track_order") },
+                { href: "/about", label: t("footer_about") },
+                { href: "/faq", label: t("footer_faq") },
+              ].map((link) => (
+                <li key={link.href}>
+                  <a
+                    href={link.href}
+                    className="text-xs text-warm-gray hover:text-white transition-colors inline-block"
+                  >
+                    {link.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
 
           {/* Contact */}
-          <Reveal delay={120}>
-            <div>
-              <h3 className="text-xs font-semibold text-white uppercase tracking-wider">{t("footer_contact")}</h3>
-              <div className="mt-1 h-0.5 w-6 bg-gold/50" />
-              <ul className="mt-4 space-y-2.5 text-xs text-warm-gray">
-                <li>
-                  <a
-                    href="https://instagram.com/casele.co"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="hover:text-white transition-colors inline-block"
-                  >
-                    @casele.co
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="https://casele.co"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="hover:text-white transition-colors inline-block"
-                  >
-                    www.casele.co
-                  </a>
-                </li>
-              </ul>
-            </div>
-          </Reveal>
+          <div>
+            <h3 className="text-xs font-semibold text-white uppercase tracking-wider">{t("footer_contact")}</h3>
+            <div className="mt-1 h-0.5 w-6 bg-gold/50" />
+            <ul className="mt-4 space-y-2.5 text-xs text-warm-gray">
+              <li>
+                <a
+                  href={INSTAGRAM_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-white transition-colors inline-block truncate max-w-[200px]"
+                >
+                  @casele_premium_mobile_case
+                </a>
+              </li>
+              <li>
+                <a
+                  href="https://casele.co"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-white transition-colors inline-block"
+                >
+                  www.casele.co
+                </a>
+              </li>
+            </ul>
+          </div>
         </div>
 
         <Separator className="my-8" />
