@@ -31,7 +31,7 @@ export function ProductGallery({ images, alt, badge, discount }: ProductGalleryP
     setTimeout(() => {
       setActiveIndex(newIndex);
       setTimeout(() => setIsTransitioning(false), 50);
-    }, 200);
+    }, 150);
   }, [activeIndex, isTransitioning]);
 
   // Touch / swipe handling
@@ -119,7 +119,7 @@ export function ProductGallery({ images, alt, badge, discount }: ProductGalleryP
         <div
           ref={imageRef}
           className={cn(
-            "relative aspect-square overflow-hidden rounded-2xl bg-white shadow-lg shadow-black/10",
+            "relative aspect-square w-full overflow-hidden rounded-2xl bg-white border border-dark-border/20 shadow-sm",
             isZoomed ? "cursor-zoom-out" : "cursor-zoom-in"
           )}
           onClick={handleImageClick}
@@ -127,7 +127,7 @@ export function ProductGallery({ images, alt, badge, discount }: ProductGalleryP
           onTouchStart={handleTouchStart}
           onTouchEnd={handleTouchEnd}
         >
-          {/* All images stacked — only active one visible */}
+          {/* Active image view */}
           {allImages.map((img, idx) => (
             <Image
               key={idx}
@@ -135,12 +135,12 @@ export function ProductGallery({ images, alt, badge, discount }: ProductGalleryP
               alt={`${alt} — image ${idx + 1} of ${allImages.length}`}
               fill
               className={cn(
-                "object-contain p-6 sm:p-8 transition-all duration-500 ease-out",
+                "object-contain p-6 sm:p-8 transition-all duration-300 ease-out",
                 idx === activeIndex
                   ? isTransitioning
-                    ? "opacity-0 scale-95"
+                    ? "opacity-0 scale-98"
                     : "opacity-100 scale-100"
-                  : "opacity-0 scale-95 pointer-events-none",
+                  : "opacity-0 scale-98 pointer-events-none",
                 isZoomed && idx === activeIndex && "scale-[2.5]"
               )}
               style={
@@ -154,21 +154,21 @@ export function ProductGallery({ images, alt, badge, discount }: ProductGalleryP
           ))}
 
           {/* Badges */}
-          <div className="absolute top-4 left-4 flex gap-2 z-10">
+          <div className="absolute top-4 left-4 flex gap-2 z-10 pointer-events-none">
             {badge && (
               <span
                 className={cn(
-                  "inline-flex items-center rounded-full px-3 py-1 text-xs font-bold shadow-lg",
-                  badge === "new" && "bg-emerald-500 text-white shadow-emerald-500/20",
-                  badge === "bestseller" && "bg-gold text-black shadow-gold/20",
-                  badge === "sale" && "bg-red-500 text-white shadow-red-500/20"
+                  "inline-flex items-center rounded-full px-3 py-1 text-[10px] font-bold tracking-wider uppercase shadow-sm",
+                  badge === "new" && "bg-emerald-500 text-white",
+                  badge === "bestseller" && "bg-gold text-black",
+                  badge === "sale" && "bg-red-500 text-white"
                 )}
               >
-                {badge === "new" ? "✨ NEW" : badge === "bestseller" ? "⭐ BESTSELLER" : "🏷️ SALE"}
+                {badge === "new" ? "NEW" : badge === "bestseller" ? "BESTSELLER" : "SALE"}
               </span>
             )}
             {discount && discount > 0 && (
-              <span className="inline-flex items-center rounded-full bg-red-500 px-3 py-1 text-xs font-bold text-white shadow-lg shadow-red-500/20">
+              <span className="inline-flex items-center rounded-full bg-red-500 px-3 py-1 text-[10px] font-bold text-white shadow-sm">
                 {discount}% OFF
               </span>
             )}
@@ -183,11 +183,11 @@ export function ProductGallery({ images, alt, badge, discount }: ProductGalleryP
                   if (activeIndex > 0) switchImage(activeIndex - 1);
                 }}
                 className={cn(
-                  "absolute left-3 top-1/2 -translate-y-1/2 z-10 hidden md:flex h-10 w-10 items-center justify-center rounded-full bg-black/40 backdrop-blur-md text-white transition-all duration-300 hover:bg-black/60 hover:scale-110",
+                  "absolute left-3 top-1/2 -translate-y-1/2 z-10 hidden md:flex h-9 w-9 items-center justify-center rounded-full bg-black/40 backdrop-blur-md text-white transition-all hover:bg-black/70 hover:scale-105",
                   activeIndex === 0 && "opacity-30 pointer-events-none"
                 )}
               >
-                <svg viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5">
+                <svg viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
                   <path fillRule="evenodd" d="M12.79 5.23a.75.75 0 01-.02 1.06L8.832 10l3.938 3.71a.75.75 0 11-1.04 1.08l-4.5-4.25a.75.75 0 010-1.08l4.5-4.25a.75.75 0 011.06.02z" clipRule="evenodd" />
                 </svg>
               </button>
@@ -197,11 +197,11 @@ export function ProductGallery({ images, alt, badge, discount }: ProductGalleryP
                   if (activeIndex < allImages.length - 1) switchImage(activeIndex + 1);
                 }}
                 className={cn(
-                  "absolute right-3 top-1/2 -translate-y-1/2 z-10 hidden md:flex h-10 w-10 items-center justify-center rounded-full bg-black/40 backdrop-blur-md text-white transition-all duration-300 hover:bg-black/60 hover:scale-110",
+                  "absolute right-3 top-1/2 -translate-y-1/2 z-10 hidden md:flex h-9 w-9 items-center justify-center rounded-full bg-black/40 backdrop-blur-md text-white transition-all hover:bg-black/70 hover:scale-105",
                   activeIndex === allImages.length - 1 && "opacity-30 pointer-events-none"
                 )}
               >
-                <svg viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5">
+                <svg viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
                   <path fillRule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clipRule="evenodd" />
                 </svg>
               </button>
@@ -210,7 +210,7 @@ export function ProductGallery({ images, alt, badge, discount }: ProductGalleryP
 
           {/* Dot indicators — mobile */}
           {allImages.length > 1 && (
-            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2 z-10 md:hidden">
+            <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-1.5 z-10 md:hidden">
               {allImages.map((_, idx) => (
                 <button
                   key={idx}
@@ -221,8 +221,8 @@ export function ProductGallery({ images, alt, badge, discount }: ProductGalleryP
                   className={cn(
                     "rounded-full transition-all duration-300",
                     idx === activeIndex
-                      ? "h-2 w-6 bg-gold shadow-md shadow-gold/30"
-                      : "h-2 w-2 bg-white/40"
+                      ? "h-1.5 w-5 bg-gold"
+                      : "h-1.5 w-1.5 bg-black/30"
                   )}
                 />
               ))}
@@ -231,29 +231,13 @@ export function ProductGallery({ images, alt, badge, discount }: ProductGalleryP
 
           {/* Image counter — desktop */}
           {allImages.length > 1 && (
-            <div className="absolute bottom-4 right-4 rounded-full bg-black/50 px-3 py-1 text-xs text-white backdrop-blur-md z-10 hidden md:block">
+            <div className="absolute bottom-3 right-3 rounded-full bg-black/60 px-2.5 py-0.5 text-[10px] text-white/90 backdrop-blur-md z-10 hidden md:block">
               {activeIndex + 1} / {allImages.length}
-            </div>
-          )}
-
-          {/* Zoom hint */}
-          {!isZoomed && (
-            <div className="absolute bottom-4 left-4 rounded-full bg-black/50 px-3 py-1 text-xs text-white/70 backdrop-blur-md z-10 hidden md:flex items-center gap-1.5">
-              <svg viewBox="0 0 20 20" fill="currentColor" className="w-3 h-3">
-                <path d="M9 3.5a5.5 5.5 0 100 11 5.5 5.5 0 000-11zM2 9a7 7 0 1112.452 4.391l3.328 3.329a.75.75 0 11-1.06 1.06l-3.329-3.328A7 7 0 012 9z" />
-                <path d="M9 5.75a.75.75 0 01.75.75v1.75h1.75a.75.75 0 010 1.5h-1.75v1.75a.75.75 0 01-1.5 0v-1.75H6.5a.75.75 0 010-1.5h1.75V6.5A.75.75 0 019 5.75z" />
-              </svg>
-              Click to zoom
-            </div>
-          )}
-          {isZoomed && (
-            <div className="absolute bottom-4 left-4 rounded-full bg-black/50 px-3 py-1 text-xs text-white backdrop-blur-md z-10 hidden md:block">
-              Move to pan — click to close
             </div>
           )}
         </div>
 
-        {/* Thumbnails — horizontal scrollable pills */}
+        {/* Thumbnails */}
         {allImages.length > 1 && (
           <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
             {allImages.map((image, index) => (
@@ -265,10 +249,10 @@ export function ProductGallery({ images, alt, badge, discount }: ProductGalleryP
                   setIsZoomed(false);
                 }}
                 className={cn(
-                  "relative h-16 w-16 sm:h-20 sm:w-20 flex-shrink-0 overflow-hidden rounded-xl transition-all duration-300",
+                  "relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-xl bg-white transition-all duration-200",
                   activeIndex === index
-                    ? "ring-2 ring-gold ring-offset-2 ring-offset-black shadow-lg shadow-gold/20 scale-105"
-                    : "opacity-60 hover:opacity-100 border border-dark-border hover:border-warm-gray/40"
+                    ? "ring-2 ring-gold border-transparent"
+                    : "opacity-60 hover:opacity-100 border border-dark-border"
                 )}
               >
                 <Image
@@ -276,7 +260,7 @@ export function ProductGallery({ images, alt, badge, discount }: ProductGalleryP
                   alt={`${alt} thumbnail ${index + 1}`}
                   fill
                   className="object-contain p-1"
-                  sizes="80px"
+                  sizes="64px"
                 />
               </button>
             ))}

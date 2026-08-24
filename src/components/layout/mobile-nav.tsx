@@ -60,74 +60,69 @@ export function MobileNav() {
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 md:hidden safe-area-pb">
-      {/* Floating pill container */}
-      <div className="mx-3 mb-2 rounded-2xl border border-dark-border/30 bg-black/80 backdrop-blur-2xl shadow-2xl shadow-black/50">
-        <div className="flex items-center justify-around h-16 px-2">
-          {navItems.map((item) => {
-            const isActive = pathname === item.href;
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={cn(
-                  "flex flex-col items-center gap-0.5 px-4 py-1.5 text-[10px] font-medium transition-all duration-300 min-w-[52px] rounded-xl active:scale-90",
-                  isActive
-                    ? "text-gold bg-gold/10"
-                    : "text-warm-gray/70"
-                )}
-              >
-                <span className={cn("transition-transform duration-300", isActive && "scale-110")}>
-                  {isActive ? item.iconFilled : item.icon}
-                </span>
-                {item.label}
-              </Link>
-            );
-          })}
+    <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-dark-border/60 bg-black/95 backdrop-blur-xl md:hidden safe-area-pb">
+      <div className="flex items-center justify-around h-16 px-2">
+        {navItems.map((item) => {
+          const isActive = pathname === item.href;
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={cn(
+                "flex flex-col items-center gap-1 py-1 text-[10px] font-medium transition-colors min-w-[48px]",
+                isActive ? "text-gold" : "text-warm-gray hover:text-white"
+              )}
+            >
+              <span>{isActive ? item.iconFilled : item.icon}</span>
+              <span>{item.label}</span>
+            </Link>
+          );
+        })}
 
-          {/* Language toggle */}
-          <button
-            onClick={() => setLocale(locale === "en" ? "ar" : "en")}
-            className="flex flex-col items-center gap-0.5 px-4 py-1.5 text-[10px] font-medium text-warm-gray/70 min-w-[52px] rounded-xl transition-all active:scale-90"
-          >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-5 h-5">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-1.605.42-3.113 1.157-4.418" />
-            </svg>
-            {locale === "en" ? "عربي" : "EN"}
-          </button>
+        {/* Language toggle */}
+        <button
+          onClick={() => setLocale(locale === "en" ? "ar" : "en")}
+          className="flex flex-col items-center gap-1 py-1 text-[10px] font-medium text-warm-gray hover:text-white min-w-[48px]"
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-5 h-5">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-1.605.42-3.113 1.157-4.418" />
+          </svg>
+          <span>{locale === "en" ? "AR" : "EN"}</span>
+        </button>
 
-          {/* Search button */}
-          <button
-            onClick={() => {
-              document.dispatchEvent(new CustomEvent("open-search"));
-            }}
-            className="flex flex-col items-center gap-0.5 px-4 py-1.5 text-[10px] font-medium text-warm-gray/70 min-w-[52px] rounded-xl transition-all active:scale-90"
-          >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-5 h-5">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
-            </svg>
-            {t("search")}
-          </button>
+        {/* Search button */}
+        <button
+          onClick={() => {
+            document.dispatchEvent(new CustomEvent("open-search"));
+          }}
+          className="flex flex-col items-center gap-1 py-1 text-[10px] font-medium text-warm-gray hover:text-white min-w-[48px]"
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-5 h-5">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+          </svg>
+          <span>{t("search")}</span>
+        </button>
 
-          {/* Cart button */}
-          <button
-            onClick={() => setOpen(true)}
-            className={cn(
-              "flex flex-col items-center gap-0.5 px-4 py-1.5 text-[10px] font-medium min-w-[52px] relative rounded-xl transition-all active:scale-90",
-              itemCount > 0 ? "text-gold" : "text-warm-gray/70"
-            )}
-          >
+        {/* Cart button */}
+        <button
+          onClick={() => setOpen(true)}
+          className={cn(
+            "flex flex-col items-center gap-1 py-1 text-[10px] font-medium min-w-[48px] relative",
+            itemCount > 0 ? "text-gold" : "text-warm-gray hover:text-white"
+          )}
+        >
+          <div className="relative">
             <svg viewBox="0 0 24 24" fill={itemCount > 0 ? "currentColor" : "none"} stroke="currentColor" strokeWidth="1.5" className="w-5 h-5">
               <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" />
             </svg>
-            {t("cart_title")}
             {itemCount > 0 && (
-              <span className="absolute -top-0.5 right-1 flex h-4.5 w-4.5 items-center justify-center rounded-full bg-gold text-[9px] font-bold text-black shadow-md shadow-gold/30 animate-scale-in">
+              <span className="absolute -top-1.5 -right-2 flex h-4 w-4 items-center justify-center rounded-full bg-gold text-[9px] font-bold text-black">
                 {itemCount}
               </span>
             )}
-          </button>
-        </div>
+          </div>
+          <span>{t("cart_title")}</span>
+        </button>
       </div>
     </nav>
   );

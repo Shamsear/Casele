@@ -16,7 +16,7 @@ export function Reveal({
   className,
   delay = 0,
   direction = "up",
-  blur = true,
+  blur = false,
 }: RevealProps) {
   const ref = useRef<HTMLDivElement>(null);
   const [isVisible, setIsVisible] = useState(false);
@@ -36,7 +36,7 @@ export function Reveal({
           observer.unobserve(el);
         }
       },
-      { threshold: 0.05, rootMargin: "50px" }
+      { threshold: 0.05, rootMargin: "30px" }
     );
 
     observer.observe(el);
@@ -44,20 +44,20 @@ export function Reveal({
   }, [delay]);
 
   const directionClasses = {
-    up: isVisible ? "translate-y-0" : "translate-y-6",
-    down: isVisible ? "translate-y-0" : "-translate-y-6",
-    left: isVisible ? "translate-x-0" : "translate-x-8",
-    right: isVisible ? "translate-x-0" : "-translate-x-8",
-    scale: isVisible ? "scale-100" : "scale-90",
+    up: isVisible ? "translate-y-0" : "translate-y-4",
+    down: isVisible ? "translate-y-0" : "-translate-y-4",
+    left: isVisible ? "translate-y-0" : "translate-y-4",
+    right: isVisible ? "translate-y-0" : "translate-y-4",
+    scale: isVisible ? "scale-100" : "scale-[0.98]",
   };
 
   return (
     <div
       ref={ref}
       className={cn(
-        "transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]",
+        "transition-all duration-500 ease-out",
         isVisible ? "opacity-100" : "opacity-0",
-        blur && !isVisible && "blur-[6px]",
+        blur && !isVisible && "blur-[2px]",
         blur && isVisible && "blur-0",
         directionClasses[direction],
         className
@@ -72,7 +72,7 @@ export function Reveal({
 export function StaggeredGrid({
   children,
   className,
-  staggerMs = 80,
+  staggerMs = 60,
 }: {
   children: React.ReactNode;
   className?: string;
@@ -82,7 +82,7 @@ export function StaggeredGrid({
     <div className={cn("grid", className)}>
       {Array.isArray(children)
         ? children.map((child, i) => (
-            <Reveal key={i} delay={i * staggerMs} blur>
+            <Reveal key={i} delay={i * staggerMs}>
               {child}
             </Reveal>
           ))
@@ -96,7 +96,7 @@ export function StaggeredGrid({
 export function ParallaxSection({
   children,
   className,
-  speed = 0.1,
+  speed = 0.05,
 }: {
   children: React.ReactNode;
   className?: string;
@@ -138,7 +138,7 @@ export function ParallaxSection({
 // Animated counter — counts up when scrolled into view
 export function AnimatedCounter({
   target,
-  duration = 2000,
+  duration = 1500,
   prefix = "",
   suffix = "",
   className,
@@ -167,7 +167,6 @@ export function AnimatedCounter({
           const animate = (now: number) => {
             const elapsed = now - start;
             const progress = Math.min(elapsed / duration, 1);
-            // Ease out cubic
             const eased = 1 - Math.pow(1 - progress, 3);
             setCount(Math.round(eased * target));
             if (progress < 1) requestAnimationFrame(animate);
@@ -175,7 +174,7 @@ export function AnimatedCounter({
           requestAnimationFrame(animate);
         }
       },
-      { threshold: 0.5 }
+      { threshold: 0.3 }
     );
 
     observer.observe(el);
