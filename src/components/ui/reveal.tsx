@@ -1,22 +1,26 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
 interface RevealProps {
-  children: React.ReactNode;
+  children: ReactNode;
   className?: string;
-  delay?: number;
-  direction?: "up" | "down" | "left" | "right" | "scale";
-  blur?: boolean;
+  animation?: "fade-up" | "fade-in" | "scale-up" | "slide-right" | "slide-left";
+  delay?: number; // ms
+  duration?: number; // ms
+  threshold?: number;
+  once?: boolean;
 }
 
 export function Reveal({
   children,
   className,
+  animation = "fade-up",
   delay = 0,
-  direction = "up",
-  blur = false,
+  duration = 700,
+  threshold = 0.15,
+  once = true,
 }: RevealProps) {
   const ref = useRef<HTMLDivElement>(null);
   const [isVisible, setIsVisible] = useState(false);
@@ -28,162 +32,60 @@ export function Reveal({
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
-          if (delay > 0) {
-            setTimeout(() => setIsVisible(true), delay);
-          } else {
-            setIsVisible(true);
+          setIsVisible(true);
+          if (once) {
+            observer.unobserve(el);
           }
-          observer.unobserve(el);
+        } else if (!once) {
+          setIsVisible(false);
         }
       },
-      { threshold: 0.05, rootMargin: "30px" }
+      {
+        threshold,
+        rootMargin: "0px 0px -40px 0px",
+      }
     );
 
     observer.observe(el);
     return () => observer.disconnect();
-  }, [delay]);
+  }, [threshold, once]);
 
-  const directionClasses = {
-    up: isVisible ? "translate-y-0" : "translate-y-4",
-    down: isVisible ? "translate-y-0" : "-translate-y-4",
-    left: isVisible ? "translate-y-0" : "translate-y-4",
-    right: isVisible ? "translate-y-0" : "translate-y-4",
-    scale: isVisible ? "scale-100" : "scale-[0.98]",
+  const getAnimationClasses = () => {
+    switch (animation) {
+      case "fade-up":
+        return isVisible
+          ? "opacity-100 translate-y-0"
+          : "opacity-0 translate-y-8";
+      case "fade-in":
+        return isVisible ? "opacity-100" : "opacity-0";
+      case "scale-up":
+        return isVisible
+          ? "opacity-100 scale-100"
+          : "opacity-0 scale-95";
+      case "slide-right":
+        return isVisible
+          ? "opacity-100 translate-x-0"
+          : "opacity-0 -translate-x-8";
+      case "slide-left":
+        return isVisible
+          ? "opacity-100 translate-x-0"
+          : "opacity-0 translate-x-8";
+      default:
+        return isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8";
+    }
   };
 
   return (
     <div
       ref={ref}
-      className={cn(
-        "transition-all duration-500 ease-out",
-        isVisible ? "opacity-100" : "opacity-0",
-        blur && !isVisible && "blur-[2px]",
-        blur && isVisible && "blur-0",
-        directionClasses[direction],
-        className
-      )}
+      style={{
+        transitionDuration: `${duration}ms`,
+        transitionDelay: `${delay}ms`,
+        transitionTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)",
+      }}
+      className={cn("transition-all will-change-transform", getAnimationClasses(), className)}
     >
       {children}
     </div>
-  );
-}
-
-// Staggered grid reveal — each child animates in sequence
-export function StaggeredGrid({
-  children,
-  className,
-  staggerMs = 60,
-}: {
-  children: React.ReactNode;
-  className?: string;
-  staggerMs?: number;
-}) {
-  return (
-    <div className={cn("grid", className)}>
-      {Array.isArray(children)
-        ? children.map((child, i) => (
-            <Reveal key={i} delay={i * staggerMs}>
-              {child}
-            </Reveal>
-          ))
-        : <Reveal>{children}</Reveal>
-      }
-    </div>
-  );
-}
-
-// Parallax section — subtle vertical shift on scroll
-export function ParallaxSection({
-  children,
-  className,
-  speed = 0.05,
-}: {
-  children: React.ReactNode;
-  className?: string;
-  speed?: number;
-}) {
-  const ref = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-
-    let ticking = false;
-
-    const handleScroll = () => {
-      if (!ticking) {
-        requestAnimationFrame(() => {
-          const rect = el.getBoundingClientRect();
-          const viewportCenter = window.innerHeight / 2;
-          const elCenter = rect.top + rect.height / 2;
-          const offset = (elCenter - viewportCenter) * speed;
-          el.style.transform = `translateY(${offset}px)`;
-          ticking = false;
-        });
-        ticking = true;
-      }
-    };
-
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [speed]);
-
-  return (
-    <div ref={ref} className={cn("will-change-transform", className)}>
-      {children}
-    </div>
-  );
-}
-
-// Animated counter — counts up when scrolled into view
-export function AnimatedCounter({
-  target,
-  duration = 1500,
-  prefix = "",
-  suffix = "",
-  className,
-}: {
-  target: number;
-  duration?: number;
-  prefix?: string;
-  suffix?: string;
-  className?: string;
-}) {
-  const ref = useRef<HTMLSpanElement>(null);
-  const [count, setCount] = useState(0);
-  const [hasAnimated, setHasAnimated] = useState(false);
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting && !hasAnimated) {
-          setHasAnimated(true);
-          observer.unobserve(el);
-
-          const start = performance.now();
-          const animate = (now: number) => {
-            const elapsed = now - start;
-            const progress = Math.min(elapsed / duration, 1);
-            const eased = 1 - Math.pow(1 - progress, 3);
-            setCount(Math.round(eased * target));
-            if (progress < 1) requestAnimationFrame(animate);
-          };
-          requestAnimationFrame(animate);
-        }
-      },
-      { threshold: 0.3 }
-    );
-
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, [target, duration, hasAnimated]);
-
-  return (
-    <span ref={ref} className={className}>
-      {prefix}{count}{suffix}
-    </span>
   );
 }
