@@ -3,6 +3,7 @@ import { Cormorant_Garamond, Inter } from "next/font/google";
 import { SITE } from "@/lib/seo";
 import { LocalBusinessSchema, WebsiteSchema, OrganizationSchema } from "@/components/seo/local-business-schema";
 import { ScrollProgressBar } from "@/components/ui/scroll-progress";
+import { SearchDialog } from "@/components/search/search-dialog";
 import "./globals.css";
 
 const cormorant = Cormorant_Garamond({
@@ -115,6 +116,7 @@ export default function RootLayout({
       </head>
       <body className="min-h-screen bg-neutral-50 text-neutral-950 font-body antialiased selection:bg-neutral-900 selection:text-white">
         <ScrollProgressBar />
+        <SearchDialog />
         {children}
       </body>
     </html>

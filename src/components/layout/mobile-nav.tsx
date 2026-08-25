@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useCartStore } from "@/lib/store/cart";
+import { useSearchStore } from "@/lib/store/search";
 import { useI18n } from "@/lib/i18n/context";
 import { cn } from "@/lib/utils";
 import { Home, Layers, Compass, Search, ShoppingBag } from "lucide-react";
@@ -10,7 +11,8 @@ import { Home, Layers, Compass, Search, ShoppingBag } from "lucide-react";
 export function MobileNav() {
   const pathname = usePathname();
   const itemCount = useCartStore((s) => s.itemCount());
-  const setOpen = useCartStore((s) => s.setOpen);
+  const setOpenCart = useCartStore((s) => s.setOpen);
+  const setOpenSearch = useSearchStore((s) => s.setOpen);
   const { t } = useI18n();
 
   const navItems = [
@@ -57,12 +59,10 @@ export function MobileNav() {
           );
         })}
 
-        {/* Search button */}
+        {/* Search button (Opens Global Search Command Palette) */}
         <button
-          onClick={() => {
-            document.dispatchEvent(new CustomEvent("open-search"));
-          }}
-          className="flex flex-col items-center gap-1 py-1 text-[10px] font-semibold uppercase tracking-wider text-neutral-400 hover:text-neutral-700 min-w-[52px] cursor-pointer"
+          onClick={() => setOpenSearch(true)}
+          className="flex flex-col items-center gap-1 py-1 text-[10px] font-semibold uppercase tracking-wider text-neutral-400 hover:text-neutral-950 min-w-[52px] cursor-pointer"
         >
           <div className="flex h-7 w-7 items-center justify-center">
             <Search className="w-4 h-4" />
@@ -72,7 +72,7 @@ export function MobileNav() {
 
         {/* Bag button */}
         <button
-          onClick={() => setOpen(true)}
+          onClick={() => setOpenCart(true)}
           className={cn(
             "flex flex-col items-center gap-1 py-1 text-[10px] font-semibold uppercase tracking-wider min-w-[52px] relative cursor-pointer",
             itemCount > 0 ? "text-neutral-950" : "text-neutral-400 hover:text-neutral-700"

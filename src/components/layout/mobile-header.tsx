@@ -3,10 +3,13 @@
 import { Logo } from "@/components/brand/logo";
 import { CartBubble } from "@/components/cart/cart-bubble";
 import { LanguageToggle } from "@/components/layout/language-toggle";
+import { useSearchStore } from "@/lib/store/search";
 import { Search } from "lucide-react";
 import { SITE } from "@/lib/seo";
 
 export function MobileHeader() {
+  const setOpenSearch = useSearchStore((s) => s.setOpen);
+
   return (
     <header className="sticky top-0 z-40 md:hidden border-b border-neutral-200/70 bg-white/85 backdrop-blur-lg">
       <div className="flex h-14 items-center justify-between px-3 sm:px-4">
@@ -29,11 +32,9 @@ export function MobileHeader() {
           </a>
 
           <button
-            onClick={() => {
-              document.dispatchEvent(new CustomEvent("open-search"));
-            }}
+            onClick={() => setOpenSearch(true)}
             aria-label="Search cases"
-            className="flex h-8 w-8 items-center justify-center rounded-full border border-neutral-200/80 bg-white text-neutral-600 hover:text-neutral-950 transition-colors shadow-2xs"
+            className="flex h-8 w-8 items-center justify-center rounded-full border border-neutral-200/80 bg-white text-neutral-600 hover:text-neutral-950 transition-colors shadow-2xs cursor-pointer"
           >
             <Search className="h-3.5 w-3.5" />
           </button>
