@@ -74,8 +74,8 @@ export function SearchBar() {
 
   return (
     <div ref={wrapperRef} className="relative">
-      {/* ═══ Inline Search Bar (No Outlines, No Harsh Boxes) ═══ */}
-      <div className="flex items-center gap-2 rounded-full border border-neutral-200/90 bg-neutral-100/70 px-3.5 py-1.5 text-xs transition-all duration-200 focus-within:border-neutral-900 focus-within:bg-white shadow-2xs">
+      {/* ═══ Inline Search Bar (Frosted Glass Pill) ═══ */}
+      <div className="flex items-center gap-2 rounded-full border border-white/80 bg-white/80 backdrop-blur-md px-3.5 py-1.5 text-xs transition-all duration-200 focus-within:border-neutral-900 focus-within:bg-white shadow-2xs">
         <Search className="h-3.5 w-3.5 shrink-0 text-neutral-400" />
         <input
           ref={inputRef}
@@ -107,7 +107,7 @@ export function SearchBar() {
 
       {/* ═══ Attached Results Dropdown Directly Underneath Search Bar ═══ */}
       {showDropdown && (
-        <div className="absolute top-full right-0 mt-2 w-80 sm:w-96 rounded-2xl border border-neutral-200 bg-white shadow-2xl shadow-neutral-900/10 overflow-hidden z-50 animate-scale-in">
+        <div className="absolute top-full right-0 mt-2 w-80 sm:w-96 rounded-2xl border border-white/70 bg-white/92 backdrop-blur-2xl shadow-2xl shadow-neutral-900/10 overflow-hidden z-50 animate-scale-in">
           {query.trim().length === 0 ? (
             <div className="p-4">
               <div className="flex items-center gap-1.5 mb-2.5">
