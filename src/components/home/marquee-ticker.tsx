@@ -18,10 +18,10 @@ export function MarqueeTicker() {
         {[...MARQUEE_ITEMS, ...MARQUEE_ITEMS, ...MARQUEE_ITEMS].map((item, idx) => {
           const Icon = item.icon;
           return (
-            <div key={idx} className="flex items-center gap-2.5 text-xs font-semibold uppercase tracking-widest text-neutral-800">
-              <Icon className="h-4 w-4 text-[#A88B4D]" />
-              <span>{item.text}</span>
-              <span className="text-neutral-300 ml-6">•</span>
+            <div key={idx} className="flex items-center gap-2.5 text-xs font-semibold uppercase tracking-widest text-neutral-800 whitespace-nowrap shrink-0">
+              <Icon className="h-4 w-4 text-[#A88B4D] shrink-0" />
+              <span className="whitespace-nowrap">{item.text}</span>
+              <span className="text-neutral-300 ml-6 shrink-0">•</span>
             </div>
           );
         })}

@@ -163,7 +163,7 @@ export function ProductCard({ product, className }: ProductCardProps) {
         <div className="flex items-center justify-between gap-1 text-[11px] font-bold text-neutral-400">
           <span className="uppercase tracking-widest truncate">{product.modelName}</span>
           {product.categoryName && (
-            <span className="text-[10px] text-neutral-400 shrink-0 font-medium uppercase tracking-wider">
+            <span className="text-[10px] text-neutral-400 shrink-0 font-medium uppercase tracking-wider whitespace-nowrap">
               {product.categoryName}
             </span>
           )}
@@ -176,15 +176,17 @@ export function ProductCard({ product, className }: ProductCardProps) {
           {product.name}
         </Link>
 
-        <div className="mt-1.5 flex items-center justify-between">
-          <Price price={product.price} comparePrice={product.comparePrice} size="sm" showBadge={false} />
+        <div className="mt-1.5 flex items-center justify-between gap-2">
+          <div className="min-w-0">
+            <Price price={product.price} comparePrice={product.comparePrice} size="sm" showBadge={false} />
+          </div>
 
           {/* Mobile Quick Add Button */}
           <button
             onClick={handleAddToCart}
             aria-label="Add to bag"
             className={cn(
-              "sm:hidden flex h-7 items-center justify-center gap-1 px-2.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all cursor-pointer",
+              "sm:hidden flex h-7 items-center justify-center gap-1 px-2.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all cursor-pointer whitespace-nowrap shrink-0",
               isAdded
                 ? "bg-emerald-600 text-white"
                 : "bg-neutral-950 text-white active:scale-95"

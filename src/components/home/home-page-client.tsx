@@ -121,18 +121,18 @@ export function HomePageClient({
 
               {/* Trust Points with Staggered Fade */}
               <Reveal animation="fade-up" delay={450}>
-                <div className="grid grid-cols-3 gap-4 pt-6 border-t border-neutral-200/60">
-                  <div>
-                    <span className="block text-sm sm:text-base font-bold text-neutral-950 font-mono">0.1mm</span>
-                    <span className="text-[11px] text-neutral-500 font-medium">Precision Fit</span>
+                <div className="grid grid-cols-3 gap-2 sm:gap-4 pt-6 border-t border-neutral-200/60">
+                  <div className="min-w-0">
+                    <span className="block text-xs sm:text-base font-bold text-neutral-950 font-mono whitespace-nowrap">0.1mm</span>
+                    <span className="text-[10px] sm:text-[11px] text-neutral-500 font-medium whitespace-nowrap block truncate">Precision Fit</span>
                   </div>
-                  <div>
-                    <span className="block text-sm sm:text-base font-bold text-neutral-950 font-mono">24H Express</span>
-                    <span className="text-[11px] text-neutral-500 font-medium">Doha Dispatch</span>
+                  <div className="min-w-0">
+                    <span className="block text-xs sm:text-base font-bold text-neutral-950 font-mono whitespace-nowrap">24H Express</span>
+                    <span className="text-[10px] sm:text-[11px] text-neutral-500 font-medium whitespace-nowrap block truncate">Doha Dispatch</span>
                   </div>
-                  <div>
-                    <span className="block text-sm sm:text-base font-bold text-neutral-950 font-mono">100% Fit</span>
-                    <span className="text-[11px] text-neutral-500 font-medium">7-Day Guarantee</span>
+                  <div className="min-w-0">
+                    <span className="block text-xs sm:text-base font-bold text-neutral-950 font-mono whitespace-nowrap">100% Fit</span>
+                    <span className="text-[10px] sm:text-[11px] text-neutral-500 font-medium whitespace-nowrap block truncate">7-Day Guarantee</span>
                   </div>
                 </div>
               </Reveal>

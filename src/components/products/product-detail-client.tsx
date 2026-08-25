@@ -158,9 +158,9 @@ export function ProductDetailClient({
                 </span>
 
                 {/* Shelled-style Live Stock Pill */}
-                <div className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 text-[10px] font-bold text-emerald-700">
-                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-600 animate-pulse" />
-                  <span>In Stock • Dispatches Today</span>
+                <div className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 text-[10px] font-bold text-emerald-700 whitespace-nowrap shrink-0">
+                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-600 animate-pulse shrink-0" />
+                  <span className="whitespace-nowrap">In Stock • Dispatches Today</span>
                 </div>
               </div>
 
@@ -185,7 +185,7 @@ export function ProductDetailClient({
                     key={model.id}
                     onClick={() => setSelectedModel(model)}
                     className={cn(
-                      "px-3.5 py-2 rounded-xl text-xs font-semibold uppercase tracking-wider transition-all duration-200 cursor-pointer select-none",
+                      "px-3.5 py-2 rounded-xl text-xs font-semibold uppercase tracking-wider transition-all duration-200 cursor-pointer select-none whitespace-nowrap",
                       selectedModel.id === model.id
                         ? "bg-neutral-950 text-white shadow-sm"
                         : "border border-neutral-200/80 bg-neutral-50 text-neutral-600 hover:border-neutral-400 hover:text-neutral-950"
