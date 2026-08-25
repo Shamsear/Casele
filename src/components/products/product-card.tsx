@@ -59,6 +59,8 @@ export function ProductCard({ product, className }: ProductCardProps) {
         : undefined,
       modelId: modelSlug,
       modelName: product.modelName,
+      finish: "Matte",
+      caseType: "Slim Precision",
     });
 
     vibrate(10);
@@ -78,14 +80,14 @@ export function ProductCard({ product, className }: ProductCardProps) {
   return (
     <div
       className={cn(
-        "group relative flex flex-col rounded-2xl border border-neutral-200/80 bg-white p-3 sm:p-3.5 transition-all duration-300 hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:-translate-y-0.5",
+        "group relative flex flex-col transition-all duration-300",
         className
       )}
     >
-      {/* ═══ 4:5 Aspect Ratio Product Image Frame ═══ */}
+      {/* ═══ 4:5 Aspect Ratio Product Image Frame (Containerless Editorial Look) ═══ */}
       <Link
         href={`/shop/${modelSlug}/${product.slug}`}
-        className="relative aspect-[4/5] w-full overflow-hidden rounded-xl bg-neutral-100/60 block"
+        className="relative aspect-[4/5] w-full overflow-hidden rounded-2xl bg-neutral-100/70 block transition-all duration-300 group-hover:bg-neutral-100"
       >
         {/* Primary Studio Angle */}
         <Image
@@ -93,7 +95,7 @@ export function ProductCard({ product, className }: ProductCardProps) {
           alt={product.name}
           fill
           className={cn(
-            "object-contain p-4 sm:p-6 transition-all duration-500 ease-out group-hover:scale-105",
+            "object-contain p-4 sm:p-6 transition-all duration-500 ease-out group-hover:scale-105 drop-shadow-sm",
             hasSecondImage && "group-hover:opacity-0"
           )}
           sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
@@ -105,13 +107,13 @@ export function ProductCard({ product, className }: ProductCardProps) {
             src={secondImageUrl}
             alt={`${product.name} alternate angle`}
             fill
-            className="object-contain p-4 sm:p-6 transition-all duration-500 ease-out opacity-0 group-hover:opacity-100 group-hover:scale-105"
+            className="object-contain p-4 sm:p-6 transition-all duration-500 ease-out opacity-0 group-hover:opacity-100 group-hover:scale-105 drop-shadow-sm"
             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
           />
         )}
 
         {/* Minimal Badges */}
-        <div className="absolute top-2.5 left-2.5 flex flex-col gap-1 z-10 pointer-events-none">
+        <div className="absolute top-3 left-3 flex flex-col gap-1 z-10 pointer-events-none">
           {product.badge && <ProductBadge badge={product.badge} />}
         </div>
 
@@ -120,7 +122,7 @@ export function ProductCard({ product, className }: ProductCardProps) {
           onClick={handleWishlist}
           aria-label={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
           className={cn(
-            "absolute top-2.5 right-2.5 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 backdrop-blur-sm border border-neutral-200/80 text-neutral-600 transition-all duration-200 hover:scale-110 active:scale-95 shadow-xs cursor-pointer",
+            "absolute top-3 right-3 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 backdrop-blur-sm border border-neutral-200/80 text-neutral-600 transition-all duration-200 hover:scale-110 active:scale-95 shadow-2xs cursor-pointer",
             isWishlisted && "text-red-500 border-red-200 bg-red-50/90"
           )}
         >
@@ -129,8 +131,8 @@ export function ProductCard({ product, className }: ProductCardProps) {
           />
         </button>
 
-        {/* Quick Action Overlay (Slide-up button on card hover) */}
-        <div className="absolute bottom-2.5 inset-x-2.5 z-10 hidden sm:block pointer-events-none">
+        {/* Quick Action Overlay (Slide-up button directly on bottom of image) */}
+        <div className="absolute bottom-3 inset-x-3 z-10 hidden sm:block pointer-events-none">
           <button
             onClick={handleAddToCart}
             className={cn(
@@ -156,12 +158,12 @@ export function ProductCard({ product, className }: ProductCardProps) {
         </div>
       </Link>
 
-      {/* ═══ Details & Mobile Action ═══ */}
-      <div className="flex flex-1 flex-col pt-3 pb-1">
-        <div className="flex items-center justify-between gap-1 text-[11px] font-medium text-neutral-400">
+      {/* ═══ Details Directly on Canvas (No Boxy Card Container) ═══ */}
+      <div className="flex flex-1 flex-col pt-3">
+        <div className="flex items-center justify-between gap-1 text-[11px] font-bold text-neutral-400">
           <span className="uppercase tracking-widest truncate">{product.modelName}</span>
           {product.categoryName && (
-            <span className="text-[10px] text-neutral-400 shrink-0 font-normal">
+            <span className="text-[10px] text-neutral-400 shrink-0 font-medium uppercase tracking-wider">
               {product.categoryName}
             </span>
           )}
@@ -169,12 +171,12 @@ export function ProductCard({ product, className }: ProductCardProps) {
 
         <Link
           href={`/shop/${modelSlug}/${product.slug}`}
-          className="mt-1 font-medium text-sm text-neutral-900 line-clamp-1 hover:text-neutral-600 transition-colors"
+          className="mt-1 font-medium text-sm text-neutral-950 line-clamp-1 hover:text-neutral-600 transition-colors"
         >
           {product.name}
         </Link>
 
-        <div className="mt-auto pt-2.5 flex items-center justify-between">
+        <div className="mt-1.5 flex items-center justify-between">
           <Price price={product.price} comparePrice={product.comparePrice} size="sm" showBadge={false} />
 
           {/* Mobile Quick Add Button */}
@@ -182,7 +184,7 @@ export function ProductCard({ product, className }: ProductCardProps) {
             onClick={handleAddToCart}
             aria-label="Add to bag"
             className={cn(
-              "sm:hidden flex h-8 items-center justify-center gap-1 px-2.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all cursor-pointer",
+              "sm:hidden flex h-7 items-center justify-center gap-1 px-2.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all cursor-pointer",
               isAdded
                 ? "bg-emerald-600 text-white"
                 : "bg-neutral-950 text-white active:scale-95"
