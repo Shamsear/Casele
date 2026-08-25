@@ -13,83 +13,44 @@ interface RevealProps {
   once?: boolean;
 }
 
-// Global velocity tracker for ultra-efficient shared state
-let lastScrollY = 0;
-let lastScrollTime = 0;
-let currentScrollVelocity = 0; // px/ms
-let isFastScrolling = false;
-let velocityTimeout: ReturnType<typeof setTimeout> | null = null;
-
-if (typeof window !== "undefined") {
-  lastScrollY = window.scrollY;
-  lastScrollTime = performance.now();
-
-  window.addEventListener(
-    "scroll",
-    () => {
-      const now = performance.now();
-      const dt = Math.max(now - lastScrollTime, 1);
-      const dy = Math.abs(window.scrollY - lastScrollY);
-      currentScrollVelocity = dy / dt;
-
-      isFastScrolling = currentScrollVelocity > 0.8;
-
-      lastScrollY = window.scrollY;
-      lastScrollTime = now;
-
-      if (velocityTimeout) clearTimeout(velocityTimeout);
-      velocityTimeout = setTimeout(() => {
-        currentScrollVelocity = 0;
-        isFastScrolling = false;
-      }, 120);
-    },
-    { passive: true }
-  );
-}
-
 export function Reveal({
   children,
   className,
   animation = "fade-up",
   delay = 0,
-  duration = 320,
-  threshold = 0.01,
+  duration = 550,
+  threshold = 0.1,
   once = true,
 }: RevealProps) {
   const ref = useRef<HTMLDivElement>(null);
   const [isVisible, setIsVisible] = useState(false);
-  const [actualDuration, setActualDuration] = useState(duration);
-  const [actualDelay, setActualDelay] = useState(delay);
 
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
 
-    // Instant reveal if element is already within or near the visible screen
-    const rect = el.getBoundingClientRect();
-    if (rect.top < window.innerHeight + 250 && rect.bottom > -100) {
-      setIsVisible(true);
-      setActualDuration(0);
-      setActualDelay(0);
-      return;
-    }
-
-    const triggerReveal = () => {
-      // If user is scrolling fast, accelerate animation to instant/snappy
-      if (isFastScrolling || currentScrollVelocity > 0.6) {
-        setActualDuration(Math.min(100, Math.round(duration * 0.3)));
-        setActualDelay(0);
-      } else {
-        setActualDuration(duration);
-        setActualDelay(delay);
+    // Check if in viewport on mount and trigger smooth entrance
+    const checkInitial = () => {
+      const rect = el.getBoundingClientRect();
+      if (rect.top < window.innerHeight - 30 && rect.bottom > 0) {
+        // Use requestAnimationFrame to ensure browser paints initial state before animating
+        requestAnimationFrame(() => {
+          setTimeout(() => {
+            setIsVisible(true);
+          }, delay);
+        });
+        return true;
       }
-      setIsVisible(true);
+      return false;
     };
+
+    const isInitiallyVisible = checkInitial();
+    if (isInitiallyVisible && once) return;
 
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
-          triggerReveal();
+          setIsVisible(true);
           if (once) {
             observer.unobserve(el);
           }
@@ -99,56 +60,36 @@ export function Reveal({
       },
       {
         threshold,
-        // Large lookahead trigger (320px ahead) ensures animations are triggered before the user reaches the content
-        rootMargin: "320px 0px 100px 0px",
+        rootMargin: "0px 0px -40px 0px",
       }
     );
 
     observer.observe(el);
-
-    // Scroll listener backup to guarantee zero missed content during high-speed scrolling
-    const checkVisibilityOnScroll = () => {
-      if (isVisible && once) return;
-      const currentRect = el.getBoundingClientRect();
-      if (currentRect.top <= window.innerHeight + 150) {
-        triggerReveal();
-        if (once) {
-          observer.unobserve(el);
-          window.removeEventListener("scroll", checkVisibilityOnScroll);
-        }
-      }
-    };
-
-    window.addEventListener("scroll", checkVisibilityOnScroll, { passive: true });
-
-    return () => {
-      observer.disconnect();
-      window.removeEventListener("scroll", checkVisibilityOnScroll);
-    };
-  }, [threshold, once, duration, delay, isVisible]);
+    return () => observer.disconnect();
+  }, [threshold, once, delay]);
 
   const getAnimationClasses = () => {
     switch (animation) {
       case "fade-up":
         return isVisible
           ? "opacity-100 translate-y-0"
-          : "opacity-0 translate-y-3";
+          : "opacity-0 translate-y-8";
       case "fade-in":
         return isVisible ? "opacity-100" : "opacity-0";
       case "scale-up":
         return isVisible
           ? "opacity-100 scale-100"
-          : "opacity-0 scale-[0.98]";
+          : "opacity-0 scale-95";
       case "slide-right":
         return isVisible
           ? "opacity-100 translate-x-0"
-          : "opacity-0 -translate-x-3";
+          : "opacity-0 -translate-x-8";
       case "slide-left":
         return isVisible
           ? "opacity-100 translate-x-0"
-          : "opacity-0 translate-x-3";
+          : "opacity-0 translate-x-8";
       default:
-        return isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-3";
+        return isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8";
     }
   };
 
@@ -156,8 +97,8 @@ export function Reveal({
     <div
       ref={ref}
       style={{
-        transitionDuration: `${actualDuration}ms`,
-        transitionDelay: `${actualDelay}ms`,
+        transitionDuration: `${duration}ms`,
+        transitionDelay: `${delay}ms`,
         transitionTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)",
       }}
       className={cn("transition-all will-change-transform", getAnimationClasses(), className)}

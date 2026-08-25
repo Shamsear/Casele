@@ -62,46 +62,46 @@ export function HomePageClient({
   return (
     <div className="min-h-screen bg-neutral-50 text-neutral-950 overflow-hidden">
       {/* 1. HERO SECTION: Editorial High-Conversion DTC Showcase */}
-      <section className="relative overflow-hidden min-h-[calc(100dvh-56px)] sm:min-h-[calc(100dvh-64px)] lg:min-h-[82vh] flex items-center justify-center pt-6 pb-8 sm:py-12 lg:py-16">
+      <section className="relative overflow-hidden pt-3 pb-6 sm:pt-6 sm:pb-8 lg:pt-6 lg:pb-8 flex items-center justify-center">
         {/* Animated Ambient Drift Orbs */}
-        <div className="pointer-events-none absolute top-10 right-10 h-72 w-72 sm:h-96 sm:w-96 rounded-full bg-amber-100/50 blur-3xl animate-float-slow" />
-        <div className="pointer-events-none absolute bottom-10 left-10 h-72 w-72 sm:h-96 sm:w-96 rounded-full bg-neutral-200/50 blur-3xl animate-float" />
+        <div className="pointer-events-none absolute top-10 right-10 h-64 w-64 sm:h-80 sm:w-80 rounded-full bg-amber-100/40 blur-3xl animate-float-slow" />
+        <div className="pointer-events-none absolute bottom-10 left-10 h-64 w-64 sm:h-80 sm:w-80 rounded-full bg-neutral-200/40 blur-3xl animate-float" />
 
         <div className="mx-auto max-w-7xl w-full px-4 sm:px-6 lg:px-8 relative z-10 my-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center">
-            {/* Left Editorial Copy (7 Cols on desktop, Full width centered on mobile) */}
-            <div className="lg:col-span-7 space-y-5 sm:space-y-6 flex flex-col justify-center">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-center">
+            {/* Left Editorial Copy (7 Cols on desktop) */}
+            <div className="lg:col-span-7 space-y-3.5 sm:space-y-4 flex flex-col justify-center">
               {/* Live Atelier Badge */}
-              <Reveal animation="fade-up" delay={0}>
-                <div className="inline-flex items-center gap-2 rounded-full border border-neutral-200 bg-white px-3.5 py-1.5 shadow-2xs">
-                  <span className="flex h-2 w-2 rounded-full bg-[#C5A869] animate-ping" />
-                  <span className="text-[10px] font-bold tracking-[0.18em] uppercase text-neutral-900">
+              <Reveal animation="fade-up" delay={50}>
+                <div className="inline-flex items-center gap-2 rounded-full border border-neutral-200 bg-white px-3 py-1 shadow-2xs">
+                  <span className="flex h-1.5 w-1.5 rounded-full bg-[#C5A869] animate-ping" />
+                  <span className="text-[9px] sm:text-[10px] font-bold tracking-[0.18em] uppercase text-neutral-900">
                     Doha Atelier • 2026 Collection
                   </span>
                 </div>
               </Reveal>
 
               {/* Main Headline */}
-              <Reveal animation="fade-up" delay={30}>
-                <h1 className="font-display text-4xl sm:text-6xl lg:text-7xl font-normal leading-[1.05] tracking-tight text-neutral-950">
+              <Reveal animation="fade-up" delay={120}>
+                <h1 className="font-display text-3xl sm:text-5xl lg:text-[2.85rem] xl:text-5xl font-normal leading-[1.08] tracking-tight text-neutral-950">
                   Refined Protection. <br />
                   <span className="italic font-light text-neutral-700">Uncompromised Design.</span>
                 </h1>
               </Reveal>
 
               {/* Subtitle */}
-              <Reveal animation="fade-up" delay={60}>
-                <p className="max-w-xl text-xs sm:text-sm lg:text-base leading-relaxed text-neutral-600">
+              <Reveal animation="fade-up" delay={190}>
+                <p className="max-w-lg text-xs sm:text-sm leading-relaxed text-neutral-600">
                   Engineered with aerospace composites, surgical tolerances, and tactile metallic accents. Hand-finished for contemporary iPhone and Galaxy flagships in Qatar.
                 </p>
               </Reveal>
 
               {/* Dual CTAs with Shimmer Hover */}
-              <Reveal animation="fade-up" delay={90}>
-                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-1">
+              <Reveal animation="fade-up" delay={260}>
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 pt-0.5">
                   <Link
                     href="/shop"
-                    className="btn-shimmer inline-flex items-center justify-center gap-2 rounded-xl bg-neutral-950 px-7 py-3.5 text-xs font-semibold uppercase tracking-widest text-white shadow-sm transition-all hover:bg-neutral-800 active:scale-[0.98]"
+                    className="btn-shimmer inline-flex items-center justify-center gap-2 rounded-xl bg-neutral-950 px-5 sm:px-6 py-2.5 sm:py-3 text-xs font-semibold uppercase tracking-widest text-white shadow-xs transition-all hover:bg-neutral-800 active:scale-[0.98]"
                   >
                     <span>Shop All Cases</span>
                     <ArrowRight className="h-3.5 w-3.5" />
@@ -111,7 +111,7 @@ export function HomePageClient({
                     href="https://wa.me/97455364455?text=Hello%20CASEL%C3%89%20Atelier%2C%20I%20would%20like%20to%20inquire%20about%20your%20protective%20cases."
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center justify-center gap-2 rounded-xl border border-neutral-300 bg-white px-6 py-3.5 text-xs font-semibold uppercase tracking-widest text-neutral-900 transition-all hover:bg-neutral-50 active:scale-[0.98] shadow-2xs"
+                    className="inline-flex items-center justify-center gap-2 rounded-xl border border-neutral-300 bg-white px-5 sm:px-6 py-2.5 sm:py-3 text-xs font-semibold uppercase tracking-widest text-neutral-900 transition-all hover:bg-neutral-50 active:scale-[0.98] shadow-2xs"
                   >
                     <MessageSquare className="h-3.5 w-3.5" />
                     <span>WhatsApp Concierge</span>
@@ -120,32 +120,32 @@ export function HomePageClient({
               </Reveal>
 
               {/* Trust Points with Staggered Fade */}
-              <Reveal animation="fade-up" delay={120}>
-                <div className="grid grid-cols-3 gap-2 sm:gap-4 pt-5 sm:pt-6 border-t border-neutral-200/60">
+              <Reveal animation="fade-up" delay={330}>
+                <div className="grid grid-cols-3 gap-2 sm:gap-4 pt-3.5 sm:pt-4 border-t border-neutral-200/60">
                   <div className="min-w-0">
-                    <span className="block text-xs sm:text-base font-bold text-neutral-950 font-mono whitespace-nowrap">0.1mm</span>
+                    <span className="block text-xs sm:text-sm font-bold text-neutral-950 font-mono whitespace-nowrap">0.1mm</span>
                     <span className="text-[10px] sm:text-[11px] text-neutral-500 font-medium whitespace-nowrap block truncate">Precision Fit</span>
                   </div>
                   <div className="min-w-0">
-                    <span className="block text-xs sm:text-base font-bold text-neutral-950 font-mono whitespace-nowrap">24H Express</span>
+                    <span className="block text-xs sm:text-sm font-bold text-neutral-950 font-mono whitespace-nowrap">24H Express</span>
                     <span className="text-[10px] sm:text-[11px] text-neutral-500 font-medium whitespace-nowrap block truncate">Doha Dispatch</span>
                   </div>
                   <div className="min-w-0">
-                    <span className="block text-xs sm:text-base font-bold text-neutral-950 font-mono whitespace-nowrap">100% Fit</span>
+                    <span className="block text-xs sm:text-sm font-bold text-neutral-950 font-mono whitespace-nowrap">100% Fit</span>
                     <span className="text-[10px] sm:text-[11px] text-neutral-500 font-medium whitespace-nowrap block truncate">7-Day Guarantee</span>
                   </div>
                 </div>
               </Reveal>
             </div>
 
-            {/* Right Hero Product Spotlight (5 Cols - Visible on 2-column desktop grid) */}
+            {/* Right Hero Product Spotlight (5 Cols - Visible on desktop) */}
             <div className="hidden lg:flex lg:col-span-5 justify-center">
-              <Reveal animation="scale-up" delay={150} className="w-full max-w-sm">
-                <TiltCard maxTilt={8} scale={1.03}>
-                  <div className="group relative w-full aspect-[4/5] rounded-3xl bg-white border border-neutral-200/80 p-8 flex items-center justify-center shadow-lg transition-shadow duration-500 hover:shadow-2xl">
+              <Reveal animation="scale-up" delay={150} className="w-full max-w-[310px] xl:max-w-[335px]">
+                <TiltCard maxTilt={6} scale={1.02}>
+                  <div className="group relative w-full aspect-[4/5] rounded-3xl bg-white border border-neutral-200/80 p-5 xl:p-6 flex items-center justify-center shadow-md transition-shadow duration-500 hover:shadow-xl">
                     {/* Floating Tag */}
-                    <div className="absolute top-4 left-4 z-10">
-                      <span className="inline-flex items-center rounded-full bg-neutral-950 px-3 py-1 text-[10px] font-bold text-white uppercase tracking-wider shadow-xs">
+                    <div className="absolute top-3.5 left-3.5 z-10">
+                      <span className="inline-flex items-center rounded-full bg-neutral-950 px-2.5 py-0.5 text-[9px] font-bold text-white uppercase tracking-wider shadow-xs">
                         Studio Spotlight
                       </span>
                     </div>
@@ -157,14 +157,14 @@ export function HomePageClient({
                         alt="Featured Case"
                         fill
                         priority
-                        className="object-contain p-4 transition-transform duration-700 group-hover:scale-105 drop-shadow-2xl"
-                        sizes="400px"
+                        className="object-contain p-2 transition-transform duration-700 group-hover:scale-105 drop-shadow-xl"
+                        sizes="340px"
                       />
                     </div>
 
                     {/* Floating Price Pill */}
-                    <div className="absolute bottom-4 right-4 z-10 rounded-2xl bg-white/95 backdrop-blur-md border border-neutral-200/80 px-3.5 py-1.5 shadow-sm text-right">
-                      <p className="text-[9px] font-bold text-neutral-400 uppercase tracking-wider">Titanium Frame</p>
+                    <div className="absolute bottom-3.5 right-3.5 z-10 rounded-2xl bg-white/95 backdrop-blur-md border border-neutral-200/80 px-3 py-1 shadow-sm text-right">
+                      <p className="text-[8px] font-bold text-neutral-400 uppercase tracking-wider">Titanium Frame</p>
                       <p className="text-xs font-bold text-neutral-950">QR 85</p>
                     </div>
                   </div>
