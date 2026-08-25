@@ -8,7 +8,7 @@ import { MarqueeTicker } from "@/components/home/marquee-ticker";
 import { ComparisonSlider } from "@/components/home/comparison-slider";
 import { ExplodedLayers } from "@/components/home/exploded-layers";
 import { TestimonialsSection } from "@/components/home/testimonials-section";
-import type { ProductWithRelations, CategoryWithCount } from "@/lib/db/products";
+import type { ProductWithRelations, CategoryWithCount, ModelWithCount } from "@/lib/db/products";
 import {
   ArrowRight,
   ShieldCheck,
@@ -23,8 +23,9 @@ import {
 import { cn } from "@/lib/utils";
 
 interface HomePageClientProps {
-  initialProducts: ProductWithRelations[];
+  allProducts: ProductWithRelations[];
   featuredProducts: ProductWithRelations[];
+  models: ModelWithCount[];
   categories: CategoryWithCount[];
 }
 
@@ -38,19 +39,20 @@ const FILTER_TABS = [
 ];
 
 export function HomePageClient({
-  initialProducts,
+  allProducts,
   featuredProducts,
+  models,
   categories,
 }: HomePageClientProps) {
   const [activeTab, setActiveTab] = useState("all");
 
-  const filteredProducts = initialProducts.filter((product) => {
+  const filteredProducts = allProducts.filter((product) => {
     if (activeTab === "all") return true;
-    if (activeTab === "bestsellers") return product.badge === "BESTSELLER" || product.isFeatured;
-    if (activeTab === "new") return product.badge === "NEW";
-    if (activeTab === "premium") return product.categorySlug === "premium" || product.name.toLowerCase().includes("leather");
-    if (activeTab === "minimal") return product.categorySlug === "minimal" || product.name.toLowerCase().includes("silicone");
-    if (activeTab === "sport") return product.categorySlug === "protection" || product.name.toLowerCase().includes("carbon");
+    if (activeTab === "bestsellers") return product.badge?.toLowerCase() === "bestseller" || product.isFeatured;
+    if (activeTab === "new") return product.badge?.toLowerCase() === "new";
+    if (activeTab === "premium") return product.categoryName.toLowerCase().includes("premium") || product.name.toLowerCase().includes("leather");
+    if (activeTab === "minimal") return product.categoryName.toLowerCase().includes("classic") || product.name.toLowerCase().includes("crystal") || product.name.toLowerCase().includes("silicone");
+    if (activeTab === "sport") return product.categoryName.toLowerCase().includes("sport") || product.name.toLowerCase().includes("carbon");
     return true;
   });
 
@@ -233,27 +235,19 @@ export function HomePageClient({
           </div>
 
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-            {[
-              { name: "iPhone 15 Pro Max", slug: "iphone-15-pro-max", count: "12 Styles", icon: Smartphone },
-              { name: "iPhone 15 Pro", slug: "iphone-15-pro", count: "12 Styles", icon: Smartphone },
-              { name: "Galaxy S24 Ultra", slug: "samsung-galaxy-s24-ultra", count: "10 Styles", icon: Smartphone },
-              { name: "Pixel 8 Pro", slug: "google-pixel-8-pro", count: "8 Styles", icon: Smartphone },
-            ].map((device) => {
-              const Icon = device.icon;
-              return (
-                <Link
-                  key={device.slug}
-                  href={`/shop/${device.slug}`}
-                  className="group flex flex-col items-center justify-center rounded-2xl border border-neutral-200/80 bg-neutral-50/70 p-6 text-center transition-all duration-300 hover:border-neutral-950 hover:bg-white hover:shadow-md hover:-translate-y-1"
-                >
-                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white border border-neutral-200/80 text-neutral-900 group-hover:bg-neutral-950 group-hover:text-white transition-colors">
-                    <Icon className="h-6 w-6" />
-                  </div>
-                  <h3 className="mt-4 font-bold text-xs sm:text-sm text-neutral-950">{device.name}</h3>
-                  <span className="mt-1 text-[11px] text-neutral-500 font-medium">{device.count}</span>
-                </Link>
-              );
-            })}
+            {models.map((device) => (
+              <Link
+                key={device.slug}
+                href={`/shop/${device.slug}`}
+                className="group flex flex-col items-center justify-center rounded-2xl border border-neutral-200/80 bg-neutral-50/70 p-6 text-center transition-all duration-300 hover:border-neutral-950 hover:bg-white hover:shadow-md hover:-translate-y-1"
+              >
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white border border-neutral-200/80 text-neutral-900 group-hover:bg-neutral-950 group-hover:text-white transition-colors">
+                  <Smartphone className="h-6 w-6" />
+                </div>
+                <h3 className="mt-4 font-bold text-xs sm:text-sm text-neutral-950">{device.name}</h3>
+                <span className="mt-1 text-[11px] text-neutral-500 font-medium">{device.count} Styles Available</span>
+              </Link>
+            ))}
           </div>
         </div>
       </section>
