@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useSyncExternalStore } from "react";
 import Link from "next/link";
 
 const ANNOUNCEMENTS = [
@@ -21,21 +21,27 @@ const ANNOUNCEMENTS = [
   },
 ];
 
+const DISMISSED_KEY = "casele_announcement_dismissed_v2";
+
 export function AnnouncementBar() {
   const [current, setCurrent] = useState(0);
-  const [isVisible, setIsVisible] = useState(true);
+  const [isDismissed, setIsDismissed] = useState<boolean | null>(null);
   const [isTransitioning, setIsTransitioning] = useState(false);
 
-  // Check sessionStorage for dismissal
+  // Sync dismissal state on mount without layout flash
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      const dismissed = sessionStorage.getItem("casele_announcement_dismissed");
-      if (dismissed) setIsVisible(false);
+    try {
+      const dismissed = localStorage.getItem(DISMISSED_KEY) === "true";
+      setIsDismissed(dismissed);
+    } catch {
+      setIsDismissed(false);
     }
   }, []);
 
   // Rotate announcements with smooth transition
   useEffect(() => {
+    if (isDismissed) return;
+
     const interval = setInterval(() => {
       setIsTransitioning(true);
       setTimeout(() => {
@@ -44,19 +50,26 @@ export function AnnouncementBar() {
       }, 250);
     }, 5500);
     return () => clearInterval(interval);
-  }, []);
+  }, [isDismissed]);
 
   const handleDismiss = () => {
-    setIsVisible(false);
-    sessionStorage.setItem("casele_announcement_dismissed", "true");
+    setIsDismissed(true);
+    try {
+      localStorage.setItem(DISMISSED_KEY, "true");
+    } catch {
+      // Ignore storage errors
+    }
   };
 
-  if (!isVisible) return null;
+  // If dismissed or checking initial state, do not render (prevents flash)
+  if (isDismissed === true || isDismissed === null) {
+    return null;
+  }
 
   const item = ANNOUNCEMENTS[current];
 
   return (
-    <div className="relative z-50 border-b border-neutral-200/80 bg-neutral-900 text-white select-none">
+    <div className="relative z-50 border-b border-neutral-200/80 bg-neutral-900 text-white select-none transition-all duration-300">
       <div className="mx-auto flex h-9 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         {/* Left spacer for perfect centering on desktop */}
         <div className="hidden sm:flex items-center gap-2 w-24">
@@ -67,27 +80,27 @@ export function AnnouncementBar() {
         </div>
 
         {/* Center message */}
-        <div className="flex-1 flex items-center justify-center">
+        <div className="flex-1 flex items-center justify-center min-w-0">
           <Link
             href={item.link}
-            className={`group inline-flex items-center gap-2 text-center text-xs font-medium tracking-wide transition-all duration-300 ${
+            className={`group inline-flex items-center gap-2 text-center text-xs font-medium tracking-wide transition-all duration-300 truncate ${
               isTransitioning ? "opacity-0 translate-y-1" : "opacity-100 translate-y-0"
             }`}
           >
             <span className="hidden md:inline-block rounded-md bg-white/10 px-2 py-0.5 text-[9px] font-bold tracking-widest text-[#DFCA9B] uppercase">
               {item.badge}
             </span>
-            <span className="text-neutral-100 group-hover:text-white transition-colors">
+            <span className="text-neutral-100 group-hover:text-white transition-colors truncate">
               {item.text}
             </span>
-            <span className="text-neutral-400 group-hover:text-white transition-transform group-hover:translate-x-0.5 text-[11px]">
+            <span className="text-neutral-400 group-hover:text-white transition-transform group-hover:translate-x-0.5 text-[11px] shrink-0">
               →
             </span>
           </Link>
         </div>
 
         {/* Right dots & close */}
-        <div className="flex items-center gap-3 w-24 justify-end">
+        <div className="flex items-center gap-3 w-24 justify-end shrink-0">
           <div className="hidden sm:flex items-center gap-1">
             {ANNOUNCEMENTS.map((_, i) => (
               <button
