@@ -13,7 +13,7 @@ export function CartBubble() {
     <button
       onClick={toggleCart}
       aria-label={`Shopping Bag (${itemCount} items)`}
-      className="group relative flex items-center gap-2 rounded-full border border-neutral-200/80 bg-white px-3.5 py-1.5 text-xs font-semibold text-neutral-900 transition-all duration-200 hover:border-neutral-400 hover:shadow-sm active:scale-95 cursor-pointer select-none"
+      className="group relative flex items-center gap-2 rounded-full border border-white/80 bg-white/80 backdrop-blur-md px-3.5 py-1.5 text-xs font-semibold text-neutral-900 transition-all duration-200 hover:border-neutral-400 hover:bg-white hover:shadow-2xs active:scale-95 cursor-pointer select-none"
     >
       <div className="relative flex items-center justify-center">
         <svg
