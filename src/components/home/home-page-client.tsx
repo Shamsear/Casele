@@ -62,15 +62,15 @@ export function HomePageClient({
   return (
     <div className="min-h-screen bg-neutral-50 text-neutral-950 overflow-hidden">
       {/* 1. HERO SECTION: Editorial High-Conversion DTC Showcase */}
-      <section className="relative overflow-hidden pt-6 pb-14 sm:pt-14 sm:pb-24">
+      <section className="relative overflow-hidden min-h-[calc(100dvh-56px)] sm:min-h-[calc(100dvh-64px)] lg:min-h-[82vh] flex items-center justify-center pt-6 pb-8 sm:py-12 lg:py-16">
         {/* Animated Ambient Drift Orbs */}
         <div className="pointer-events-none absolute top-10 right-10 h-72 w-72 sm:h-96 sm:w-96 rounded-full bg-amber-100/50 blur-3xl animate-float-slow" />
         <div className="pointer-events-none absolute bottom-10 left-10 h-72 w-72 sm:h-96 sm:w-96 rounded-full bg-neutral-200/50 blur-3xl animate-float" />
 
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-8 items-center">
-            {/* Left Editorial Copy (7 Cols) with Scroll Reveal */}
-            <div className="lg:col-span-7 space-y-6">
+        <div className="mx-auto max-w-7xl w-full px-4 sm:px-6 lg:px-8 relative z-10 my-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center">
+            {/* Left Editorial Copy (7 Cols on desktop, Full width centered on mobile) */}
+            <div className="lg:col-span-7 space-y-5 sm:space-y-6 flex flex-col justify-center">
               {/* Live Atelier Badge */}
               <Reveal animation="fade-up" delay={0}>
                 <div className="inline-flex items-center gap-2 rounded-full border border-neutral-200 bg-white px-3.5 py-1.5 shadow-2xs">
@@ -98,10 +98,10 @@ export function HomePageClient({
 
               {/* Dual CTAs with Shimmer Hover */}
               <Reveal animation="fade-up" delay={90}>
-                <div className="flex flex-wrap items-center gap-3.5 pt-2">
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-1">
                   <Link
                     href="/shop"
-                    className="btn-shimmer inline-flex items-center gap-2 rounded-xl bg-neutral-950 px-7 py-3.5 text-xs font-semibold uppercase tracking-widest text-white shadow-sm transition-all hover:bg-neutral-800 active:scale-[0.98]"
+                    className="btn-shimmer inline-flex items-center justify-center gap-2 rounded-xl bg-neutral-950 px-7 py-3.5 text-xs font-semibold uppercase tracking-widest text-white shadow-sm transition-all hover:bg-neutral-800 active:scale-[0.98]"
                   >
                     <span>Shop All Cases</span>
                     <ArrowRight className="h-3.5 w-3.5" />
@@ -111,7 +111,7 @@ export function HomePageClient({
                     href="https://wa.me/97455364455?text=Hello%20CASEL%C3%89%20Atelier%2C%20I%20would%20like%20to%20inquire%20about%20your%20protective%20cases."
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 rounded-xl border border-neutral-300 bg-white px-6 py-3.5 text-xs font-semibold uppercase tracking-widest text-neutral-900 transition-all hover:bg-neutral-50 active:scale-[0.98] shadow-2xs"
+                    className="inline-flex items-center justify-center gap-2 rounded-xl border border-neutral-300 bg-white px-6 py-3.5 text-xs font-semibold uppercase tracking-widest text-neutral-900 transition-all hover:bg-neutral-50 active:scale-[0.98] shadow-2xs"
                   >
                     <MessageSquare className="h-3.5 w-3.5" />
                     <span>WhatsApp Concierge</span>
@@ -121,7 +121,7 @@ export function HomePageClient({
 
               {/* Trust Points with Staggered Fade */}
               <Reveal animation="fade-up" delay={120}>
-                <div className="grid grid-cols-3 gap-2 sm:gap-4 pt-6 border-t border-neutral-200/60">
+                <div className="grid grid-cols-3 gap-2 sm:gap-4 pt-5 sm:pt-6 border-t border-neutral-200/60">
                   <div className="min-w-0">
                     <span className="block text-xs sm:text-base font-bold text-neutral-950 font-mono whitespace-nowrap">0.1mm</span>
                     <span className="text-[10px] sm:text-[11px] text-neutral-500 font-medium whitespace-nowrap block truncate">Precision Fit</span>
@@ -138,9 +138,9 @@ export function HomePageClient({
               </Reveal>
             </div>
 
-            {/* Right Hero Product Spotlight (5 Cols) with 3D Mouse Tilt */}
-            <div className="lg:col-span-5 flex justify-center">
-              <Reveal animation="scale-up" delay={200} className="w-full max-w-sm">
+            {/* Right Hero Product Spotlight (5 Cols - Visible on 2-column desktop grid) */}
+            <div className="hidden lg:flex lg:col-span-5 justify-center">
+              <Reveal animation="scale-up" delay={150} className="w-full max-w-sm">
                 <TiltCard maxTilt={8} scale={1.03}>
                   <div className="group relative w-full aspect-[4/5] rounded-3xl bg-white border border-neutral-200/80 p-8 flex items-center justify-center shadow-lg transition-shadow duration-500 hover:shadow-2xl">
                     {/* Floating Tag */}
@@ -158,7 +158,7 @@ export function HomePageClient({
                         fill
                         priority
                         className="object-contain p-4 transition-transform duration-700 group-hover:scale-105 drop-shadow-2xl"
-                        sizes="(max-width: 768px) 80vw, 400px"
+                        sizes="400px"
                       />
                     </div>
 
