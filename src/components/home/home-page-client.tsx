@@ -62,22 +62,22 @@ export function HomePageClient({
   return (
     <div className="min-h-screen bg-neutral-50 text-neutral-950 overflow-hidden">
       {/* 1. HERO FOLD: Hero Content + Bottom MagSafe Marquee Ticker Filling Initial Viewport */}
-      <div className="h-[calc(100dvh-150px)] sm:h-[calc(100dvh-130px)] md:h-[calc(100vh-100px)] min-h-[480px] max-h-[880px] flex flex-col justify-between relative overflow-hidden">
+      <div className="h-[calc(100svh-148px)] md:h-[calc(100vh-108px)] max-h-[720px] min-h-[440px] flex flex-col justify-between relative overflow-hidden">
         {/* Animated Ambient Drift Orbs */}
         <div className="pointer-events-none absolute top-10 right-10 h-64 w-64 sm:h-80 sm:w-80 rounded-full bg-amber-100/40 blur-3xl animate-float-slow" />
         <div className="pointer-events-none absolute bottom-10 left-10 h-64 w-64 sm:h-80 sm:w-80 rounded-full bg-neutral-200/40 blur-3xl animate-float" />
 
         {/* Hero Main Content */}
-        <section className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8 py-1 sm:py-3 lg:py-4">
+        <section className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8 py-1">
           <div className="mx-auto max-w-7xl w-full relative z-10 my-auto">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-8 items-center">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-6 items-center">
               {/* Left Editorial Copy (7 Cols on desktop) */}
-              <div className="lg:col-span-7 space-y-2.5 sm:space-y-3.5 flex flex-col justify-center">
+              <div className="lg:col-span-7 space-y-2 sm:space-y-2.5 flex flex-col justify-center">
                 {/* Live Atelier Badge */}
                 <Reveal animation="fade-up" delay={50}>
-                  <div className="inline-flex items-center gap-2 rounded-full border border-neutral-200 bg-white px-3 py-1 shadow-2xs">
+                  <div className="inline-flex items-center gap-1.5 rounded-full border border-neutral-200 bg-white px-2.5 py-0.5 shadow-2xs">
                     <span className="flex h-1.5 w-1.5 rounded-full bg-[#C5A869] animate-ping" />
-                    <span className="text-[9px] sm:text-[10px] font-bold tracking-[0.18em] uppercase text-neutral-900">
+                    <span className="text-[9px] sm:text-[9.5px] font-bold tracking-[0.18em] uppercase text-neutral-900">
                       Doha Atelier • 2026 Collection
                     </span>
                   </div>
@@ -85,7 +85,7 @@ export function HomePageClient({
 
                 {/* Main Headline */}
                 <Reveal animation="fade-up" delay={120}>
-                  <h1 className="font-display text-3xl sm:text-4xl lg:text-[2.75rem] xl:text-5xl font-normal leading-[1.08] tracking-tight text-neutral-950">
+                  <h1 className="font-display text-2.5xl sm:text-4xl lg:text-[2.35rem] xl:text-[2.65rem] font-normal leading-[1.06] tracking-tight text-neutral-950">
                     Refined Protection. <br />
                     <span className="italic font-light text-neutral-700">Uncompromised Design.</span>
                   </h1>
@@ -93,7 +93,7 @@ export function HomePageClient({
 
                 {/* Subtitle */}
                 <Reveal animation="fade-up" delay={190}>
-                  <p className="max-w-lg text-[11px] sm:text-xs lg:text-sm leading-relaxed text-neutral-600">
+                  <p className="max-w-md text-[11px] sm:text-xs leading-relaxed text-neutral-600">
                     Engineered with aerospace composites, surgical tolerances, and tactile metallic accents. Hand-finished for contemporary iPhone and Galaxy flagships in Qatar.
                   </p>
                 </Reveal>
@@ -123,7 +123,7 @@ export function HomePageClient({
 
                 {/* Trust Points with Staggered Fade */}
                 <Reveal animation="fade-up" delay={330}>
-                  <div className="grid grid-cols-3 gap-2 sm:gap-4 pt-2.5 sm:pt-3 border-t border-neutral-200/60">
+                  <div className="grid grid-cols-3 gap-2 sm:gap-4 pt-2 border-t border-neutral-200/60">
                     <div className="min-w-0">
                       <span className="block text-xs sm:text-sm font-bold text-neutral-950 font-mono whitespace-nowrap">0.1mm</span>
                       <span className="text-[10px] sm:text-[11px] text-neutral-500 font-medium whitespace-nowrap block truncate">Precision Fit</span>
@@ -142,12 +142,12 @@ export function HomePageClient({
 
               {/* Right Hero Product Spotlight (5 Cols - Visible on desktop) */}
               <div className="hidden lg:flex lg:col-span-5 justify-center">
-                <Reveal animation="scale-up" delay={150} className="w-full max-w-[295px] xl:max-w-[325px]">
+                <Reveal animation="scale-up" delay={150} className="w-full max-w-[260px] xl:max-w-[285px]">
                   <TiltCard maxTilt={6} scale={1.02}>
-                    <div className="group relative w-full aspect-[4/5] rounded-3xl bg-white border border-neutral-200/80 p-4 xl:p-5 flex items-center justify-center shadow-md transition-shadow duration-500 hover:shadow-xl">
+                    <div className="group relative w-full aspect-[4/5] rounded-3xl bg-white border border-neutral-200/80 p-3.5 xl:p-4 flex items-center justify-center shadow-md transition-shadow duration-500 hover:shadow-xl">
                       {/* Floating Tag */}
-                      <div className="absolute top-3 left-3 z-10">
-                        <span className="inline-flex items-center rounded-full bg-neutral-950 px-2.5 py-0.5 text-[9px] font-bold text-white uppercase tracking-wider shadow-xs">
+                      <div className="absolute top-2.5 left-2.5 z-10">
+                        <span className="inline-flex items-center rounded-full bg-neutral-950 px-2 py-0.5 text-[8.5px] font-bold text-white uppercase tracking-wider shadow-xs">
                           Studio Spotlight
                         </span>
                       </div>
@@ -159,15 +159,15 @@ export function HomePageClient({
                           alt="Featured Case"
                           fill
                           priority
-                          className="object-contain p-2 transition-transform duration-700 group-hover:scale-105 drop-shadow-xl"
-                          sizes="320px"
+                          className="object-contain p-1.5 transition-transform duration-700 group-hover:scale-105 drop-shadow-xl"
+                          sizes="285px"
                         />
                       </div>
 
                       {/* Floating Price Pill */}
-                      <div className="absolute bottom-3 right-3 z-10 rounded-2xl bg-white/95 backdrop-blur-md border border-neutral-200/80 px-2.5 py-1 shadow-sm text-right">
-                        <p className="text-[8px] font-bold text-neutral-400 uppercase tracking-wider">Titanium Frame</p>
-                        <p className="text-xs font-bold text-neutral-950">QR 85</p>
+                      <div className="absolute bottom-2.5 right-2.5 z-10 rounded-2xl bg-white/95 backdrop-blur-md border border-neutral-200/80 px-2.5 py-0.5 shadow-sm text-right">
+                        <p className="text-[7.5px] font-bold text-neutral-400 uppercase tracking-wider">Titanium Frame</p>
+                        <p className="text-[11px] font-bold text-neutral-950">QR 85</p>
                       </div>
                     </div>
                   </TiltCard>

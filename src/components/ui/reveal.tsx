@@ -19,7 +19,7 @@ export function Reveal({
   animation = "fade-up",
   delay = 0,
   duration = 550,
-  threshold = 0.1,
+  threshold = 0.02,
   once = true,
 }: RevealProps) {
   const ref = useRef<HTMLDivElement>(null);
@@ -28,24 +28,6 @@ export function Reveal({
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
-
-    // Check if in viewport on mount and trigger smooth entrance
-    const checkInitial = () => {
-      const rect = el.getBoundingClientRect();
-      if (rect.top < window.innerHeight - 30 && rect.bottom > 0) {
-        // Use requestAnimationFrame to ensure browser paints initial state before animating
-        requestAnimationFrame(() => {
-          setTimeout(() => {
-            setIsVisible(true);
-          }, delay);
-        });
-        return true;
-      }
-      return false;
-    };
-
-    const isInitiallyVisible = checkInitial();
-    if (isInitiallyVisible && once) return;
 
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -60,48 +42,50 @@ export function Reveal({
       },
       {
         threshold,
-        rootMargin: "0px 0px -40px 0px",
+        // Eager 80px top buffer so mobile and desktop viewports trigger smoothly
+        rootMargin: "80px 0px -10px 0px",
       }
     );
 
     observer.observe(el);
     return () => observer.disconnect();
-  }, [threshold, once, delay]);
+  }, [threshold, once]);
 
-  const getAnimationClasses = () => {
+  const getAnimationName = () => {
     switch (animation) {
       case "fade-up":
-        return isVisible
-          ? "opacity-100 translate-y-0"
-          : "opacity-0 translate-y-8";
+        return "revealFadeUp";
       case "fade-in":
-        return isVisible ? "opacity-100" : "opacity-0";
+        return "revealFadeIn";
       case "scale-up":
-        return isVisible
-          ? "opacity-100 scale-100"
-          : "opacity-0 scale-95";
+        return "revealScaleUp";
       case "slide-right":
-        return isVisible
-          ? "opacity-100 translate-x-0"
-          : "opacity-0 -translate-x-8";
+        return "revealSlideRight";
       case "slide-left":
-        return isVisible
-          ? "opacity-100 translate-x-0"
-          : "opacity-0 translate-x-8";
+        return "revealSlideLeft";
       default:
-        return isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8";
+        return "revealFadeUp";
     }
   };
 
   return (
     <div
       ref={ref}
-      style={{
-        transitionDuration: `${duration}ms`,
-        transitionDelay: `${delay}ms`,
-        transitionTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)",
-      }}
-      className={cn("transition-all will-change-transform", getAnimationClasses(), className)}
+      style={
+        isVisible
+          ? {
+              animationName: getAnimationName(),
+              animationDuration: `${duration}ms`,
+              animationDelay: `${delay}ms`,
+              animationTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)",
+              animationFillMode: "both",
+              willChange: "transform, opacity",
+            }
+          : {
+              opacity: 0,
+            }
+      }
+      className={cn("will-change-transform", className)}
     >
       {children}
     </div>
