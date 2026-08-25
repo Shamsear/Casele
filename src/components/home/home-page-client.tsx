@@ -1,13 +1,22 @@
 "use client";
 
+import { useState, useMemo } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { ProductCard } from "@/components/products/product-card";
 import { Price } from "@/components/ui/price";
 import type { ProductWithRelations, ModelWithCount, CategoryWithCount } from "@/lib/db/products";
-import { PhoneIcon } from "@/components/ui/icons";
-import { Logo } from "@/components/brand/logo";
 import { useI18n } from "@/lib/i18n/context";
+import {
+  Smartphone,
+  ShieldCheck,
+  Truck,
+  Sparkles,
+  ArrowRight,
+  CheckCircle2,
+  SlidersHorizontal
+} from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface HomePageClientProps {
   featured: ProductWithRelations[];
@@ -17,110 +26,158 @@ interface HomePageClientProps {
 
 export function HomePageClient({ featured, models, categories }: HomePageClientProps) {
   const { t } = useI18n();
+  const [activeFilter, setActiveFilter] = useState("All");
+
+  // Collection pills
+  const filterPills = [
+    { id: "All", label: "All Cases" },
+    { id: "bestseller", label: "Best Sellers" },
+    { id: "new", label: "New Releases" },
+    { id: "Premium", label: "Luxe Series" },
+    { id: "Classic", label: "Classic Minimal" },
+    { id: "Sport", label: "Carbon Sport" },
+  ];
+
+  const filteredProducts = useMemo(() => {
+    if (activeFilter === "All") return featured;
+    if (activeFilter === "bestseller") return featured.filter((p) => p.badge?.toLowerCase() === "bestseller");
+    if (activeFilter === "new") return featured.filter((p) => p.badge?.toLowerCase() === "new");
+    return featured.filter((p) => p.categoryName.toLowerCase().includes(activeFilter.toLowerCase()));
+  }, [featured, activeFilter]);
+
+  const heroFeatured = featured[0] || null;
 
   return (
-    <div className="min-h-screen bg-black">
-      {/* ═══════ HERO SECTION — IMMEDIATELY VISIBLE (NO SCROLL NEEDED) ═══════ */}
-      <section className="relative border-b border-dark-border">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-4 pb-12 sm:pt-8 sm:pb-16 lg:py-16">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
-            {/* Left: Brand Identity, Logo, and Copy */}
-            <div className="lg:col-span-7 space-y-5 sm:space-y-6">
-              {/* Company Logo & Name Prominently Featured */}
-              <div className="flex items-center gap-4">
-                <Logo size="lg" />
-                <div className="h-8 w-px bg-dark-border hidden sm:block" />
-                <div className="hidden sm:block">
-                  <p className="text-xs font-semibold tracking-[0.25em] text-white uppercase">CASELÉ</p>
-                  <p className="text-[10px] tracking-widest text-gold uppercase">Doha, Qatar</p>
-                </div>
-              </div>
-
-              {/* Eyebrow */}
-              <div className="inline-flex items-center gap-2">
-                <span className="h-px w-5 bg-gold" />
-                <span className="text-[11px] font-semibold text-gold uppercase tracking-[0.2em]">
-                  {t("hero_eyebrow")}
+    <div className="min-h-screen bg-neutral-50 text-neutral-950">
+      {/* ═══════ 1. EDITORIAL HERO SECTION ═══════ */}
+      <section className="relative border-b border-neutral-200/70 bg-gradient-to-b from-white via-white to-neutral-50/50">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-8 pb-16 sm:pt-12 sm:pb-20 lg:py-20">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
+            {/* Left: Brand Identity & Editorial Narrative */}
+            <div className="lg:col-span-7 space-y-6">
+              {/* Atelier Micro Badge */}
+              <div className="inline-flex items-center gap-2 rounded-full border border-neutral-200/90 bg-neutral-50 px-3.5 py-1 shadow-2xs">
+                <span className="h-2 w-2 rounded-full bg-[#C5A869] animate-pulse" />
+                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-neutral-800">
+                  Doha Luxury Atelier • 2026 Edition
                 </span>
               </div>
 
-              {/* Headline */}
-              <h1 className="font-display text-3xl sm:text-5xl lg:text-6xl font-normal tracking-tight text-white leading-[1.08]">
+              {/* High-Impact Headline */}
+              <h1 className="font-display text-4xl sm:text-6xl lg:text-7xl font-normal tracking-tight text-neutral-950 leading-[1.05]">
                 Refined Protection.
                 <br />
-                <span className="italic font-light text-white/90">Uncompromised Design.</span>
+                <span className="italic font-light text-neutral-700">Uncompromised Design.</span>
               </h1>
 
-              {/* Subtitle */}
-              <p className="max-w-lg text-xs sm:text-sm leading-relaxed text-warm-gray font-normal">
-                {t("hero_subtitle")}
+              {/* Sub-headline */}
+              <p className="max-w-xl text-sm sm:text-base leading-relaxed text-neutral-600 font-normal">
+                Engineered with aerospace-grade composites and bespoke finishes. Tailored specifically for discerning flagship users across Qatar.
               </p>
 
-              {/* CTA Buttons */}
-              <div className="flex flex-wrap items-center gap-3 pt-1">
+              {/* Action Buttons */}
+              <div className="flex flex-wrap items-center gap-3 pt-2">
                 <Link
                   href="/shop"
-                  className="inline-flex items-center justify-center bg-white px-7 py-3.5 text-xs font-semibold uppercase tracking-widest text-black transition-colors hover:bg-gold active:bg-gold-light"
+                  className="inline-flex items-center justify-center gap-2 rounded-xl bg-neutral-950 px-7 py-3.5 text-xs font-semibold uppercase tracking-widest text-white transition-all duration-200 hover:bg-neutral-800 active:scale-[0.98] shadow-sm"
                 >
-                  {t("hero_cta")}
+                  <span>Explore Collection</span>
+                  <ArrowRight className="h-4 w-4" />
                 </Link>
                 <Link
                   href="/track"
-                  className="inline-flex items-center justify-center border border-white/20 px-7 py-3.5 text-xs font-semibold uppercase tracking-widest text-white transition-colors hover:border-white hover:bg-white/5"
+                  className="inline-flex items-center justify-center rounded-xl border border-neutral-300 bg-white px-7 py-3.5 text-xs font-semibold uppercase tracking-widest text-neutral-900 transition-all duration-200 hover:bg-neutral-100 hover:border-neutral-400 active:scale-[0.98]"
                 >
-                  {t("hero_track")}
+                  Track Order
                 </Link>
               </div>
 
-              {/* Minimal Trust Signals */}
-              <div className="grid grid-cols-3 gap-4 pt-4 border-t border-dark-border/60">
-                <div>
-                  <p className="text-[10px] font-semibold uppercase tracking-widest text-white/90">Precision Fit</p>
-                  <p className="text-[11px] text-warm-gray mt-0.5">Engineered to 0.1mm</p>
+              {/* 3-Column Trust Metric Strip */}
+              <div className="grid grid-cols-3 gap-4 pt-6 border-t border-neutral-200/70">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-1.5 text-neutral-950 font-semibold text-xs uppercase tracking-wider">
+                    <ShieldCheck className="h-4 w-4 text-[#A88B4D]" />
+                    <span>0.1mm Precision</span>
+                  </div>
+                  <p className="text-[11px] text-neutral-500">Aerospace Tolerances</p>
                 </div>
-                <div>
-                  <p className="text-[10px] font-semibold uppercase tracking-widest text-white/90">Doha Delivery</p>
-                  <p className="text-[11px] text-warm-gray mt-0.5">Same-day dispatch</p>
+
+                <div className="space-y-1">
+                  <div className="flex items-center gap-1.5 text-neutral-950 font-semibold text-xs uppercase tracking-wider">
+                    <Truck className="h-4 w-4 text-[#A88B4D]" />
+                    <span>Doha Express</span>
+                  </div>
+                  <p className="text-[11px] text-neutral-500">Same-Day Dispatch</p>
                 </div>
-                <div>
-                  <p className="text-[10px] font-semibold uppercase tracking-widest text-white/90">Instant Order</p>
-                  <p className="text-[11px] text-warm-gray mt-0.5">Via WhatsApp</p>
+
+                <div className="space-y-1">
+                  <div className="flex items-center gap-1.5 text-neutral-950 font-semibold text-xs uppercase tracking-wider">
+                    <Sparkles className="h-4 w-4 text-[#A88B4D]" />
+                    <span>WhatsApp Concierge</span>
+                  </div>
+                  <p className="text-[11px] text-neutral-500">Direct Checkout</p>
                 </div>
               </div>
             </div>
 
-            {/* Right: Studio Product Display */}
+            {/* Right: Studio Product Spotlight */}
             <div className="lg:col-span-5">
-              {featured[0] && (
-                <div className="relative bg-[#111111] border border-dark-border p-6 sm:p-8">
-                  <div className="aspect-[4/5] max-h-[380px] relative flex items-center justify-center">
+              {heroFeatured && (
+                <div className="relative rounded-3xl border border-neutral-200/80 bg-white p-6 sm:p-7 shadow-xl shadow-neutral-900/5 transition-all duration-300 hover:shadow-2xl">
+                  {/* Spotlight Header */}
+                  <div className="flex items-center justify-between pb-4 mb-2 border-b border-neutral-100">
+                    <div className="flex items-center gap-2">
+                      <span className="flex h-2 w-2 rounded-full bg-emerald-500" />
+                      <span className="text-[10px] font-bold uppercase tracking-widest text-neutral-500">
+                        Atelier Spotlight
+                      </span>
+                    </div>
+                    <span className="rounded-full bg-neutral-100 px-2.5 py-0.5 text-[10px] font-bold text-neutral-800 uppercase tracking-wider">
+                      {heroFeatured.modelName}
+                    </span>
+                  </div>
+
+                  {/* High-Resolution Hero Product Image */}
+                  <div className="relative aspect-[4/5] max-h-[360px] w-full overflow-hidden rounded-2xl bg-neutral-100/60 flex items-center justify-center group">
                     <Image
-                      src={featured[0].images[0]}
-                      alt={featured[0].name}
+                      src={heroFeatured.images[0]}
+                      alt={heroFeatured.name}
                       fill
-                      className="object-contain p-2"
+                      className="object-contain p-4 sm:p-6 transition-transform duration-700 ease-out group-hover:scale-105"
                       priority
                       sizes="(max-width: 1024px) 100vw, 40vw"
                     />
+                    {heroFeatured.images[1] && (
+                      <Image
+                        src={heroFeatured.images[1]}
+                        alt={`${heroFeatured.name} angle`}
+                        fill
+                        className="object-contain p-4 sm:p-6 transition-opacity duration-500 opacity-0 group-hover:opacity-100"
+                        sizes="(max-width: 1024px) 100vw, 40vw"
+                      />
+                    )}
                   </div>
 
-                  <div className="mt-4 pt-4 border-t border-dark-border flex items-baseline justify-between">
+                  {/* Product Metadata & Price */}
+                  <div className="mt-5 flex items-baseline justify-between">
                     <div>
-                      <p className="text-[10px] uppercase tracking-widest text-warm-gray font-medium">
-                        {featured[0].modelName}
-                      </p>
-                      <h3 className="font-display text-lg text-white font-medium mt-0.5">
-                        {featured[0].name}
+                      <h3 className="font-display text-xl text-neutral-950 font-semibold tracking-tight">
+                        {heroFeatured.name}
                       </h3>
+                      <p className="text-xs text-neutral-500 mt-0.5">
+                        Hand-finished matte composite
+                      </p>
                     </div>
-                    <Price price={featured[0].price} comparePrice={featured[0].comparePrice} size="md" />
+                    <Price price={heroFeatured.price} comparePrice={heroFeatured.comparePrice} size="md" />
                   </div>
 
+                  {/* View Details Link */}
                   <Link
-                    href={`/shop/${featured[0].modelSlug}/${featured[0].slug}`}
-                    className="mt-3 block w-full text-center border border-white/10 bg-white/5 py-2.5 text-xs font-semibold uppercase tracking-wider text-white hover:border-gold hover:text-gold transition-colors"
+                    href={`/shop/${heroFeatured.modelSlug}/${heroFeatured.slug}`}
+                    className="mt-4 flex w-full items-center justify-center gap-1.5 rounded-xl border border-neutral-200 bg-neutral-50 py-3 text-xs font-semibold uppercase tracking-wider text-neutral-950 hover:bg-neutral-950 hover:text-white transition-all duration-200"
                   >
-                    View Details
+                    <span>View Product Details</span>
+                    <ArrowRight className="h-3.5 w-3.5" />
                   </Link>
                 </div>
               )}
@@ -129,64 +186,102 @@ export function HomePageClient({ featured, models, categories }: HomePageClientP
         </div>
       </section>
 
-      {/* ═══════ SIGNATURE FEATURED GRID ═══════ */}
-      {featured.length > 0 && (
-        <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
-          <div className="flex items-end justify-between mb-8 pb-4 border-b border-dark-border">
-            <div>
-              <p className="text-[11px] font-semibold text-gold tracking-widest uppercase mb-1">
-                {t("featured_eyebrow")}
-              </p>
-              <h2 className="font-display text-2xl sm:text-4xl text-white font-normal">
-                {t("featured_title")}
-              </h2>
+      {/* ═══════ 2. CURATED COLLECTION FILTER BAR & SIGNATURE GRID ═══════ */}
+      <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8 pb-5 border-b border-neutral-200/70">
+          <div>
+            <div className="inline-flex items-center gap-1.5 text-[11px] font-bold text-[#A88B4D] tracking-widest uppercase mb-1.5">
+              <SlidersHorizontal className="h-3.5 w-3.5" />
+              <span>Curated Selection</span>
             </div>
-            <Link
-              href="/shop"
-              className="text-xs font-semibold uppercase tracking-widest text-warm-gray hover:text-gold transition-colors"
-            >
-              {t("featured_view_all")} →
-            </Link>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4 sm:gap-6 lg:grid-cols-4">
-            {featured.slice(0, 4).map((product, i) => (
-              <ProductCard key={product.id} product={product} index={i} />
-            ))}
-          </div>
-        </section>
-      )}
-
-      {/* ═══════ ARCHITECTURAL MODEL SELECTOR ═══════ */}
-      <section className="border-t border-dark-border bg-[#0D0D0D]">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
-          <div className="text-center max-w-xl mx-auto mb-10">
-            <p className="text-[11px] font-semibold text-gold tracking-widest uppercase mb-1">
-              {t("shop_by_model_eyebrow")}
-            </p>
-            <h2 className="font-display text-2xl sm:text-4xl text-white font-normal">
-              {t("shop_by_model_title")}
+            <h2 className="font-display text-3xl sm:text-4xl text-neutral-950 font-normal">
+              Signature Collection
             </h2>
-            <p className="mt-2 text-xs sm:text-sm text-warm-gray leading-relaxed">
-              {t("shop_by_model_subtitle")}
+          </div>
+
+          <Link
+            href="/shop"
+            className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-widest text-neutral-600 hover:text-neutral-950 transition-colors self-start md:self-auto"
+          >
+            <span>View All Styles</span>
+            <ArrowRight className="h-3.5 w-3.5" />
+          </Link>
+        </div>
+
+        {/* Horizontal Category Pill Filter Bar */}
+        <div className="mb-8 overflow-x-auto no-scrollbar pb-2">
+          <div className="flex items-center gap-2 min-w-max">
+            {filterPills.map((pill) => {
+              const isActive = activeFilter === pill.id;
+              return (
+                <button
+                  key={pill.id}
+                  onClick={() => setActiveFilter(pill.id)}
+                  className={cn(
+                    "px-4 py-2 rounded-full text-xs font-semibold uppercase tracking-wider transition-all duration-200 cursor-pointer select-none",
+                    isActive
+                      ? "bg-neutral-950 text-white shadow-sm scale-102"
+                      : "bg-white border border-neutral-200/80 text-neutral-600 hover:border-neutral-400 hover:text-neutral-950"
+                  )}
+                >
+                  {pill.label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* 4:5 Responsive Product Grid */}
+        <div className="grid grid-cols-2 gap-4 sm:gap-6 lg:grid-cols-4">
+          {filteredProducts.slice(0, 8).map((product, i) => (
+            <ProductCard key={product.id} product={product} index={i} />
+          ))}
+        </div>
+
+        {filteredProducts.length === 0 && (
+          <div className="py-20 text-center rounded-2xl border border-neutral-200/80 bg-white">
+            <p className="text-sm font-semibold text-neutral-900">No cases found in this category</p>
+            <p className="mt-1 text-xs text-neutral-500">Try selecting &quot;All Cases&quot; to browse our entire portfolio.</p>
+            <button
+              onClick={() => setActiveFilter("All")}
+              className="mt-4 rounded-xl bg-neutral-950 px-5 py-2.5 text-xs font-semibold uppercase tracking-wider text-white hover:bg-neutral-800"
+            >
+              Reset Filter
+            </button>
+          </div>
+        )}
+      </section>
+
+      {/* ═══════ 3. ARCHITECTURAL MODEL SELECTOR ═══════ */}
+      <section className="border-t border-neutral-200/70 bg-white py-16 sm:py-20">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="text-center max-w-xl mx-auto mb-12">
+            <span className="text-[11px] font-bold text-[#A88B4D] tracking-widest uppercase mb-1.5 block">
+              Device Compatibility
+            </span>
+            <h2 className="font-display text-3xl sm:text-4xl text-neutral-950 font-normal">
+              Shop by Phone Model
+            </h2>
+            <p className="mt-2 text-xs sm:text-sm text-neutral-600 leading-relaxed">
+              Every case is bespoke tailored to the exact millimeter dimensions of your device.
             </p>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3.5">
             {models.map((model) => (
               <Link
                 key={model.id}
                 href={`/shop/${model.slug}`}
-                className="group border border-dark-border bg-black/60 p-4 text-center transition-colors hover:border-gold/50 hover:bg-black"
+                className="group rounded-2xl border border-neutral-200/80 bg-neutral-50/50 p-5 text-center transition-all duration-300 hover:border-neutral-400 hover:bg-white hover:shadow-[0_8px_25px_rgb(0,0,0,0.05)] hover:-translate-y-0.5"
               >
-                <div className="mx-auto mb-2.5 flex h-9 w-9 items-center justify-center text-white/70 group-hover:text-gold transition-colors">
-                  <PhoneIcon size={18} />
+                <div className="mx-auto mb-3 flex h-11 w-11 items-center justify-center rounded-xl bg-white border border-neutral-200/70 text-neutral-800 group-hover:bg-neutral-950 group-hover:text-white transition-colors shadow-2xs">
+                  <Smartphone className="h-5 w-5" />
                 </div>
-                <p className="text-xs font-medium text-white group-hover:text-gold transition-colors">
+                <p className="text-xs font-semibold text-neutral-950 group-hover:text-neutral-950 transition-colors">
                   {model.name}
                 </p>
-                <p className="mt-1 text-[10px] text-warm-gray/60 uppercase tracking-wider">
-                  {model.count} {t("cases_count")}
+                <p className="mt-1 text-[10px] text-neutral-400 uppercase tracking-wider font-medium">
+                  {model.count} {t("cases_count") || "styles"}
                 </p>
               </Link>
             ))}
@@ -194,39 +289,40 @@ export function HomePageClient({ featured, models, categories }: HomePageClientP
         </div>
       </section>
 
-      {/* ═══════ EDITORIAL COLLECTIONS ═══════ */}
+      {/* ═══════ 4. EDITORIAL DESIGN SERIES ═══════ */}
       {categories.length > 0 && (
         <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
-          <div className="mb-8 pb-4 border-b border-dark-border">
-            <p className="text-[11px] font-semibold text-gold tracking-widest uppercase mb-1">
-              {t("collections_eyebrow")}
-            </p>
-            <h2 className="font-display text-2xl sm:text-4xl text-white font-normal">
-              {t("collections_title")}
+          <div className="mb-10 pb-5 border-b border-neutral-200/70">
+            <span className="text-[11px] font-bold text-[#A88B4D] tracking-widest uppercase mb-1.5 block">
+              Design Architecture
+            </span>
+            <h2 className="font-display text-3xl sm:text-4xl text-neutral-950 font-normal">
+              Explore Design Series
             </h2>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
             {categories.map((cat) => (
               <Link
                 key={cat.slug}
                 href={`/category/${cat.slug}`}
-                className="group relative border border-dark-border bg-[#111111] p-6 sm:p-8 flex flex-col justify-between min-h-[200px] transition-colors hover:border-gold/40"
+                className="group relative rounded-2xl border border-neutral-200/80 bg-white p-6 sm:p-7 flex flex-col justify-between min-h-[220px] transition-all duration-300 hover:border-neutral-400 hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:-translate-y-0.5"
               >
                 <div>
-                  <p className="font-display text-2xl text-white font-medium group-hover:text-gold transition-colors">
+                  <p className="font-display text-2xl text-neutral-950 font-medium group-hover:text-neutral-700 transition-colors">
                     {cat.name}
                   </p>
-                  <p className="mt-2 text-xs text-warm-gray leading-relaxed line-clamp-2">
+                  <p className="mt-2.5 text-xs text-neutral-600 leading-relaxed line-clamp-2">
                     {cat.description}
                   </p>
                 </div>
-                <div className="mt-6 pt-4 border-t border-dark-border/40 flex items-center justify-between">
-                  <span className="text-[10px] uppercase tracking-widest text-warm-gray font-medium">
-                    {cat.count} styles
+                <div className="mt-6 pt-4 border-t border-neutral-100 flex items-center justify-between">
+                  <span className="text-[10px] uppercase tracking-widest text-neutral-400 font-semibold">
+                    {cat.count} models
                   </span>
-                  <span className="text-xs text-white group-hover:text-gold transition-colors font-medium">
-                    Explore →
+                  <span className="inline-flex items-center gap-1 text-xs text-neutral-950 font-semibold group-hover:translate-x-1 transition-transform">
+                    <span>Explore</span>
+                    <ArrowRight className="h-3.5 w-3.5" />
                   </span>
                 </div>
               </Link>
@@ -235,60 +331,63 @@ export function HomePageClient({ featured, models, categories }: HomePageClientP
         </section>
       )}
 
-      {/* ═══════ BRAND PHILOSOPHY / CRAFTSMANSHIP ═══════ */}
-      <section className="border-t border-dark-border bg-[#0D0D0D]">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div>
-              <p className="text-[10px] font-semibold text-gold uppercase tracking-widest mb-2">01 / Material</p>
-              <h3 className="font-display text-xl sm:text-2xl text-white font-normal mb-2">
-                {t("promise_protection_title")}
+      {/* ═══════ 5. BRAND CRAFTSMANSHIP / PILLARS ═══════ */}
+      <section className="border-t border-neutral-200/70 bg-white py-16 sm:py-20">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 sm:gap-12">
+            <div className="space-y-3">
+              <span className="text-[10px] font-bold text-[#A88B4D] uppercase tracking-[0.2em]">01 / Material Architecture</span>
+              <h3 className="font-display text-2xl text-neutral-950 font-medium">
+                High-Impact Aerospace Composites
               </h3>
-              <p className="text-xs text-warm-gray leading-relaxed">
-                {t("promise_protection_desc")}
+              <p className="text-xs leading-relaxed text-neutral-600">
+                Crafted from ballistic-grade polycarbonates and supple treated leathers to ensure maximum shock dissipation while maintaining a razor-thin profile.
               </p>
             </div>
-            <div>
-              <p className="text-[10px] font-semibold text-gold uppercase tracking-widest mb-2">02 / Design</p>
-              <h3 className="font-display text-xl sm:text-2xl text-white font-normal mb-2">
-                {t("promise_express_title")}
+
+            <div className="space-y-3">
+              <span className="text-[10px] font-bold text-[#A88B4D] uppercase tracking-[0.2em]">02 / Dimensional Tolerance</span>
+              <h3 className="font-display text-2xl text-neutral-950 font-medium">
+                0.1mm Precision Enclosure
               </h3>
-              <p className="text-xs text-warm-gray leading-relaxed">
-                {t("promise_express_desc")}
+              <p className="text-xs leading-relaxed text-neutral-600">
+                Laser-calibrated cutouts for tactile buttons, camera island bevels, and unobstructed wireless charging compatibility.
               </p>
             </div>
-            <div>
-              <p className="text-[10px] font-semibold text-gold uppercase tracking-widest mb-2">03 / Experience</p>
-              <h3 className="font-display text-xl sm:text-2xl text-white font-normal mb-2">
-                {t("promise_whatsapp_title")}
+
+            <div className="space-y-3">
+              <span className="text-[10px] font-bold text-[#A88B4D] uppercase tracking-[0.2em]">03 / White-Glove Service</span>
+              <h3 className="font-display text-2xl text-neutral-950 font-medium">
+                Doha WhatsApp Concierge
               </h3>
-              <p className="text-xs text-warm-gray leading-relaxed">
-                {t("promise_whatsapp_desc")}
+              <p className="text-xs leading-relaxed text-neutral-600">
+                Experience friction-free ordering via WhatsApp with same-day express delivery across Doha, Al Wakrah, and Al Khor.
               </p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* ═══════ FINAL STATEMENT BANNER ═══════ */}
-      <section className="border-t border-dark-border">
+      {/* ═══════ 6. FINAL STATEMENT BANNER ═══════ */}
+      <section className="border-t border-neutral-200/70 bg-neutral-900 text-white">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16 sm:py-20 text-center">
           <div className="max-w-xl mx-auto space-y-5">
-            <p className="text-[11px] font-semibold text-gold uppercase tracking-widest">
-              {t("cta_ready")}
-            </p>
-            <h2 className="font-display text-2xl sm:text-4xl text-white font-normal leading-tight">
-              {t("cta_title")}
+            <span className="text-[10px] font-bold text-[#DFCA9B] uppercase tracking-[0.25em]">
+              Elevate Your Daily Carry
+            </span>
+            <h2 className="font-display text-3xl sm:text-5xl font-normal leading-tight text-white">
+              Ready to experience uncompromising protection?
             </h2>
-            <p className="text-xs text-warm-gray max-w-md mx-auto leading-relaxed">
-              {t("cta_desc")}
+            <p className="text-xs sm:text-sm text-neutral-300 max-w-md mx-auto leading-relaxed">
+              Explore our full collection or connect with our Doha concierge team on WhatsApp for bespoke inquiries.
             </p>
-            <div className="pt-2">
+            <div className="pt-3">
               <Link
                 href="/shop"
-                className="inline-flex items-center justify-center bg-white px-8 py-3.5 text-xs font-semibold uppercase tracking-widest text-black hover:bg-gold transition-colors"
+                className="inline-flex items-center justify-center gap-2 rounded-xl bg-white px-8 py-3.5 text-xs font-semibold uppercase tracking-widest text-neutral-950 hover:bg-[#C5A869] transition-colors shadow-lg active:scale-[0.98]"
               >
-                {t("cta_shop")}
+                <span>Browse All Cases</span>
+                <ArrowRight className="h-4 w-4" />
               </Link>
             </div>
           </div>

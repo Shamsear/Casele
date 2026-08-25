@@ -3,6 +3,8 @@
 import { useState, useRef, useCallback, useEffect } from "react";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
+import { ProductBadge } from "@/components/ui/badge";
+import { ChevronLeft, ChevronRight, X, Maximize2 } from "lucide-react";
 
 interface ProductGalleryProps {
   images: string[];
@@ -50,10 +52,8 @@ export function ProductGallery({ images, alt, badge, discount }: ProductGalleryP
     // Ensure horizontal swipe is dominant and exceeds threshold (40px)
     if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 40) {
       if (deltaX > 0) {
-        // Swiped Left -> Go Next
         goToNext();
       } else {
-        // Swiped Right -> Go Prev
         goToPrev();
       }
     }
@@ -80,9 +80,9 @@ export function ProductGallery({ images, alt, badge, discount }: ProductGalleryP
   return (
     <>
       <div className="flex flex-col gap-4 select-none">
-        {/* Main Stage */}
+        {/* Main Stage Container */}
         <div
-          className="relative aspect-square w-full overflow-hidden bg-[#111111] border border-dark-border touch-pan-y"
+          className="relative aspect-square w-full overflow-hidden rounded-3xl bg-neutral-100/60 border border-neutral-200/80 touch-pan-y group"
           onTouchStart={handleTouchStart}
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
@@ -92,7 +92,7 @@ export function ProductGallery({ images, alt, badge, discount }: ProductGalleryP
             <div
               key={idx}
               className={cn(
-                "absolute inset-0 transition-opacity duration-200 cursor-pointer",
+                "absolute inset-0 transition-opacity duration-300 cursor-pointer flex items-center justify-center",
                 idx === activeIndex ? "opacity-100 z-0" : "opacity-0 pointer-events-none -z-10"
               )}
               onClick={() => setLightbox(true)}
@@ -101,7 +101,7 @@ export function ProductGallery({ images, alt, badge, discount }: ProductGalleryP
                 src={img}
                 alt={`${alt} view ${idx + 1}`}
                 fill
-                className="object-contain p-6 sm:p-12"
+                className="object-contain p-6 sm:p-12 transition-transform duration-700 group-hover:scale-102"
                 priority={idx === 0}
                 sizes="(max-width: 1024px) 100vw, 55vw"
               />
@@ -109,18 +109,23 @@ export function ProductGallery({ images, alt, badge, discount }: ProductGalleryP
           ))}
 
           {/* Badges */}
-          <div className="absolute top-4 left-4 flex gap-2 z-10 pointer-events-none">
-            {badge && (
-              <span className="bg-black/90 border border-white/10 px-2.5 py-1 text-[9px] font-semibold tracking-widest text-white uppercase">
-                {badge}
+          <div className="absolute top-4 left-4 flex gap-1.5 z-10 pointer-events-none">
+            {badge && <ProductBadge badge={badge} />}
+            {discount && discount > 0 ? (
+              <span className="rounded-md bg-red-50 border border-red-200 px-2 py-0.5 text-[9px] font-bold tracking-wider text-red-700 uppercase">
+                Save {discount}%
               </span>
-            )}
-            {discount && discount > 0 && (
-              <span className="bg-[#B91C1C] px-2.5 py-1 text-[9px] font-semibold tracking-widest text-white uppercase">
-                -{discount}%
-              </span>
-            )}
+            ) : null}
           </div>
+
+          {/* Zoom button */}
+          <button
+            onClick={() => setLightbox(true)}
+            aria-label="Expand image"
+            className="absolute top-4 right-4 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 backdrop-blur-sm border border-neutral-200/80 text-neutral-600 hover:text-neutral-950 transition-all opacity-0 group-hover:opacity-100 shadow-xs cursor-pointer"
+          >
+            <Maximize2 className="h-3.5 w-3.5" />
+          </button>
 
           {/* Left Arrow Button */}
           {hasMultiple && (
@@ -130,11 +135,9 @@ export function ProductGallery({ images, alt, badge, discount }: ProductGalleryP
                 goToPrev();
               }}
               aria-label="Previous Image"
-              className="absolute left-3 top-1/2 -translate-y-1/2 z-20 flex h-9 w-9 items-center justify-center bg-black/60 border border-white/10 text-white transition-colors hover:bg-black hover:border-white/30 active:scale-95 cursor-pointer"
+              className="absolute left-3 top-1/2 -translate-y-1/2 z-20 flex h-9 w-9 items-center justify-center rounded-full bg-white/90 border border-neutral-200 text-neutral-800 transition-all hover:bg-white hover:scale-105 active:scale-95 shadow-sm cursor-pointer"
             >
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
-              </svg>
+              <ChevronLeft className="w-4 h-4" />
             </button>
           )}
 
@@ -146,17 +149,15 @@ export function ProductGallery({ images, alt, badge, discount }: ProductGalleryP
                 goToNext();
               }}
               aria-label="Next Image"
-              className="absolute right-3 top-1/2 -translate-y-1/2 z-20 flex h-9 w-9 items-center justify-center bg-black/60 border border-white/10 text-white transition-colors hover:bg-black hover:border-white/30 active:scale-95 cursor-pointer"
+              className="absolute right-3 top-1/2 -translate-y-1/2 z-20 flex h-9 w-9 items-center justify-center rounded-full bg-white/90 border border-neutral-200 text-neutral-800 transition-all hover:bg-white hover:scale-105 active:scale-95 shadow-sm cursor-pointer"
             >
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
-              </svg>
+              <ChevronRight className="w-4 h-4" />
             </button>
           )}
 
           {/* Bottom Dot Indicators */}
           {hasMultiple && (
-            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1.5 bg-black/40 px-3 py-1 border border-white/10 backdrop-blur-sm">
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1.5 rounded-full bg-white/90 px-3 py-1.5 border border-neutral-200/80 backdrop-blur-sm shadow-xs">
               {allImages.map((_, i) => (
                 <button
                   key={i}
@@ -166,10 +167,10 @@ export function ProductGallery({ images, alt, badge, discount }: ProductGalleryP
                   }}
                   aria-label={`Go to image ${i + 1}`}
                   className={cn(
-                    "h-1.5 transition-all cursor-pointer",
+                    "rounded-full transition-all cursor-pointer",
                     i === activeIndex
-                      ? "w-4 bg-white"
-                      : "w-1.5 bg-white/40 hover:bg-white/70"
+                      ? "w-4 h-1.5 bg-neutral-950"
+                      : "w-1.5 h-1.5 bg-neutral-300 hover:bg-neutral-500"
                   )}
                 />
               ))}
@@ -177,7 +178,7 @@ export function ProductGallery({ images, alt, badge, discount }: ProductGalleryP
           )}
 
           {/* Counter */}
-          <div className="absolute bottom-4 right-4 text-[10px] uppercase tracking-widest text-warm-gray/70 font-mono hidden sm:block pointer-events-none">
+          <div className="absolute bottom-4 right-4 text-[10px] uppercase tracking-widest text-neutral-400 font-mono hidden sm:block pointer-events-none font-semibold">
             {activeIndex + 1} / {allImages.length}
           </div>
         </div>
@@ -190,10 +191,10 @@ export function ProductGallery({ images, alt, badge, discount }: ProductGalleryP
                 key={index}
                 onClick={() => setActiveIndex(index)}
                 className={cn(
-                  "relative aspect-square overflow-hidden bg-[#111111] border transition-colors cursor-pointer",
+                  "relative aspect-square overflow-hidden rounded-2xl bg-neutral-100/60 border transition-all cursor-pointer",
                   activeIndex === index
-                    ? "border-white"
-                    : "border-dark-border hover:border-white/40"
+                    ? "border-neutral-950 ring-2 ring-neutral-950/10 shadow-xs"
+                    : "border-neutral-200/80 hover:border-neutral-400"
                 )}
               >
                 <Image
@@ -209,17 +210,18 @@ export function ProductGallery({ images, alt, badge, discount }: ProductGalleryP
         )}
       </div>
 
-      {/* Clean Fullscreen Lightbox */}
+      {/* Clean Lightbox */}
       {lightbox && (
         <div
-          className="fixed inset-0 z-[200] flex items-center justify-center bg-black/95 p-6"
+          className="fixed inset-0 z-[200] flex items-center justify-center bg-neutral-950/90 backdrop-blur-md p-6"
           onClick={() => setLightbox(false)}
         >
           <button
             onClick={() => setLightbox(false)}
-            className="absolute top-6 right-6 text-xs uppercase tracking-widest text-white/70 hover:text-white"
+            className="absolute top-6 right-6 flex items-center gap-1.5 rounded-full bg-white/10 px-4 py-2 text-xs font-semibold uppercase tracking-widest text-white hover:bg-white/20 transition-colors cursor-pointer"
           >
-            Close ✕
+            <span>Close</span>
+            <X className="h-4 w-4" />
           </button>
 
           {hasMultiple && (
@@ -229,22 +231,18 @@ export function ProductGallery({ images, alt, badge, discount }: ProductGalleryP
                   e.stopPropagation();
                   goToPrev();
                 }}
-                className="absolute left-6 top-1/2 -translate-y-1/2 text-white/70 hover:text-white p-3"
+                className="absolute left-6 top-1/2 -translate-y-1/2 rounded-full bg-white/10 p-3 text-white hover:bg-white/20 transition-colors cursor-pointer"
               >
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-8 h-8">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
-                </svg>
+                <ChevronLeft className="w-6 h-6" />
               </button>
               <button
                 onClick={(e) => {
                   e.stopPropagation();
                   goToNext();
                 }}
-                className="absolute right-6 top-1/2 -translate-y-1/2 text-white/70 hover:text-white p-3"
+                className="absolute right-6 top-1/2 -translate-y-1/2 rounded-full bg-white/10 p-3 text-white hover:bg-white/20 transition-colors cursor-pointer"
               >
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-8 h-8">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
-                </svg>
+                <ChevronRight className="w-6 h-6" />
               </button>
             </>
           )}

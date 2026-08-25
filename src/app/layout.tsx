@@ -14,7 +14,7 @@ const cormorant = Cormorant_Garamond({
 const inter = Inter({
   variable: "--font-body",
   subsets: ["latin"],
-  weight: ["400", "500", "600"],
+  weight: ["400", "500", "600", "700"],
   display: "swap",
 });
 
@@ -22,13 +22,13 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   maximumScale: 5,
-  themeColor: "#000000",
+  themeColor: "#FAFAFA",
 };
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE.url),
   title: {
-    default: SITE.title,
+    default: `${SITE.title} — Luxury Phone Protection`,
     template: `%s | ${SITE.name} Qatar`,
   },
   description: SITE.description,
@@ -47,14 +47,14 @@ export const metadata: Metadata = {
     locale: SITE.locale,
     url: SITE.url,
     siteName: SITE.name,
-    title: SITE.title,
+    title: `${SITE.name} — Refined Protection. Uncompromised Design.`,
     description: SITE.description,
     images: [
       {
         url: `${SITE.url}/og-home.png`,
         width: 1200,
         height: 630,
-        alt: `${SITE.name} — Premium Phone Cases in Qatar`,
+        alt: `${SITE.name} — Premium Luxury Phone Cases in Qatar`,
       },
     ],
   },
@@ -81,7 +81,6 @@ export const metadata: Metadata = {
     },
   },
 
-  // Alternate links for internationalisation (future)
   alternates: {
     canonical: SITE.url,
   },
@@ -93,9 +92,6 @@ export const metadata: Metadata = {
     "geo.position": `${SITE.geo.latitude};${SITE.geo.longitude}`,
     ICBM: `${SITE.geo.latitude}, ${SITE.geo.longitude}`,
   },
-
-  // Verification (add when ready)
-  // verification: { google: "..." },
 };
 
 export default function RootLayout({
@@ -106,16 +102,11 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${cormorant.variable} ${inter.variable}`} suppressHydrationWarning>
       <head>
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `(function(){try{var t=localStorage.getItem('casele_theme');if(t==='light'){document.documentElement.classList.add('light')}else if(t==='dark'){document.documentElement.classList.remove('light')}else if(!window.matchMedia('(prefers-color-scheme: dark)').matches){document.documentElement.classList.add('light')}}catch(e){}})()`,
-          }}
-        />
         <LocalBusinessSchema />
         <WebsiteSchema />
         <OrganizationSchema />
       </head>
-      <body className="min-h-screen font-body antialiased">
+      <body className="min-h-screen bg-neutral-50 text-neutral-950 font-body antialiased selection:bg-neutral-900 selection:text-white">
         {children}
       </body>
     </html>

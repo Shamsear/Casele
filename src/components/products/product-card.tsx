@@ -4,12 +4,13 @@ import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { cn, getDiscountPercent } from "@/lib/utils";
-import { useI18n } from "@/lib/i18n/context";
 import { Price } from "@/components/ui/price";
+import { ProductBadge } from "@/components/ui/badge";
 import { useCartStore } from "@/lib/store/cart";
 import { useWishlistStore } from "@/lib/store/wishlist";
 import { useHaptic } from "@/hooks/use-haptic";
 import { useToast } from "@/components/ui/toast";
+import { Heart, Plus, Check } from "lucide-react";
 
 interface ProductCardProps {
   product: {
@@ -22,13 +23,14 @@ interface ProductCardProps {
     badge?: string | null;
     modelName: string;
     modelSlug?: string;
+    categoryName?: string;
     orderCount?: number;
   };
   className?: string;
   index?: number;
 }
 
-export function ProductCard({ product, className, index = 0 }: ProductCardProps) {
+export function ProductCard({ product, className }: ProductCardProps) {
   const addItem = useCartStore((s) => s.addItem);
   const toggleWishlist = useWishlistStore((s) => s.toggleItem);
   const isWishlisted = useWishlistStore((s) => s.hasItem(product.id));
@@ -63,7 +65,7 @@ export function ProductCard({ product, className, index = 0 }: ProductCardProps)
     setIsAdded(true);
     toast(`${product.name} added to bag`);
 
-    setTimeout(() => setIsAdded(false), 1500);
+    setTimeout(() => setIsAdded(false), 1600);
   };
 
   const handleWishlist = (e: React.MouseEvent) => {
@@ -76,100 +78,117 @@ export function ProductCard({ product, className, index = 0 }: ProductCardProps)
   return (
     <div
       className={cn(
-        "group relative flex flex-col border border-dark-border bg-[#0E0E0E] transition-colors hover:border-white/30",
+        "group relative flex flex-col rounded-2xl border border-neutral-200/80 bg-white p-3 sm:p-3.5 transition-all duration-300 hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:-translate-y-0.5",
         className
       )}
     >
-      {/* ═══ Image Frame ═══ */}
+      {/* ═══ 4:5 Aspect Ratio Product Image Frame ═══ */}
       <Link
         href={`/shop/${modelSlug}/${product.slug}`}
-        className="relative aspect-square w-full overflow-hidden bg-[#141414] block"
+        className="relative aspect-[4/5] w-full overflow-hidden rounded-xl bg-neutral-100/60 block"
       >
-        {/* Primary Product Image */}
+        {/* Primary Studio Angle */}
         <Image
           src={imageUrl}
           alt={product.name}
           fill
           className={cn(
-            "object-contain p-6 transition-all duration-300 ease-out",
+            "object-contain p-4 sm:p-6 transition-all duration-500 ease-out group-hover:scale-105",
             hasSecondImage && "group-hover:opacity-0"
           )}
           sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
         />
 
-        {/* Secondary Angle on Hover */}
+        {/* Secondary Detail Angle on Hover */}
         {secondImageUrl && (
           <Image
             src={secondImageUrl}
-            alt={`${product.name} alternate view`}
+            alt={`${product.name} alternate angle`}
             fill
-            className="object-contain p-6 transition-all duration-300 ease-out opacity-0 group-hover:opacity-100"
+            className="object-contain p-4 sm:p-6 transition-all duration-500 ease-out opacity-0 group-hover:opacity-100 group-hover:scale-105"
             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
           />
         )}
 
         {/* Minimal Badges */}
-        <div className="absolute top-3 left-3 flex flex-col gap-1 z-10 pointer-events-none">
-          {product.badge && (
-            <span className="bg-black/90 border border-white/10 px-2 py-0.5 text-[9px] font-semibold tracking-widest text-white uppercase">
-              {product.badge}
-            </span>
-          )}
-          {discount > 0 && (
-            <span className="bg-[#B91C1C] px-2 py-0.5 text-[9px] font-semibold tracking-wider text-white uppercase">
-              -{discount}%
-            </span>
-          )}
+        <div className="absolute top-2.5 left-2.5 flex flex-col gap-1 z-10 pointer-events-none">
+          {product.badge && <ProductBadge badge={product.badge} />}
         </div>
 
         {/* Wishlist Icon */}
         <button
           onClick={handleWishlist}
-          aria-label="Wishlist"
-          className="absolute top-3 right-3 z-10 flex h-7 w-7 items-center justify-center bg-black/60 text-white/70 backdrop-blur-sm transition-colors hover:text-white hover:bg-black"
+          aria-label={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
+          className={cn(
+            "absolute top-2.5 right-2.5 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 backdrop-blur-sm border border-neutral-200/80 text-neutral-600 transition-all duration-200 hover:scale-110 active:scale-95 shadow-xs cursor-pointer",
+            isWishlisted && "text-red-500 border-red-200 bg-red-50/90"
+          )}
         >
-          <svg
-            viewBox="0 0 24 24"
-            fill={isWishlisted ? "#C5A869" : "none"}
-            stroke={isWishlisted ? "#C5A869" : "currentColor"}
-            strokeWidth="1.5"
-            className="w-3.5 h-3.5"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z"
-            />
-          </svg>
+          <Heart
+            className={cn("h-4 w-4 transition-colors", isWishlisted && "fill-current")}
+          />
         </button>
+
+        {/* Quick Action Overlay (Slide-up button on card hover) */}
+        <div className="absolute bottom-2.5 inset-x-2.5 z-10 hidden sm:block pointer-events-none">
+          <button
+            onClick={handleAddToCart}
+            className={cn(
+              "w-full flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl text-xs font-semibold uppercase tracking-wider transition-all duration-200 pointer-events-auto cursor-pointer shadow-md",
+              "opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0",
+              isAdded
+                ? "bg-emerald-600 text-white"
+                : "bg-neutral-950 text-white hover:bg-neutral-800 active:scale-[0.98]"
+            )}
+          >
+            {isAdded ? (
+              <>
+                <Check className="h-3.5 w-3.5" />
+                <span>Added to Bag</span>
+              </>
+            ) : (
+              <>
+                <Plus className="h-3.5 w-3.5" />
+                <span>Quick Add</span>
+              </>
+            )}
+          </button>
+        </div>
       </Link>
 
-      {/* ═══ Details & Actions ═══ */}
-      <div className="flex flex-1 flex-col p-4">
-        <p className="text-[10px] text-warm-gray uppercase tracking-widest font-medium">
-          {product.modelName}
-        </p>
+      {/* ═══ Details & Mobile Action ═══ */}
+      <div className="flex flex-1 flex-col pt-3 pb-1">
+        <div className="flex items-center justify-between gap-1 text-[11px] font-medium text-neutral-400">
+          <span className="uppercase tracking-widest truncate">{product.modelName}</span>
+          {product.categoryName && (
+            <span className="text-[10px] text-neutral-400 shrink-0 font-normal">
+              {product.categoryName}
+            </span>
+          )}
+        </div>
 
         <Link
           href={`/shop/${modelSlug}/${product.slug}`}
-          className="mt-1 font-display text-base text-white hover:text-gold transition-colors line-clamp-1"
+          className="mt-1 font-medium text-sm text-neutral-900 line-clamp-1 hover:text-neutral-600 transition-colors"
         >
           {product.name}
         </Link>
 
-        <div className="mt-auto pt-3 flex items-center justify-between">
+        <div className="mt-auto pt-2.5 flex items-center justify-between">
           <Price price={product.price} comparePrice={product.comparePrice} size="sm" showBadge={false} />
 
+          {/* Mobile Quick Add Button */}
           <button
             onClick={handleAddToCart}
+            aria-label="Add to bag"
             className={cn(
-              "px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wider transition-colors",
+              "sm:hidden flex h-8 items-center justify-center gap-1 px-2.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all cursor-pointer",
               isAdded
-                ? "bg-white text-black"
-                : "border border-white/20 text-white hover:border-gold hover:text-gold"
+                ? "bg-emerald-600 text-white"
+                : "bg-neutral-950 text-white active:scale-95"
             )}
           >
-            {isAdded ? "Added" : "+ Add"}
+            {isAdded ? <Check className="h-3 w-3" /> : "+ Bag"}
           </button>
         </div>
       </div>

@@ -1,9 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Image from "next/image";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
 import { ProductCard } from "@/components/products/product-card";
 import { ProductGallery } from "@/components/products/product-gallery";
 import { Breadcrumbs } from "@/components/seo/breadcrumbs";
@@ -21,6 +19,18 @@ import { StickyAddToCart } from "@/components/products/sticky-add-to-cart";
 import { buildWhatsAppMessage, openWhatsApp } from "@/lib/whatsapp";
 import { getWhatsAppNumber } from "@/lib/settings";
 import type { ProductWithRelations } from "@/lib/db/products";
+import {
+  MessageSquare,
+  ShoppingBag,
+  Heart,
+  Truck,
+  ShieldCheck,
+  RefreshCw,
+  Plus,
+  Minus,
+  ArrowRight
+} from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface ProductDetailClientProps {
   product: ProductWithRelations;
@@ -96,7 +106,7 @@ export function ProductDetailClient({
   };
 
   return (
-    <>
+    <div className="min-h-screen bg-neutral-50 text-neutral-950">
       <ProductStructuredData
         name={product.name}
         description={product.description || ""}
@@ -106,7 +116,7 @@ export function ProductDetailClient({
       />
       <FAQSchema faqs={DEFAULT_FAQS} />
 
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 lg:py-16">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 lg:py-14">
         <Breadcrumbs
           items={[
             { label: "Collection", href: "/shop" },
@@ -115,8 +125,8 @@ export function ProductDetailClient({
           ]}
         />
 
-        <div className="mt-8 grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
-          {/* Left: Gallery (7 Cols) */}
+        <div className="mt-8 grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-start">
+          {/* Left: Interactive Gallery (7 Cols) */}
           <div className="lg:col-span-7">
             <ProductGallery
               images={product.images}
@@ -127,41 +137,37 @@ export function ProductDetailClient({
           </div>
 
           {/* Right: Product Purchase Details (5 Cols) */}
-          <div className="lg:col-span-5 space-y-8">
+          <div className="lg:col-span-5 space-y-7 rounded-3xl border border-neutral-200/80 bg-white p-6 sm:p-8 shadow-xs">
             <div>
-              <p className="text-[11px] font-semibold text-gold tracking-widest uppercase mb-2">
+              <span className="text-[11px] font-bold text-[#A88B4D] tracking-widest uppercase mb-1.5 block">
                 {selectedModel.name}
-              </p>
-              <h1 className="font-display text-3xl sm:text-4xl text-white font-normal leading-tight">
+              </span>
+              <h1 className="font-display text-3xl sm:text-4xl text-neutral-950 font-normal leading-tight">
                 {product.name}
               </h1>
 
-              <div className="mt-4 flex items-baseline gap-4">
-                <Price price={product.price} comparePrice={product.comparePrice} size="lg" showBadge={false} />
-                {discount > 0 && (
-                  <span className="text-xs font-semibold text-[#B91C1C] uppercase tracking-wider">
-                    Save {discount}%
-                  </span>
-                )}
+              <div className="mt-4 flex items-baseline gap-3">
+                <Price price={product.price} comparePrice={product.comparePrice} size="xl" showBadge={true} />
               </div>
             </div>
 
             {/* Model Selection */}
             {product.models.length > 1 && (
-              <div className="space-y-3 pt-6 border-t border-dark-border">
-                <p className="text-xs font-semibold uppercase tracking-widest text-white">
-                  Device Compatibility
+              <div className="space-y-3 pt-6 border-t border-neutral-100">
+                <p className="text-xs font-bold uppercase tracking-wider text-neutral-900">
+                  Select Phone Model
                 </p>
                 <div className="flex flex-wrap gap-2">
                   {product.models.map((model) => (
                     <button
                       key={model.id}
                       onClick={() => setSelectedModel(model)}
-                      className={`px-4 py-2.5 text-xs font-medium uppercase tracking-wider transition-colors ${
+                      className={cn(
+                        "px-4 py-2 rounded-xl text-xs font-semibold uppercase tracking-wider transition-all duration-200 cursor-pointer select-none",
                         selectedModel.id === model.id
-                          ? "bg-white text-black border border-white"
-                          : "border border-dark-border bg-black/40 text-warm-gray hover:border-white/40 hover:text-white"
-                      }`}
+                          ? "bg-neutral-950 text-white shadow-sm"
+                          : "border border-neutral-200/80 bg-neutral-50 text-neutral-600 hover:border-neutral-400 hover:text-neutral-950"
+                      )}
                     >
                       {model.name}
                     </button>
@@ -171,73 +177,88 @@ export function ProductDetailClient({
             )}
 
             {/* Quantity */}
-            <div className="space-y-3 pt-6 border-t border-dark-border">
-              <p className="text-xs font-semibold uppercase tracking-widest text-white">
+            <div className="space-y-3 pt-6 border-t border-neutral-100">
+              <p className="text-xs font-bold uppercase tracking-wider text-neutral-900">
                 Quantity
               </p>
               <div className="flex items-center gap-3">
-                <div className="flex items-center border border-dark-border bg-black">
+                <div className="flex items-center rounded-xl border border-neutral-200 bg-neutral-50">
                   <button
                     onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                    className="h-10 w-10 text-warm-gray hover:text-white transition-colors"
+                    className="flex h-10 w-10 items-center justify-center text-neutral-600 hover:text-neutral-950 transition-colors cursor-pointer"
+                    aria-label="Decrease"
                   >
-                    −
+                    <Minus className="h-4 w-4" />
                   </button>
-                  <span className="w-10 text-center text-xs font-semibold text-white">{quantity}</span>
+                  <span className="w-10 text-center text-xs font-bold text-neutral-950">{quantity}</span>
                   <button
                     onClick={() => setQuantity(Math.min(10, quantity + 1))}
-                    className="h-10 w-10 text-warm-gray hover:text-white transition-colors"
+                    className="flex h-10 w-10 items-center justify-center text-neutral-600 hover:text-neutral-950 transition-colors cursor-pointer"
+                    aria-label="Increase"
                   >
-                    +
+                    <Plus className="h-4 w-4" />
                   </button>
                 </div>
-                <span className="text-xs text-warm-gray">
+                <span className="text-xs font-medium text-neutral-500">
                   {formatPrice(parseFloat(product.price) * quantity)} total
                 </span>
               </div>
             </div>
 
-            {/* CTA Buttons */}
-            <div className="space-y-3 pt-6 border-t border-dark-border">
+            {/* CTAs */}
+            <div className="space-y-3 pt-6 border-t border-neutral-100">
               <button
                 onClick={handleBuyNow}
-                className="w-full bg-white py-4 text-xs font-semibold uppercase tracking-widest text-black hover:bg-gold transition-colors"
+                className="w-full flex items-center justify-center gap-2 rounded-xl bg-neutral-950 py-4 text-xs font-semibold uppercase tracking-widest text-white hover:bg-neutral-800 transition-all shadow-sm active:scale-[0.98] cursor-pointer"
               >
-                Order via WhatsApp
+                <MessageSquare className="h-4 w-4" />
+                <span>Instant Order via WhatsApp</span>
               </button>
 
               <button
                 onClick={handleAddToCart}
-                className="w-full border border-white/20 py-4 text-xs font-semibold uppercase tracking-widest text-white hover:border-white hover:bg-white/5 transition-colors"
+                className="w-full flex items-center justify-center gap-2 rounded-xl border border-neutral-300 bg-white py-4 text-xs font-semibold uppercase tracking-widest text-neutral-900 hover:bg-neutral-50 hover:border-neutral-400 transition-all active:scale-[0.98] cursor-pointer"
               >
-                Add to Bag
+                <ShoppingBag className="h-4 w-4" />
+                <span>Add to Bag</span>
               </button>
 
               <button
                 onClick={() => toggleWishlist(product.id)}
-                className="w-full py-2 text-[11px] font-medium uppercase tracking-widest text-warm-gray hover:text-white transition-colors text-center"
+                className={cn(
+                  "w-full flex items-center justify-center gap-1.5 py-2.5 text-xs font-medium uppercase tracking-wider transition-colors cursor-pointer",
+                  isWishlisted ? "text-red-600" : "text-neutral-500 hover:text-neutral-950"
+                )}
               >
-                {isWishlisted ? "Saved in Wishlist" : "Save to Wishlist"}
+                <Heart className={cn("h-3.5 w-3.5", isWishlisted && "fill-current")} />
+                <span>{isWishlisted ? "Saved in Wishlist" : "Save to Wishlist"}</span>
               </button>
             </div>
 
-            {/* Editorial Specifications Accordion / Features */}
-            <div className="pt-6 border-t border-dark-border space-y-6">
+            {/* Specifications & Assurances */}
+            <div className="pt-6 border-t border-neutral-100 space-y-4">
               <div>
-                <p className="text-[11px] font-semibold text-white uppercase tracking-widest mb-2">Description</p>
-                <p className="text-xs leading-relaxed text-warm-gray">
-                  {product.description || "Precision engineered phone case featuring impact-absorbing composite construction, responsive tactile buttons, and raised bezel protection for screen and camera lenses."}
+                <p className="text-xs font-bold text-neutral-900 uppercase tracking-wider mb-2">Description</p>
+                <p className="text-xs leading-relaxed text-neutral-600">
+                  {product.description || "Hand-finished aerospace composite enclosure engineered with high-impact shock dissipation and tactile metallic button overlays."}
                 </p>
               </div>
 
-              <div className="grid grid-cols-2 gap-4 pt-4 border-t border-dark-border/40 text-xs">
-                <div>
-                  <p className="font-semibold text-white">Same-Day Qatar Delivery</p>
-                  <p className="text-warm-gray mt-0.5 text-[11px]">Doha, Al Wakrah, Al Khor</p>
+              <div className="grid grid-cols-2 gap-3 pt-3 border-t border-neutral-100 text-xs">
+                <div className="flex items-start gap-2 p-2.5 rounded-xl bg-neutral-50 border border-neutral-200/60">
+                  <Truck className="h-4 w-4 text-neutral-800 shrink-0 mt-0.5" />
+                  <div>
+                    <p className="font-semibold text-neutral-950">Doha Express</p>
+                    <p className="text-neutral-500 text-[10px]">Same-day dispatch</p>
+                  </div>
                 </div>
-                <div>
-                  <p className="font-semibold text-white">7-Day Guarantee</p>
-                  <p className="text-warm-gray mt-0.5 text-[11px]">Hassle-free exchange policy</p>
+
+                <div className="flex items-start gap-2 p-2.5 rounded-xl bg-neutral-50 border border-neutral-200/60">
+                  <RefreshCw className="h-4 w-4 text-neutral-800 shrink-0 mt-0.5" />
+                  <div>
+                    <p className="font-semibold text-neutral-950">7-Day Guarantee</p>
+                    <p className="text-neutral-500 text-[10px]">Hassle-free return</p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -246,16 +267,22 @@ export function ProductDetailClient({
 
         {/* Related Products */}
         {relatedProducts.length > 0 && (
-          <div className="mt-24 border-t border-dark-border pt-16">
-            <div className="flex items-baseline justify-between mb-8 pb-4 border-b border-dark-border">
-              <h2 className="font-display text-2xl sm:text-3xl text-white font-normal">
-                Complementary Pieces
-              </h2>
+          <div className="mt-20 border-t border-neutral-200/70 pt-16">
+            <div className="flex items-baseline justify-between mb-8 pb-4 border-b border-neutral-200/70">
+              <div>
+                <span className="text-[10px] font-bold text-[#A88B4D] tracking-widest uppercase mb-1 block">
+                  Curated Pairings
+                </span>
+                <h2 className="font-display text-2xl sm:text-3xl text-neutral-950 font-normal">
+                  Complementary Pieces
+                </h2>
+              </div>
               <Link
                 href="/shop"
-                className="text-xs font-semibold uppercase tracking-widest text-warm-gray hover:text-gold transition-colors"
+                className="inline-flex items-center gap-1 text-xs font-semibold uppercase tracking-widest text-neutral-600 hover:text-neutral-950 transition-colors"
               >
-                View Collection →
+                <span>View All</span>
+                <ArrowRight className="h-3.5 w-3.5" />
               </Link>
             </div>
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
@@ -277,6 +304,6 @@ export function ProductDetailClient({
         modelName={selectedModel.name}
         quantity={quantity}
       />
-    </>
+    </div>
   );
 }

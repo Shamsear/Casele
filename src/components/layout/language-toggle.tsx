@@ -2,6 +2,7 @@
 
 import { useI18n } from "@/lib/i18n/context";
 import { cn } from "@/lib/utils";
+import { Globe } from "lucide-react";
 
 export function LanguageToggle({ className }: { className?: string }) {
   const { locale, setLocale } = useI18n();
@@ -10,15 +11,13 @@ export function LanguageToggle({ className }: { className?: string }) {
     <button
       onClick={() => setLocale(locale === "en" ? "ar" : "en")}
       className={cn(
-        "flex h-8 items-center gap-1 rounded-lg border border-dark-border bg-dark-surface px-2.5 text-xs font-medium text-warm-gray transition-colors hover:border-gold/30 hover:text-white",
+        "flex h-9 items-center gap-1.5 rounded-full border border-neutral-200/80 bg-white px-3 text-xs font-semibold text-neutral-700 transition-all duration-200 hover:border-neutral-400 hover:text-neutral-950 hover:shadow-xs active:scale-95 cursor-pointer select-none",
         className
       )}
       aria-label={locale === "en" ? "Switch to Arabic" : "Switch to English"}
     >
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-3.5 h-3.5">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-1.605.42-3.113 1.157-4.418" />
-      </svg>
-      {locale === "en" ? "AR" : "EN"}
+      <Globe className="h-3.5 w-3.5 text-neutral-500" />
+      <span className="font-mono text-[11px] font-bold">{locale === "en" ? "AR" : "EN"}</span>
     </button>
   );
 }

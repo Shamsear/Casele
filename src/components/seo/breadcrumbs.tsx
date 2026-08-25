@@ -12,10 +12,8 @@ interface BreadcrumbsProps {
 
 /**
  * Breadcrumb navigation with JSON-LD structured data
- * Improves SEO by showing navigation path in search results
  */
 export function Breadcrumbs({ items }: BreadcrumbsProps) {
-  // JSON-LD structured data for breadcrumbs
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
@@ -41,25 +39,25 @@ export function Breadcrumbs({ items }: BreadcrumbsProps) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
       />
-      <nav aria-label="Breadcrumb" className="mb-6">
-        <ol className="flex flex-wrap items-center gap-1 text-sm text-warm-gray">
+      <nav aria-label="Breadcrumb" className="mb-4">
+        <ol className="flex flex-wrap items-center gap-1.5 text-xs text-neutral-500">
           <li>
             <Link
               href="/"
-              className="transition-colors hover:text-gold"
+              className="transition-colors hover:text-neutral-950"
             >
               Home
             </Link>
           </li>
           {items.map((item, index) => (
-            <li key={item.href} className="flex items-center gap-1">
-              <span className="text-warm-gray/40">/</span>
+            <li key={item.href} className="flex items-center gap-1.5">
+              <span className="text-neutral-300">/</span>
               {index === items.length - 1 ? (
-                <span className="text-white">{item.label}</span>
+                <span className="font-semibold text-neutral-950">{item.label}</span>
               ) : (
                 <Link
                   href={item.href}
-                  className="transition-colors hover:text-gold"
+                  className="transition-colors hover:text-neutral-950"
                 >
                   {item.label}
                 </Link>

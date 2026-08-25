@@ -1,22 +1,22 @@
 @import "tailwindcss";
 
 @theme inline {
-  /* CASELÉ Luxury Palette */
-  --color-black: #0A0A0A;
+  /* CASELÉ Luxury Light Palette */
+  --color-neutral-base: #FAFAFA;
+  --color-surface-white: #FFFFFF;
   --color-gold: #C5A869;
-  --color-cream: #F4EFEA;
-  --color-white: #FFFFFF;
-  --color-warm-gray: #8E8A85;
   --color-gold-light: #DFCA9B;
-  --color-dark-surface: #141414;
-  --color-dark-border: #222222;
+  --color-gold-dark: #A88B4D;
+  --color-charcoal: #0A0A0A;
+  --color-subtle-border: #E5E5E5;
+  --color-muted-text: #737373;
 
   /* Semantic colors */
-  --color-background: var(--color-black);
-  --color-foreground: var(--color-white);
-  --color-muted: var(--color-warm-gray);
-  --color-card: var(--color-dark-surface);
-  --color-card-border: var(--color-dark-border);
+  --color-background: #FAFAFA;
+  --color-foreground: #0A0A0A;
+  --color-muted: #737373;
+  --color-card: #FFFFFF;
+  --color-card-border: #E5E5E5;
 
   /* Typography */
   --font-display: "Cormorant Garamond", Georgia, serif;
@@ -24,10 +24,24 @@
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   CLEAN LUXURY BASE STYLES
+   LUXURY DTC LIGHT MODE BASE STYLES
    ═══════════════════════════════════════════════════════════════ */
 
 :root {
+  color-scheme: light;
+  --bg-primary: #FAFAFA;
+  --bg-secondary: #FFFFFF;
+  --bg-tertiary: #F4F4F5;
+  --border-color: #E5E5E5;
+  --border-color-hover: #D4D4D8;
+  --text-primary: #0A0A0A;
+  --text-secondary: #52525B;
+  --text-muted: #A1A1AA;
+  --surface-card: #FFFFFF;
+  --surface-card-hover: #FAFAFA;
+}
+
+.dark {
   color-scheme: dark;
   --bg-primary: #0A0A0A;
   --bg-secondary: #141414;
@@ -41,22 +55,8 @@
   --surface-card-hover: #181818;
 }
 
-.light {
-  color-scheme: light;
-  --bg-primary: #F7F5F0;
-  --bg-secondary: #FFFFFF;
-  --bg-tertiary: #EFECE6;
-  --border-color: #E2DDD5;
-  --border-color-hover: #C5A869;
-  --text-primary: #121212;
-  --text-secondary: #6B665F;
-  --text-muted: rgba(107, 102, 95, 0.6);
-  --surface-card: #FFFFFF;
-  --surface-card-hover: #FAFAF8;
-}
-
 body {
-  background: var(--bg-primary);
+  background-color: var(--bg-primary);
   color: var(--text-primary);
   font-family: var(--font-body);
   -webkit-font-smoothing: antialiased;
@@ -64,23 +64,23 @@ body {
   letter-spacing: -0.01em;
 }
 
-/* Clean scrollbar */
+/* Clean minimal scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--bg-primary);
+  background: #FAFAFA;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--border-color);
-  border-radius: 3px;
+  background: #D4D4D8;
+  border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--text-secondary);
+  background: #A1A1AA;
 }
 
 /* Utility: hide scrollbar */
@@ -94,44 +94,28 @@ body {
 
 /* Focused elements */
 *:focus-visible {
-  outline: 1.5px solid var(--color-gold);
+  outline: 2px solid #0A0A0A;
   outline-offset: 2px;
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   LIGHT MODE OVERRIDES
-   ═══════════════════════════════════════════════════════════════ */
+/* Luxury animation keyframes */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-4px); }
+}
 
-.light .bg-black { background-color: var(--bg-primary) !important; }
-.light .bg-black\/40 { background-color: rgba(247, 245, 240, 0.7) !important; }
-.light .bg-black\/50 { background-color: rgba(247, 245, 240, 0.8) !important; }
-.light .bg-black\/60 { background-color: rgba(247, 245, 240, 0.9) !important; }
-.light .bg-black\/80 { background-color: rgba(247, 245, 240, 0.95) !important; }
-.light .bg-black\/90 { background-color: rgba(247, 245, 240, 0.98) !important; }
-.light .bg-black\/95 { background-color: rgba(247, 245, 240, 0.99) !important; }
+@keyframes pulseSubtle {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
 
-.light .bg-dark-surface { background-color: var(--bg-secondary) !important; }
-.light .bg-dark-surface\/30 { background-color: rgba(255, 255, 255, 0.5) !important; }
-.light .bg-dark-surface\/40 { background-color: rgba(255, 255, 255, 0.7) !important; }
-.light .bg-dark-surface\/50 { background-color: rgba(255, 255, 255, 0.8) !important; }
-.light .bg-dark-surface\/60 { background-color: rgba(255, 255, 255, 0.9) !important; }
-.light .bg-dark-surface\/70 { background-color: rgba(255, 255, 255, 0.95) !important; }
-.light .bg-dark-surface\/80 { background-color: var(--bg-secondary) !important; }
+.animate-float {
+  animation: float 4s ease-in-out infinite;
+}
 
-.light .text-white { color: var(--text-primary) !important; }
-.light .text-warm-gray { color: var(--text-secondary) !important; }
-.light .text-warm-gray\/50 { color: rgba(107, 102, 95, 0.5) !important; }
-.light .text-warm-gray\/60 { color: rgba(107, 102, 95, 0.6) !important; }
-.light .text-warm-gray\/70 { color: rgba(107, 102, 95, 0.7) !important; }
-
-.light .border-dark-border { border-color: var(--border-color) !important; }
-.light .border-dark-border\/30 { border-color: rgba(226, 221, 213, 0.4) !important; }
-.light .border-dark-border\/40 { border-color: rgba(226, 221, 213, 0.6) !important; }
-.light .border-dark-border\/50 { border-color: rgba(226, 221, 213, 0.8) !important; }
-.light .border-dark-border\/60 { border-color: var(--border-color) !important; }
-
-.light header { background-color: rgba(247, 245, 240, 0.9) !important; }
-.light nav.fixed { background-color: rgba(247, 245, 240, 0.98) !important; }
+.animate-pulse-subtle {
+  animation: pulseSubtle 3s ease-in-out infinite;
+}
 
 /* ═══════════════════════════════════════════════════════════════
    RTL SUPPORT

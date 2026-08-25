@@ -1,10 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { SearchIcon } from "@/components/ui/icons";
 import { useI18n } from "@/lib/i18n/context";
+import { Search, Package, CheckCircle2, Truck, Check, MapPin, Compass } from "lucide-react";
 
 interface OrderItem {
   name: string;
@@ -57,122 +56,134 @@ export default function TrackPage() {
   };
 
   return (
-    <div className="mx-auto max-w-2xl px-4 py-12 lg:px-8">
-      <h1 className="font-display text-h1 font-bold text-white text-center">
-        Track Your Order
-      </h1>
-      <p className="mt-2 text-center text-warm-gray">
-        Enter your phone number to see your order status
-      </p>
-
-      <form onSubmit={handleTrack} className="mt-8 flex gap-3">
-        <Input
-          type="tel"
-          placeholder="e.g. 97455123456"
-          value={phone}
-          onChange={(e) => setPhone(e.target.value)}
-          className="flex-1"
-        />
-        <Button type="submit" variant="cta" loading={loading}>
-          Track
-        </Button>
-      </form>
-
-      <p className="mt-3 text-center text-xs text-warm-gray/60">
-        Enter the phone number you used when placing your order
-      </p>
-
-      {searched && !loading && orders.length === 0 && (
-        <div className="mt-12 rounded-xl border border-dark-border bg-dark-surface p-8 text-center">
-          <div className="mb-4 text-warm-gray/30"><SearchIcon size={48} /></div>
-          <p className="text-warm-gray">No orders found for this phone number.</p>
-          <p className="mt-2 text-sm text-warm-gray/60">
-            Check the number and try again, or contact us on WhatsApp.
+    <div className="min-h-screen bg-neutral-50 text-neutral-950 py-12 lg:py-16">
+      <div className="mx-auto max-w-2xl px-4 sm:px-6 lg:px-8">
+        <div className="text-center space-y-2 mb-8">
+          <div className="inline-flex items-center gap-1.5 text-[11px] font-bold text-[#A88B4D] tracking-widest uppercase mb-1">
+            <Compass className="h-3.5 w-3.5" />
+            <span>Order Concierge</span>
+          </div>
+          <h1 className="font-display text-4xl sm:text-5xl font-normal text-neutral-950">
+            Track Your Delivery
+          </h1>
+          <p className="text-xs sm:text-sm text-neutral-600">
+            Enter your mobile number to view live order progress and courier status
           </p>
         </div>
-      )}
 
-      {orders.length > 0 && (
-        <div className="mt-8 space-y-4">
-          {orders.map((order) => (
-            <div
-              key={order.id}
-              className="rounded-xl border border-dark-border bg-dark-surface p-6"
-            >
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-medium text-white">{order.id}</span>
-                <span className="text-xs text-warm-gray">
-                  {new Date(order.createdAt).toLocaleDateString("en-QA", {
-                    day: "numeric",
-                    month: "short",
-                    year: "numeric",
-                  })}
-                </span>
-              </div>
+        <form onSubmit={handleTrack} className="flex gap-2.5 rounded-2xl border border-neutral-200/80 bg-white p-2 shadow-sm">
+          <div className="relative flex-1">
+            <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-xs font-semibold text-neutral-400 font-mono">+974</span>
+            <input
+              type="tel"
+              placeholder="e.g. 55123456"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              className="h-11 w-full rounded-xl bg-transparent py-2 pl-14 pr-3 text-sm text-neutral-950 placeholder:text-neutral-400 focus:outline-none"
+            />
+          </div>
+          <button
+            type="submit"
+            disabled={loading}
+            className="flex items-center justify-center gap-1.5 rounded-xl bg-neutral-950 px-6 py-2.5 text-xs font-semibold uppercase tracking-wider text-white hover:bg-neutral-800 transition-all shadow-sm cursor-pointer disabled:opacity-50"
+          >
+            {loading ? "Searching..." : "Track Status"}
+          </button>
+        </form>
 
-              {/* Status stepper */}
-              <div className="mt-6 flex items-center justify-between">
-                {statusSteps.map((step, i) => {
-                  const currentIdx = statusSteps.indexOf(order.status);
-                  const isComplete = i <= currentIdx;
-                  const isCurrent = i === currentIdx;
-                  return (
-                    <div key={step} className="flex flex-1 items-center">
-                      <div className="flex flex-col items-center">
-                        <div
-                          className={`flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold ${
-                            isComplete
-                              ? "bg-gold text-black"
-                              : "bg-dark-border text-warm-gray"
-                          } ${isCurrent ? "ring-2 ring-gold/30" : ""}`}
-                        >
-                          {isComplete ? (
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4"><path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg>
-                          ) : i + 1}
-                        </div>
-                        <span className="mt-1 text-[10px] text-warm-gray">
-                          {statusLabels[step]}
-                        </span>
-                      </div>
-                      {i < statusSteps.length - 1 && (
-                        <div
-                          className={`mx-1 h-0.5 flex-1 ${
-                            i < currentIdx ? "bg-gold" : "bg-dark-border"
-                          }`}
-                        />
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
+        <p className="mt-3 text-center text-[11px] text-neutral-400">
+          Enter the exact phone number provided during WhatsApp checkout
+        </p>
 
-              {/* Items */}
-              <div className="mt-6 border-t border-dark-border pt-4">
-                {order.items.map((item: OrderItem, i: number) => (
-                  <div key={i} className="flex items-center justify-between text-sm">
-                    <span className="text-white">
-                      {item.name} ({item.model}) × {item.qty}
-                    </span>
-                    <span className="text-warm-gray">{formatPrice(item.price)}</span>
+        {searched && !loading && orders.length === 0 && (
+          <div className="mt-10 rounded-3xl border border-neutral-200/80 bg-white p-10 text-center shadow-xs">
+            <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-neutral-100 text-neutral-400">
+              <Package className="h-7 w-7" />
+            </div>
+            <h3 className="text-sm font-semibold text-neutral-950">No orders found for this number</h3>
+            <p className="mt-1 text-xs text-neutral-500 max-w-sm mx-auto">
+              Please verify your phone digits or reach out to our Doha concierge directly on WhatsApp.
+            </p>
+          </div>
+        )}
+
+        {orders.length > 0 && (
+          <div className="mt-8 space-y-4">
+            {orders.map((order) => (
+              <div
+                key={order.id}
+                className="rounded-3xl border border-neutral-200/80 bg-white p-6 shadow-xs"
+              >
+                <div className="flex items-center justify-between pb-4 border-b border-neutral-100">
+                  <div>
+                    <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider">Tracking Reference</span>
+                    <p className="text-sm font-bold text-neutral-950">{order.id}</p>
                   </div>
-                ))}
-                <div className="mt-3 flex items-center justify-between border-t border-dark-border pt-3">
-                  <span className="font-semibold text-white">Total</span>
-                  <span className="font-display text-lg font-semibold text-gold">
-                    {formatPrice(order.total)}
+                  <span className="text-xs text-neutral-500 font-medium">
+                    {new Date(order.createdAt).toLocaleDateString("en-QA", {
+                      day: "numeric",
+                      month: "short",
+                      year: "numeric",
+                    })}
                   </span>
                 </div>
-              </div>
 
-              {order.status === "delivered" && (
-                <Button variant="secondary" className="mt-4 w-full">
-                  Re-order these items
-                </Button>
-              )}
-            </div>
-          ))}
-        </div>
-      )}
+                {/* Status stepper */}
+                <div className="mt-6 flex items-center justify-between px-2">
+                  {statusSteps.map((step, i) => {
+                    const currentIdx = statusSteps.indexOf(order.status);
+                    const isComplete = i <= currentIdx;
+                    const isCurrent = i === currentIdx;
+                    return (
+                      <div key={step} className="flex flex-1 items-center">
+                        <div className="flex flex-col items-center">
+                          <div
+                            className={`flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold transition-all ${
+                              isComplete
+                                ? "bg-neutral-950 text-white shadow-xs"
+                                : "bg-neutral-100 text-neutral-400 border border-neutral-200"
+                            } ${isCurrent ? "ring-4 ring-neutral-900/10" : ""}`}
+                          >
+                            {isComplete ? <Check className="h-4 w-4" /> : i + 1}
+                          </div>
+                          <span className={`mt-2 text-[10px] uppercase tracking-wider font-semibold text-center ${isCurrent ? "text-neutral-950" : "text-neutral-400"}`}>
+                            {statusLabels[step]}
+                          </span>
+                        </div>
+                        {i < statusSteps.length - 1 && (
+                          <div
+                            className={`mx-2 h-0.5 flex-1 mb-5 transition-colors ${
+                              i < currentIdx ? "bg-neutral-950" : "bg-neutral-200"
+                            }`}
+                          />
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Items */}
+                <div className="mt-6 border-t border-neutral-100 pt-4 space-y-2">
+                  {order.items.map((item: OrderItem, i: number) => (
+                    <div key={i} className="flex items-center justify-between text-xs">
+                      <span className="font-medium text-neutral-800">
+                        {item.name} <span className="text-neutral-400">({item.model})</span> × {item.qty}
+                      </span>
+                      <span className="font-semibold text-neutral-950">{formatPrice(item.price)}</span>
+                    </div>
+                  ))}
+                  <div className="mt-3 flex items-center justify-between border-t border-neutral-100 pt-3 text-sm">
+                    <span className="font-bold text-neutral-950">Total Amount</span>
+                    <span className="font-display text-base font-bold text-neutral-950">
+                      {formatPrice(order.total)}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

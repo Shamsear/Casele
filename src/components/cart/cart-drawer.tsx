@@ -7,8 +7,18 @@ import { useCartStore } from "@/lib/store/cart";
 import { useI18n } from "@/lib/i18n/context";
 import { getWhatsAppNumber } from "@/lib/settings";
 import { buildWhatsAppMessage, openWhatsApp } from "@/lib/whatsapp";
-import { TruckIcon, CartIcon } from "@/components/ui/icons";
 import { Price } from "@/components/ui/price";
+import {
+  ShoppingBag,
+  X,
+  Plus,
+  Minus,
+  Trash2,
+  Truck,
+  ShieldCheck,
+  ArrowRight,
+  MessageSquare
+} from "lucide-react";
 
 export function CartDrawer() {
   const { items, isOpen, setOpen, removeItem, updateQuantity, total, subtotal, tierDiscount, promoDiscount } = useCartStore();
@@ -85,78 +95,84 @@ export function CartDrawer() {
     <>
       {/* Backdrop */}
       <div
-        className={`fixed inset-0 z-50 bg-black/70 backdrop-blur-md transition-opacity duration-300 ${
+        className={`fixed inset-0 z-50 bg-neutral-950/40 backdrop-blur-xs transition-opacity duration-300 ${
           isOpen ? "opacity-100" : "pointer-events-none opacity-0"
         }`}
         onClick={() => setOpen(false)}
       />
 
-      {/* Drawer */}
+      {/* Slide-Over Drawer */}
       <div
-        className={`fixed right-0 top-0 z-50 flex h-full w-full max-w-md flex-col bg-dark-surface shadow-2xl transition-transform duration-300 ease-out ${
+        className={`fixed right-0 top-0 z-50 flex h-full w-full max-w-md flex-col bg-white border-l border-neutral-200/80 shadow-2xl transition-transform duration-300 ease-out text-neutral-950 ${
           isOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-dark-border px-6 py-4">
-          <div>
-            <h2 className="font-display text-lg font-bold text-white">Your Cart</h2>
-            <p className="text-xs text-warm-gray">{itemCount} {itemCount === 1 ? "item" : "items"}</p>
+        <div className="flex items-center justify-between border-b border-neutral-200/70 px-6 py-4">
+          <div className="flex items-center gap-2.5">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-neutral-100 text-neutral-900">
+              <ShoppingBag className="h-4 w-4" />
+            </div>
+            <div>
+              <h2 className="font-semibold text-sm text-neutral-950 uppercase tracking-wider">Your Shopping Bag</h2>
+              <p className="text-xs text-neutral-500">{itemCount} {itemCount === 1 ? "piece" : "pieces"} selected</p>
+            </div>
           </div>
           <button
             onClick={() => setOpen(false)}
-            aria-label="Close cart"
-            className="flex h-8 w-8 items-center justify-center rounded-lg text-warm-gray transition-colors hover:text-white"
+            aria-label="Close bag"
+            className="flex h-8 w-8 items-center justify-center rounded-full text-neutral-400 hover:text-neutral-950 hover:bg-neutral-100 transition-all cursor-pointer"
           >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-5 h-5">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-            </svg>
+            <X className="h-4 w-4" />
           </button>
         </div>
 
-        {/* Free Delivery Progress */}
-        <div className="mx-6 mt-4 rounded-xl bg-dark-surface border border-dark-border p-3.5">
+        {/* Free Delivery Progress Bar */}
+        <div className="mx-6 mt-4 rounded-xl bg-neutral-50 border border-neutral-200/70 p-3.5">
           {qualifiesForFreeDelivery ? (
-            <div className="flex items-center gap-2 text-xs font-semibold text-emerald-400">
-              <TruckIcon size={16} />
-              <span>You qualify for FREE delivery</span>
+            <div className="flex items-center gap-2 text-xs font-semibold text-emerald-700">
+              <Truck className="h-4 w-4 text-emerald-600" />
+              <span>You have unlocked <strong>Complimentary Doha Delivery</strong></span>
             </div>
           ) : (
             <>
-              <div className="flex items-center gap-2 text-xs">
-                <TruckIcon size={15} className="text-emerald-400" />
-                <span className="text-white font-medium">
-                  Add <span className="text-emerald-400 font-bold">QR {Math.ceil(deliveryThreshold - currentSubtotal)}</span> more for FREE delivery
-                </span>
+              <div className="flex items-center justify-between text-xs">
+                <div className="flex items-center gap-1.5 font-medium text-neutral-800">
+                  <Truck className="h-3.5 w-3.5 text-neutral-500" />
+                  <span>
+                    Add <strong className="text-neutral-950">QR {Math.ceil(deliveryThreshold - currentSubtotal)}</strong> for FREE Express Delivery
+                  </span>
+                </div>
+                <span className="text-[11px] font-semibold text-neutral-500">{Math.round(progressPercent)}%</span>
               </div>
-              <div className="mt-2.5 h-1.5 overflow-hidden rounded-full bg-black">
+              <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-neutral-200">
                 <div
-                  className="h-full rounded-full bg-emerald-400 transition-all duration-500"
+                  className="h-full rounded-full bg-neutral-950 transition-all duration-500"
                   style={{ width: `${progressPercent}%` }}
                 />
               </div>
-              <p className="mt-1 text-[10px] text-warm-gray">
-                {formatPrice(currentSubtotal)} of QR {deliveryThreshold}
-              </p>
             </>
           )}
         </div>
 
-        {/* Items */}
+        {/* Cart Item List */}
         <div className="flex-1 overflow-y-auto px-6 py-4">
           {items.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-full text-center">
-              <div className="mb-3 text-warm-gray/30">
-                <CartIcon size={40} />
+            <div className="flex flex-col items-center justify-center h-full text-center py-12">
+              <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-neutral-100 text-neutral-400 mb-4">
+                <ShoppingBag className="h-8 w-8" />
               </div>
-              <p className="text-sm font-medium text-white">Your cart is empty</p>
-              <p className="mt-1 text-xs text-warm-gray">Browse our cases to get started</p>
+              <p className="text-sm font-semibold text-neutral-900">Your bag is currently empty</p>
+              <p className="mt-1 text-xs text-neutral-500 max-w-xs leading-relaxed">
+                Discover our precision-engineered protective cases for flagship devices.
+              </p>
               <Link
                 href="/shop"
                 onClick={() => setOpen(false)}
-                className="mt-4 rounded-lg bg-gold px-5 py-2 text-xs font-semibold text-black hover:bg-gold-light transition-colors"
+                className="mt-5 inline-flex items-center gap-2 rounded-xl bg-neutral-950 px-6 py-3 text-xs font-semibold uppercase tracking-wider text-white hover:bg-neutral-800 transition-all shadow-sm active:scale-[0.98]"
               >
-                Start Shopping
+                <span>Explore Collection</span>
+                <ArrowRight className="h-3.5 w-3.5" />
               </Link>
             </div>
           ) : (
@@ -164,47 +180,51 @@ export function CartDrawer() {
               {items.map((item) => (
                 <div
                   key={`${item.productId}-${item.modelId}`}
-                  className="flex gap-3 rounded-xl border border-dark-border bg-black/40 p-3"
+                  className="flex gap-3.5 rounded-2xl border border-neutral-200/80 bg-neutral-50/50 p-3 transition-colors hover:bg-neutral-50"
                 >
-                  {/* Image */}
-                  <div className="relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-lg bg-black">
+                  {/* Thumbnail */}
+                  <div className="relative h-18 w-18 flex-shrink-0 overflow-hidden rounded-xl bg-white border border-neutral-200/60">
                     <Image
                       src={item.image}
                       alt={item.name}
                       fill
-                      className="object-contain p-1"
-                      sizes="64px"
+                      className="object-contain p-1.5"
+                      sizes="72px"
                     />
                   </div>
 
                   {/* Details */}
                   <div className="flex flex-1 flex-col min-w-0">
-                    <p className="text-[10px] text-warm-gray/60 uppercase">{item.modelName}</p>
-                    <p className="text-xs font-semibold text-white line-clamp-1">{item.name}</p>
+                    <span className="text-[10px] font-semibold text-neutral-400 uppercase tracking-wider">{item.modelName}</span>
+                    <span className="text-xs font-semibold text-neutral-950 truncate">{item.name}</span>
                     <Price price={item.price} size="sm" showBadge={false} />
 
                     {/* Quantity Controls */}
-                    <div className="mt-auto flex items-center justify-between pt-1">
-                      <div className="flex items-center gap-1.5">
+                    <div className="mt-auto flex items-center justify-between pt-2">
+                      <div className="flex items-center rounded-lg border border-neutral-200 bg-white">
                         <button
                           onClick={() => updateQuantity(item.productId, item.modelId, item.quantity - 1)}
-                          className="flex h-6 w-6 items-center justify-center rounded border border-dark-border text-warm-gray hover:border-gold/30 hover:text-white text-xs"
+                          className="flex h-6 w-6 items-center justify-center text-neutral-600 hover:text-neutral-950 hover:bg-neutral-100 rounded-l transition-colors cursor-pointer"
+                          aria-label="Decrease quantity"
                         >
-                          −
+                          <Minus className="h-3 w-3" />
                         </button>
-                        <span className="w-5 text-center text-xs font-semibold text-white">{item.quantity}</span>
+                        <span className="w-6 text-center text-xs font-semibold text-neutral-950">{item.quantity}</span>
                         <button
                           onClick={() => updateQuantity(item.productId, item.modelId, item.quantity + 1)}
-                          className="flex h-6 w-6 items-center justify-center rounded border border-dark-border text-warm-gray hover:border-gold/30 hover:text-white text-xs"
+                          className="flex h-6 w-6 items-center justify-center text-neutral-600 hover:text-neutral-950 hover:bg-neutral-100 rounded-r transition-colors cursor-pointer"
+                          aria-label="Increase quantity"
                         >
-                          +
+                          <Plus className="h-3 w-3" />
                         </button>
                       </div>
+
                       <button
                         onClick={() => removeItem(item.productId, item.modelId)}
-                        className="text-[11px] text-warm-gray/60 hover:text-red-400"
+                        className="flex items-center gap-1 text-[11px] font-medium text-neutral-400 hover:text-red-600 transition-colors cursor-pointer"
                       >
-                        Remove
+                        <Trash2 className="h-3 w-3" />
+                        <span>Remove</span>
                       </button>
                     </div>
                   </div>
@@ -216,48 +236,48 @@ export function CartDrawer() {
 
         {/* Footer with totals and WhatsApp button */}
         {items.length > 0 && (
-          <div className="border-t border-dark-border px-6 py-4 space-y-3.5">
-            {/* Totals */}
+          <div className="border-t border-neutral-200/80 bg-neutral-50/50 px-6 py-4 space-y-4">
+            {/* Price Breakdown */}
             <div className="space-y-1.5 text-xs">
-              <div className="flex justify-between">
-                <span className="text-warm-gray">Subtotal</span>
-                <span className="text-white font-medium">{formatPrice(currentSubtotal)}</span>
+              <div className="flex justify-between text-neutral-600">
+                <span>Subtotal</span>
+                <span className="text-neutral-950 font-medium">{formatPrice(currentSubtotal)}</span>
               </div>
               {tierDiscount() > 0 && (
-                <div className="flex justify-between text-emerald-400">
-                  <span>Tier Discount</span>
+                <div className="flex justify-between text-emerald-700">
+                  <span>Tier Bundle Savings</span>
                   <span>-{formatPrice(tierDiscount())}</span>
                 </div>
               )}
               {promoDiscount > 0 && (
-                <div className="flex justify-between text-emerald-400">
-                  <span>Promo Discount</span>
+                <div className="flex justify-between text-emerald-700">
+                  <span>Promo Code Savings</span>
                   <span>-{formatPrice(promoDiscount)}</span>
                 </div>
               )}
-              <div className="flex justify-between border-t border-dark-border pt-2 text-sm">
-                <span className="font-semibold text-white">Total</span>
-                <span className="font-bold text-gold text-base">{formatPrice(total())}</span>
+              <div className="flex justify-between border-t border-neutral-200/80 pt-2 text-sm font-bold text-neutral-950">
+                <span>Estimated Total</span>
+                <span className="font-display text-base tracking-tight">{formatPrice(total())}</span>
               </div>
             </div>
 
-            {/* Customer Info */}
+            {/* Quick Customer Info */}
             <div className="space-y-2">
               <input
                 type="text"
-                placeholder="Your name"
+                placeholder="Full Name (for delivery)"
                 value={customerName}
                 onChange={(e) => setCustomerName(e.target.value)}
-                className="w-full rounded-lg border border-dark-border bg-black/50 px-3 py-2 text-xs text-white placeholder:text-warm-gray/40 focus:border-gold/50 focus:outline-none"
+                className="w-full rounded-xl border border-neutral-200 bg-white px-3.5 py-2 text-xs text-neutral-950 placeholder:text-neutral-400 focus:border-neutral-950 focus:outline-none shadow-2xs"
               />
               <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-warm-gray/50 font-medium">+974</span>
+                <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-xs text-neutral-400 font-semibold font-mono">+974</span>
                 <input
                   type="tel"
-                  placeholder="Phone number"
+                  placeholder="Mobile / WhatsApp number"
                   value={customerPhone}
                   onChange={(e) => setCustomerPhone(e.target.value.replace(/\D/g, "").slice(0, 8))}
-                  className="w-full rounded-lg border border-dark-border bg-black/50 py-2 pl-12 pr-3 text-xs text-white placeholder:text-warm-gray/40 focus:border-gold/50 focus:outline-none"
+                  className="w-full rounded-xl border border-neutral-200 bg-white py-2 pl-14 pr-3 text-xs text-neutral-950 placeholder:text-neutral-400 focus:border-neutral-950 focus:outline-none shadow-2xs"
                   inputMode="numeric"
                   maxLength={8}
                 />
@@ -267,18 +287,17 @@ export function CartDrawer() {
             {/* WhatsApp Order Button */}
             <button
               onClick={handleWhatsAppOrder}
-              className="flex w-full items-center justify-center gap-2 rounded-xl bg-gold px-4 py-3 text-xs font-semibold text-black transition-all hover:bg-gold-light active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
               disabled={!customerName.trim() || customerPhone.length < 8}
+              className="flex w-full items-center justify-center gap-2 rounded-xl bg-neutral-950 py-3.5 text-xs font-semibold uppercase tracking-wider text-white transition-all hover:bg-neutral-800 active:scale-[0.98] shadow-sm disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
             >
-              <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
-                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z" />
-              </svg>
-              Order on WhatsApp
+              <MessageSquare className="h-4 w-4" />
+              <span>Checkout via WhatsApp</span>
             </button>
 
-            <p className="text-center text-[10px] text-warm-gray/50">
-              Direct checkout via WhatsApp
-            </p>
+            <div className="flex items-center justify-center gap-2 text-[10px] text-neutral-400 font-medium">
+              <ShieldCheck className="h-3.5 w-3.5 text-neutral-400" />
+              <span>Direct Concierge Checkout • Cash on Delivery Available</span>
+            </div>
           </div>
         )}
       </div>
