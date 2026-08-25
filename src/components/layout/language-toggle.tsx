@@ -11,7 +11,7 @@ export function LanguageToggle({ className }: { className?: string }) {
     <button
       onClick={() => setLocale(locale === "en" ? "ar" : "en")}
       className={cn(
-        "flex h-9 items-center gap-1.5 rounded-full border border-neutral-200/80 bg-white px-3 text-xs font-semibold text-neutral-700 transition-all duration-200 hover:border-neutral-400 hover:text-neutral-950 hover:shadow-xs active:scale-95 cursor-pointer select-none",
+        "flex h-9 items-center gap-1.5 rounded-full border border-white/80 bg-white/80 backdrop-blur-md px-3 text-xs font-semibold text-neutral-800 transition-all duration-200 hover:border-neutral-400 hover:bg-white hover:text-neutral-950 hover:shadow-2xs active:scale-95 cursor-pointer select-none",
         className
       )}
       aria-label={locale === "en" ? "Switch to Arabic" : "Switch to English"}
