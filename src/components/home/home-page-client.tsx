@@ -61,122 +61,127 @@ export function HomePageClient({
 
   return (
     <div className="min-h-screen bg-neutral-50 text-neutral-950 overflow-hidden">
-      {/* 1. HERO SECTION: Editorial High-Conversion DTC Showcase */}
-      <section className="relative overflow-hidden pt-3 pb-6 sm:pt-6 sm:pb-8 lg:pt-6 lg:pb-8 flex items-center justify-center">
+      {/* 1. HERO FOLD: Hero Content + Bottom MagSafe Marquee Ticker Filling Initial Viewport */}
+      <div className="min-h-[calc(100dvh-56px)] md:min-h-[calc(100vh-64px)] flex flex-col justify-between relative overflow-hidden">
         {/* Animated Ambient Drift Orbs */}
         <div className="pointer-events-none absolute top-10 right-10 h-64 w-64 sm:h-80 sm:w-80 rounded-full bg-amber-100/40 blur-3xl animate-float-slow" />
         <div className="pointer-events-none absolute bottom-10 left-10 h-64 w-64 sm:h-80 sm:w-80 rounded-full bg-neutral-200/40 blur-3xl animate-float" />
 
-        <div className="mx-auto max-w-7xl w-full px-4 sm:px-6 lg:px-8 relative z-10 my-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-center">
-            {/* Left Editorial Copy (7 Cols on desktop) */}
-            <div className="lg:col-span-7 space-y-3.5 sm:space-y-4 flex flex-col justify-center">
-              {/* Live Atelier Badge */}
-              <Reveal animation="fade-up" delay={50}>
-                <div className="inline-flex items-center gap-2 rounded-full border border-neutral-200 bg-white px-3 py-1 shadow-2xs">
-                  <span className="flex h-1.5 w-1.5 rounded-full bg-[#C5A869] animate-ping" />
-                  <span className="text-[9px] sm:text-[10px] font-bold tracking-[0.18em] uppercase text-neutral-900">
-                    Doha Atelier • 2026 Collection
-                  </span>
-                </div>
-              </Reveal>
-
-              {/* Main Headline */}
-              <Reveal animation="fade-up" delay={120}>
-                <h1 className="font-display text-3xl sm:text-5xl lg:text-[2.85rem] xl:text-5xl font-normal leading-[1.08] tracking-tight text-neutral-950">
-                  Refined Protection. <br />
-                  <span className="italic font-light text-neutral-700">Uncompromised Design.</span>
-                </h1>
-              </Reveal>
-
-              {/* Subtitle */}
-              <Reveal animation="fade-up" delay={190}>
-                <p className="max-w-lg text-xs sm:text-sm leading-relaxed text-neutral-600">
-                  Engineered with aerospace composites, surgical tolerances, and tactile metallic accents. Hand-finished for contemporary iPhone and Galaxy flagships in Qatar.
-                </p>
-              </Reveal>
-
-              {/* Dual CTAs with Shimmer Hover */}
-              <Reveal animation="fade-up" delay={260}>
-                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 pt-0.5">
-                  <Link
-                    href="/shop"
-                    className="btn-shimmer inline-flex items-center justify-center gap-2 rounded-xl bg-neutral-950 px-5 sm:px-6 py-2.5 sm:py-3 text-xs font-semibold uppercase tracking-widest text-white shadow-xs transition-all hover:bg-neutral-800 active:scale-[0.98]"
-                  >
-                    <span>Shop All Cases</span>
-                    <ArrowRight className="h-3.5 w-3.5" />
-                  </Link>
-
-                  <a
-                    href="https://wa.me/97455364455?text=Hello%20CASEL%C3%89%20Atelier%2C%20I%20would%20like%20to%20inquire%20about%20your%20protective%20cases."
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center justify-center gap-2 rounded-xl border border-neutral-300 bg-white px-5 sm:px-6 py-2.5 sm:py-3 text-xs font-semibold uppercase tracking-widest text-neutral-900 transition-all hover:bg-neutral-50 active:scale-[0.98] shadow-2xs"
-                  >
-                    <MessageSquare className="h-3.5 w-3.5" />
-                    <span>WhatsApp Concierge</span>
-                  </a>
-                </div>
-              </Reveal>
-
-              {/* Trust Points with Staggered Fade */}
-              <Reveal animation="fade-up" delay={330}>
-                <div className="grid grid-cols-3 gap-2 sm:gap-4 pt-3.5 sm:pt-4 border-t border-neutral-200/60">
-                  <div className="min-w-0">
-                    <span className="block text-xs sm:text-sm font-bold text-neutral-950 font-mono whitespace-nowrap">0.1mm</span>
-                    <span className="text-[10px] sm:text-[11px] text-neutral-500 font-medium whitespace-nowrap block truncate">Precision Fit</span>
+        {/* Hero Main Content */}
+        <section className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8 py-2 sm:py-4 lg:py-6">
+          <div className="mx-auto max-w-7xl w-full relative z-10 my-auto">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 lg:gap-8 items-center">
+              {/* Left Editorial Copy (7 Cols on desktop) */}
+              <div className="lg:col-span-7 space-y-3 sm:space-y-4 flex flex-col justify-center">
+                {/* Live Atelier Badge */}
+                <Reveal animation="fade-up" delay={50}>
+                  <div className="inline-flex items-center gap-2 rounded-full border border-neutral-200 bg-white px-3 py-1 shadow-2xs">
+                    <span className="flex h-1.5 w-1.5 rounded-full bg-[#C5A869] animate-ping" />
+                    <span className="text-[9px] sm:text-[10px] font-bold tracking-[0.18em] uppercase text-neutral-900">
+                      Doha Atelier • 2026 Collection
+                    </span>
                   </div>
-                  <div className="min-w-0">
-                    <span className="block text-xs sm:text-sm font-bold text-neutral-950 font-mono whitespace-nowrap">24H Express</span>
-                    <span className="text-[10px] sm:text-[11px] text-neutral-500 font-medium whitespace-nowrap block truncate">Doha Dispatch</span>
-                  </div>
-                  <div className="min-w-0">
-                    <span className="block text-xs sm:text-sm font-bold text-neutral-950 font-mono whitespace-nowrap">100% Fit</span>
-                    <span className="text-[10px] sm:text-[11px] text-neutral-500 font-medium whitespace-nowrap block truncate">7-Day Guarantee</span>
-                  </div>
-                </div>
-              </Reveal>
-            </div>
+                </Reveal>
 
-            {/* Right Hero Product Spotlight (5 Cols - Visible on desktop) */}
-            <div className="hidden lg:flex lg:col-span-5 justify-center">
-              <Reveal animation="scale-up" delay={150} className="w-full max-w-[310px] xl:max-w-[335px]">
-                <TiltCard maxTilt={6} scale={1.02}>
-                  <div className="group relative w-full aspect-[4/5] rounded-3xl bg-white border border-neutral-200/80 p-5 xl:p-6 flex items-center justify-center shadow-md transition-shadow duration-500 hover:shadow-xl">
-                    {/* Floating Tag */}
-                    <div className="absolute top-3.5 left-3.5 z-10">
-                      <span className="inline-flex items-center rounded-full bg-neutral-950 px-2.5 py-0.5 text-[9px] font-bold text-white uppercase tracking-wider shadow-xs">
-                        Studio Spotlight
-                      </span>
+                {/* Main Headline */}
+                <Reveal animation="fade-up" delay={120}>
+                  <h1 className="font-display text-3xl sm:text-5xl lg:text-[2.85rem] xl:text-5xl font-normal leading-[1.08] tracking-tight text-neutral-950">
+                    Refined Protection. <br />
+                    <span className="italic font-light text-neutral-700">Uncompromised Design.</span>
+                  </h1>
+                </Reveal>
+
+                {/* Subtitle */}
+                <Reveal animation="fade-up" delay={190}>
+                  <p className="max-w-lg text-xs sm:text-sm leading-relaxed text-neutral-600">
+                    Engineered with aerospace composites, surgical tolerances, and tactile metallic accents. Hand-finished for contemporary iPhone and Galaxy flagships in Qatar.
+                  </p>
+                </Reveal>
+
+                {/* Dual CTAs with Shimmer Hover */}
+                <Reveal animation="fade-up" delay={260}>
+                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 pt-0.5">
+                    <Link
+                      href="/shop"
+                      className="btn-shimmer inline-flex items-center justify-center gap-2 rounded-xl bg-neutral-950 px-5 sm:px-6 py-2.5 sm:py-3 text-xs font-semibold uppercase tracking-widest text-white shadow-xs transition-all hover:bg-neutral-800 active:scale-[0.98]"
+                    >
+                      <span>Shop All Cases</span>
+                      <ArrowRight className="h-3.5 w-3.5" />
+                    </Link>
+
+                    <a
+                      href="https://wa.me/97455364455?text=Hello%20CASEL%C3%89%20Atelier%2C%20I%20would%20like%20to%20inquire%20about%20your%20protective%20cases."
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center justify-center gap-2 rounded-xl border border-neutral-300 bg-white px-5 sm:px-6 py-2.5 sm:py-3 text-xs font-semibold uppercase tracking-widest text-neutral-900 transition-all hover:bg-neutral-50 active:scale-[0.98] shadow-2xs"
+                    >
+                      <MessageSquare className="h-3.5 w-3.5" />
+                      <span>WhatsApp Concierge</span>
+                    </a>
+                  </div>
+                </Reveal>
+
+                {/* Trust Points with Staggered Fade */}
+                <Reveal animation="fade-up" delay={330}>
+                  <div className="grid grid-cols-3 gap-2 sm:gap-4 pt-3 sm:pt-4 border-t border-neutral-200/60">
+                    <div className="min-w-0">
+                      <span className="block text-xs sm:text-sm font-bold text-neutral-950 font-mono whitespace-nowrap">0.1mm</span>
+                      <span className="text-[10px] sm:text-[11px] text-neutral-500 font-medium whitespace-nowrap block truncate">Precision Fit</span>
                     </div>
-
-                    {/* Product Image */}
-                    <div className="relative h-full w-full">
-                      <Image
-                        src={featuredProducts[0]?.images[0] || "/products/leather-case-black.png"}
-                        alt="Featured Case"
-                        fill
-                        priority
-                        className="object-contain p-2 transition-transform duration-700 group-hover:scale-105 drop-shadow-xl"
-                        sizes="340px"
-                      />
+                    <div className="min-w-0">
+                      <span className="block text-xs sm:text-sm font-bold text-neutral-950 font-mono whitespace-nowrap">24H Express</span>
+                      <span className="text-[10px] sm:text-[11px] text-neutral-500 font-medium whitespace-nowrap block truncate">Doha Dispatch</span>
                     </div>
-
-                    {/* Floating Price Pill */}
-                    <div className="absolute bottom-3.5 right-3.5 z-10 rounded-2xl bg-white/95 backdrop-blur-md border border-neutral-200/80 px-3 py-1 shadow-sm text-right">
-                      <p className="text-[8px] font-bold text-neutral-400 uppercase tracking-wider">Titanium Frame</p>
-                      <p className="text-xs font-bold text-neutral-950">QR 85</p>
+                    <div className="min-w-0">
+                      <span className="block text-xs sm:text-sm font-bold text-neutral-950 font-mono whitespace-nowrap">100% Fit</span>
+                      <span className="text-[10px] sm:text-[11px] text-neutral-500 font-medium whitespace-nowrap block truncate">7-Day Guarantee</span>
                     </div>
                   </div>
-                </TiltCard>
-              </Reveal>
+                </Reveal>
+              </div>
+
+              {/* Right Hero Product Spotlight (5 Cols - Visible on desktop) */}
+              <div className="hidden lg:flex lg:col-span-5 justify-center">
+                <Reveal animation="scale-up" delay={150} className="w-full max-w-[305px] xl:max-w-[335px]">
+                  <TiltCard maxTilt={6} scale={1.02}>
+                    <div className="group relative w-full aspect-[4/5] rounded-3xl bg-white border border-neutral-200/80 p-5 xl:p-6 flex items-center justify-center shadow-md transition-shadow duration-500 hover:shadow-xl">
+                      {/* Floating Tag */}
+                      <div className="absolute top-3.5 left-3.5 z-10">
+                        <span className="inline-flex items-center rounded-full bg-neutral-950 px-2.5 py-0.5 text-[9px] font-bold text-white uppercase tracking-wider shadow-xs">
+                          Studio Spotlight
+                        </span>
+                      </div>
+
+                      {/* Product Image */}
+                      <div className="relative h-full w-full">
+                        <Image
+                          src={featuredProducts[0]?.images[0] || "/products/leather-case-black.png"}
+                          alt="Featured Case"
+                          fill
+                          priority
+                          className="object-contain p-2 transition-transform duration-700 group-hover:scale-105 drop-shadow-xl"
+                          sizes="340px"
+                        />
+                      </div>
+
+                      {/* Floating Price Pill */}
+                      <div className="absolute bottom-3.5 right-3.5 z-10 rounded-2xl bg-white/95 backdrop-blur-md border border-neutral-200/80 px-3 py-1 shadow-sm text-right">
+                        <p className="text-[8px] font-bold text-neutral-400 uppercase tracking-wider">Titanium Frame</p>
+                        <p className="text-xs font-bold text-neutral-950">QR 85</p>
+                      </div>
+                    </div>
+                  </TiltCard>
+                </Reveal>
+              </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* 2. INFINITE MARQUEE TICKER */}
-      <MarqueeTicker />
+        {/* 2. INFINITE MARQUEE TICKER (Anchored at the bottom edge of the initial fold) */}
+        <div className="relative z-10 shrink-0">
+          <MarqueeTicker />
+        </div>
+      </div>
 
       {/* 3. CURATED COLLECTION SECTION WITH PILL FILTERS */}
       <section className="py-16 sm:py-24">
