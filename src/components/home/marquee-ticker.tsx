@@ -13,7 +13,7 @@ const MARQUEE_ITEMS = [
 
 export function MarqueeTicker() {
   return (
-    <div className="border-y border-neutral-200/80 bg-white py-4 overflow-hidden select-none">
+    <div className="border-y border-neutral-200/80 bg-white py-2.5 sm:py-3.5 overflow-hidden select-none">
       <div className="flex w-max animate-marquee space-x-8">
         {[...MARQUEE_ITEMS, ...MARQUEE_ITEMS, ...MARQUEE_ITEMS].map((item, idx) => {
           const Icon = item.icon;
