@@ -5,13 +5,14 @@
 
 export const SITE = {
   name: "CASELÉ",
-  title: "CASELÉ — Premium Phone Cases in Qatar",
+  title: "CASELÉ — Luxury Phone Protection in Qatar",
   description:
-    "Protect. Express. Elevate. Premium mobile phone cases designed for style and durability. Shop iPhone, Samsung, Huawei & OnePlus cases in Doha, Qatar.",
+    "Protect. Express. Elevate. Premium mobile phone cases designed for style and durability. Shop iPhone, Samsung, & Pixel cases in Doha, Qatar.",
   url: "https://casele.qa",
   locale: "en_QA",
   type: "website" as const,
   twitter: "@casele_qa",
+  instagram: "https://www.instagram.com/casele_premium_mobile_case?igsi=MW55cTM4MmN6dGF3ag%3D%3D&utm_source=qr",
   phone: "+97455364455",
   email: "info@casele.qa",
   address: {
@@ -31,8 +32,7 @@ export const SITE = {
     "mobile accessories Qatar",
     "iPhone case Qatar",
     "Samsung case Doha",
-    "Huawei case Qatar",
-    "OnePlus case Qatar",
+    "Google Pixel case Qatar",
     "phone covers Qatar",
     "luxury phone cases",
     "WhatsApp order phone case",
