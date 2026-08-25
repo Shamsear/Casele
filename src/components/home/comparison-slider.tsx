@@ -14,8 +14,8 @@ interface ComparisonSliderProps {
 export function ComparisonSlider({
   beforeImage = "/products/leather-case-black.png",
   afterImage = "/products/titanium-case-gray.png",
-  beforeLabel = "Velvety Matte Finish",
-  afterLabel = "High-Gloss Crystal Luxe",
+  beforeLabel = "Matte Velvet",
+  afterLabel = "Glossy Luxe",
 }: ComparisonSliderProps) {
   const [sliderPosition, setSliderPosition] = useState(50);
   const [isDragging, setIsDragging] = useState(false);
@@ -40,14 +40,14 @@ export function ComparisonSlider({
   };
 
   return (
-    <section className="py-16 sm:py-24 border-t border-neutral-200/70 bg-white">
+    <section className="py-12 sm:py-24 border-t border-neutral-200/70 bg-white overflow-hidden">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="text-center space-y-3 mb-12">
-          <div className="inline-flex items-center gap-1.5 rounded-full bg-neutral-100 border border-neutral-200 px-3 py-1 text-[11px] font-bold text-neutral-900 uppercase tracking-widest">
-            <Sparkles className="h-3.5 w-3.5 text-[#A88B4D]" />
+        <div className="text-center space-y-2.5 mb-8 sm:mb-12">
+          <div className="inline-flex items-center gap-1.5 rounded-full bg-neutral-100 border border-neutral-200 px-3 py-1 text-[10px] sm:text-[11px] font-bold text-neutral-900 uppercase tracking-widest">
+            <Sparkles className="h-3 w-3 text-[#A88B4D]" />
             <span>Finish Dual-Matrix</span>
           </div>
-          <h2 className="font-display text-3xl sm:text-5xl font-normal text-neutral-950">
+          <h2 className="font-display text-2xl sm:text-4xl lg:text-5xl font-normal text-neutral-950">
             Matte Velvet vs Glossy Luxe
           </h2>
           <p className="text-xs sm:text-sm text-neutral-600 max-w-lg mx-auto leading-relaxed">
@@ -55,49 +55,51 @@ export function ComparisonSlider({
           </p>
         </div>
 
-        {/* Interactive Comparison Container */}
+        {/* Interactive Comparison Container (Optimized for Mobile Touch & Desktop Drag) */}
         <div
           ref={containerRef}
           onMouseDown={() => setIsDragging(true)}
           onMouseUp={() => setIsDragging(false)}
           onMouseLeave={() => setIsDragging(false)}
           onMouseMove={handleMouseMove}
+          onTouchStart={() => setIsDragging(true)}
+          onTouchEnd={() => setIsDragging(false)}
           onTouchMove={handleTouchMove}
-          className="relative mx-auto max-w-4xl aspect-[16/9] sm:aspect-[2/1] rounded-3xl border border-neutral-200/80 bg-neutral-100/60 overflow-hidden select-none cursor-ew-resize shadow-md"
+          className="relative mx-auto max-w-4xl aspect-[4/3] sm:aspect-[16/9] lg:aspect-[2/1] rounded-3xl border border-neutral-200/80 bg-neutral-100/60 overflow-hidden select-none cursor-ew-resize shadow-md touch-none"
         >
           {/* Base Layer (Right / After: Glossy) */}
-          <div className="absolute inset-0 flex items-center justify-center p-8">
-            <div className="relative h-full w-full max-w-md">
+          <div className="absolute inset-0 flex items-center justify-center p-4 sm:p-8">
+            <div className="relative h-full w-full max-w-xs sm:max-w-md">
               <Image
                 src={afterImage}
                 alt={afterLabel}
                 fill
-                className="object-contain drop-shadow-2xl"
-                sizes="(max-width: 1024px) 100vw, 800px"
+                className="object-contain drop-shadow-2xl p-2 sm:p-4"
+                sizes="(max-width: 640px) 100vw, 800px"
               />
             </div>
-            <div className="absolute top-6 right-6 rounded-full bg-white/90 backdrop-blur-md border border-neutral-200 px-3.5 py-1 text-[11px] font-bold text-neutral-950 uppercase tracking-wider shadow-xs">
+            <div className="absolute top-3.5 right-3.5 sm:top-6 sm:right-6 rounded-full bg-white/90 backdrop-blur-md border border-neutral-200 px-2.5 py-0.5 sm:px-3.5 sm:py-1 text-[10px] sm:text-[11px] font-bold text-neutral-950 uppercase tracking-wider shadow-xs">
               {afterLabel}
             </div>
           </div>
 
           {/* Clipped Layer (Left / Before: Matte) */}
           <div
-            className="absolute inset-0 overflow-hidden flex items-center justify-center p-8 bg-neutral-50/90"
+            className="absolute inset-0 overflow-hidden flex items-center justify-center p-4 sm:p-8 bg-neutral-50/90"
             style={{ width: `${sliderPosition}%` }}
           >
-            <div className="absolute inset-0 flex items-center justify-center p-8 min-w-[100%]">
-              <div className="relative h-full w-full max-w-md">
+            <div className="absolute inset-0 flex items-center justify-center p-4 sm:p-8 min-w-[100%]">
+              <div className="relative h-full w-full max-w-xs sm:max-w-md">
                 <Image
                   src={beforeImage}
                   alt={beforeLabel}
                   fill
-                  className="object-contain drop-shadow-2xl"
-                  sizes="(max-width: 1024px) 100vw, 800px"
+                  className="object-contain drop-shadow-2xl p-2 sm:p-4"
+                  sizes="(max-width: 640px) 100vw, 800px"
                 />
               </div>
             </div>
-            <div className="absolute top-6 left-6 rounded-full bg-neutral-950 text-white px-3.5 py-1 text-[11px] font-bold uppercase tracking-wider shadow-xs">
+            <div className="absolute top-3.5 left-3.5 sm:top-6 sm:left-6 rounded-full bg-neutral-950 text-white px-2.5 py-0.5 sm:px-3.5 sm:py-1 text-[10px] sm:text-[11px] font-bold uppercase tracking-wider shadow-xs">
               {beforeLabel}
             </div>
           </div>
@@ -107,28 +109,28 @@ export function ComparisonSlider({
             className="absolute top-0 bottom-0 w-0.5 bg-neutral-950 pointer-events-none shadow-[0_0_10px_rgba(0,0,0,0.3)]"
             style={{ left: `${sliderPosition}%` }}
           >
-            <div className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 h-10 w-10 rounded-full bg-white border-2 border-neutral-950 flex items-center justify-center text-neutral-950 shadow-lg cursor-ew-resize pointer-events-auto">
-              <MoveHorizontal className="h-5 w-5" />
+            <div className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 h-8 w-8 sm:h-10 sm:w-10 rounded-full bg-white border-2 border-neutral-950 flex items-center justify-center text-neutral-950 shadow-lg cursor-ew-resize pointer-events-auto">
+              <MoveHorizontal className="h-4 w-4 sm:h-5 sm:w-5" />
             </div>
           </div>
         </div>
 
         {/* Feature comparison pills */}
-        <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-3xl mx-auto">
-          <div className="p-4 rounded-2xl bg-neutral-50 border border-neutral-200/80">
+        <div className="mt-6 sm:mt-8 grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 max-w-3xl mx-auto">
+          <div className="p-3.5 sm:p-4 rounded-2xl bg-neutral-50 border border-neutral-200/80">
             <span className="text-xs font-bold uppercase tracking-wider text-neutral-950 block mb-1">
               Matte Soft-Touch Finish
             </span>
             <p className="text-xs text-neutral-600 leading-relaxed">
-              Hydrophobic micro-texture that completely eliminates glare, smudges, and fingerprints while offering supreme tactile grip.
+              Hydrophobic micro-texture that eliminates glare and fingerprints with supreme tactile grip.
             </p>
           </div>
-          <div className="p-4 rounded-2xl bg-neutral-50 border border-neutral-200/80">
+          <div className="p-3.5 sm:p-4 rounded-2xl bg-neutral-50 border border-neutral-200/80">
             <span className="text-xs font-bold uppercase tracking-wider text-neutral-950 block mb-1">
               High-Gloss Crystal Luxe
             </span>
             <p className="text-xs text-neutral-600 leading-relaxed">
-              Deep 3D reflective gloss coat that accentuates color saturation, protected by an anti-scratch clearcoat seal.
+              Deep reflective gloss coat accentuating depth, sealed with an anti-scratch clearcoat.
             </p>
           </div>
         </div>
