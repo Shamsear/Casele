@@ -37,8 +37,12 @@ export const metadata: Metadata = {
   creator: SITE.name,
   publisher: SITE.name,
   icons: {
-    icon: "/icon.svg",
-    apple: "/apple-icon.png",
+    icon: [
+      { url: "/logo.png", sizes: "32x32", type: "image/png" },
+      { url: "/logo.png", sizes: "192x192", type: "image/png" },
+    ],
+    shortcut: "/logo.png",
+    apple: "/logo.png",
   },
 
   // Open Graph
@@ -102,6 +106,8 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${cormorant.variable} ${inter.variable}`} suppressHydrationWarning>
       <head>
+        <link rel="icon" href="/logo.png" type="image/png" />
+        <link rel="apple-touch-icon" href="/logo.png" />
         <LocalBusinessSchema />
         <WebsiteSchema />
         <OrganizationSchema />

@@ -11,19 +11,22 @@ export default function AppleIcon() {
     (
       <div
         style={{
-          fontSize: 100,
-          background: "#0D0D0D",
+          fontSize: 32,
+          background: "#FAFAFA",
           width: "100%",
           height: "100%",
           display: "flex",
+          flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
-          color: "#D4AF37",
+          color: "#0A0A0A",
           fontFamily: "Georgia, serif",
           fontWeight: "bold",
+          letterSpacing: "0.2em",
         }}
       >
-        C
+        <div style={{ fontSize: 44, color: "#A88B4D", marginBottom: 6 }}>👑</div>
+        <div>CASELÉ</div>
       </div>
     ),
     {
