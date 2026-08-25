@@ -72,7 +72,7 @@ export function HomePageClient({
             {/* Left Editorial Copy (7 Cols) with Scroll Reveal */}
             <div className="lg:col-span-7 space-y-6">
               {/* Live Atelier Badge */}
-              <Reveal animation="fade-up" delay={50}>
+              <Reveal animation="fade-up" delay={0}>
                 <div className="inline-flex items-center gap-2 rounded-full border border-neutral-200 bg-white px-3.5 py-1.5 shadow-2xs">
                   <span className="flex h-2 w-2 rounded-full bg-[#C5A869] animate-ping" />
                   <span className="text-[10px] font-bold tracking-[0.18em] uppercase text-neutral-900">
@@ -82,7 +82,7 @@ export function HomePageClient({
               </Reveal>
 
               {/* Main Headline */}
-              <Reveal animation="fade-up" delay={150}>
+              <Reveal animation="fade-up" delay={30}>
                 <h1 className="font-display text-4xl sm:text-6xl lg:text-7xl font-normal leading-[1.05] tracking-tight text-neutral-950">
                   Refined Protection. <br />
                   <span className="italic font-light text-neutral-700">Uncompromised Design.</span>
@@ -90,14 +90,14 @@ export function HomePageClient({
               </Reveal>
 
               {/* Subtitle */}
-              <Reveal animation="fade-up" delay={250}>
+              <Reveal animation="fade-up" delay={60}>
                 <p className="max-w-xl text-xs sm:text-sm lg:text-base leading-relaxed text-neutral-600">
                   Engineered with aerospace composites, surgical tolerances, and tactile metallic accents. Hand-finished for contemporary iPhone and Galaxy flagships in Qatar.
                 </p>
               </Reveal>
 
               {/* Dual CTAs with Shimmer Hover */}
-              <Reveal animation="fade-up" delay={350}>
+              <Reveal animation="fade-up" delay={90}>
                 <div className="flex flex-wrap items-center gap-3.5 pt-2">
                   <Link
                     href="/shop"
@@ -120,7 +120,7 @@ export function HomePageClient({
               </Reveal>
 
               {/* Trust Points with Staggered Fade */}
-              <Reveal animation="fade-up" delay={450}>
+              <Reveal animation="fade-up" delay={120}>
                 <div className="grid grid-cols-3 gap-2 sm:gap-4 pt-6 border-t border-neutral-200/60">
                   <div className="min-w-0">
                     <span className="block text-xs sm:text-base font-bold text-neutral-950 font-mono whitespace-nowrap">0.1mm</span>
@@ -216,14 +216,14 @@ export function HomePageClient({
           {/* 4:5 Aspect Ratio Containerless Product Grid with Staggered Reveals */}
           <div className="grid grid-cols-2 gap-4 sm:gap-6 lg:grid-cols-4">
             {filteredProducts.map((product, index) => (
-              <Reveal key={product.id} animation="fade-up" delay={Math.min(index * 60, 400)}>
+              <Reveal key={product.id} animation="fade-up" delay={Math.min(index * 25, 80)}>
                 <ProductCard product={product} index={index} />
               </Reveal>
             ))}
           </div>
 
           {/* Catalog View All Link */}
-          <Reveal animation="fade-up" delay={200}>
+          <Reveal animation="fade-up" delay={60}>
             <div className="mt-14 text-center">
               <Link
                 href="/shop"

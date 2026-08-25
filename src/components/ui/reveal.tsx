@@ -18,8 +18,8 @@ export function Reveal({
   className,
   animation = "fade-up",
   delay = 0,
-  duration = 700,
-  threshold = 0.15,
+  duration = 380,
+  threshold = 0.01,
   once = true,
 }: RevealProps) {
   const ref = useRef<HTMLDivElement>(null);
@@ -28,6 +28,13 @@ export function Reveal({
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
+
+    // Check if element is already in viewport on mount
+    const rect = el.getBoundingClientRect();
+    if (rect.top < window.innerHeight + 100 && rect.bottom > -50) {
+      setIsVisible(true);
+      return;
+    }
 
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -42,7 +49,7 @@ export function Reveal({
       },
       {
         threshold,
-        rootMargin: "0px 0px -40px 0px",
+        rootMargin: "140px 0px 50px 0px", // Eager trigger: reveals 140px before entering viewport
       }
     );
 
@@ -55,23 +62,23 @@ export function Reveal({
       case "fade-up":
         return isVisible
           ? "opacity-100 translate-y-0"
-          : "opacity-0 translate-y-8";
+          : "opacity-0 translate-y-3.5";
       case "fade-in":
         return isVisible ? "opacity-100" : "opacity-0";
       case "scale-up":
         return isVisible
           ? "opacity-100 scale-100"
-          : "opacity-0 scale-95";
+          : "opacity-0 scale-[0.98]";
       case "slide-right":
         return isVisible
           ? "opacity-100 translate-x-0"
-          : "opacity-0 -translate-x-8";
+          : "opacity-0 -translate-x-4";
       case "slide-left":
         return isVisible
           ? "opacity-100 translate-x-0"
-          : "opacity-0 translate-x-8";
+          : "opacity-0 translate-x-4";
       default:
-        return isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8";
+        return isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-3.5";
     }
   };
 
