@@ -35,7 +35,7 @@ export function MobileNav() {
   const bagLabel = locale === "ar" ? "الحقيبة" : "Bag";
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-white/40 bg-white/60 backdrop-blur-2xl saturate-180 shadow-[0_-8px_32px_rgba(0,0,0,0.05)] md:hidden safe-area-pb transition-all duration-300">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-neutral-200/80 bg-white/85 backdrop-blur-xl saturate-180 shadow-[0_-8px_32px_rgba(0,0,0,0.06)] md:hidden safe-area-pb transition-all duration-300">
       <div className="flex items-center justify-around h-16 px-4">
         {navItems.map((item) => {
           const isActive = pathname === item.href && !isCartOpen;
