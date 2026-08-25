@@ -1,8 +1,9 @@
-import { getFeaturedProducts, getAllModels, getAllCategories } from "@/lib/db/products";
+import { getAllProducts, getFeaturedProducts, getAllModels, getAllCategories } from "@/lib/db/products";
 import { HomePageClient } from "@/components/home/home-page-client";
 
 export default async function HomePage() {
-  const [featured, models, categories] = await Promise.all([
+  const [allProducts, featured, models, categories] = await Promise.all([
+    getAllProducts(),
     getFeaturedProducts(),
     getAllModels(),
     getAllCategories(),
@@ -10,7 +11,8 @@ export default async function HomePage() {
 
   return (
     <HomePageClient
-      featured={featured}
+      allProducts={allProducts}
+      featuredProducts={featured}
       models={models}
       categories={categories}
     />
