@@ -11,6 +11,8 @@ export interface CartItem {
   comparePrice?: number;
   modelId: string;
   modelName: string;
+  finish?: string; // "Matte" | "Glossy"
+  caseType?: string; // "Slim Precision" | "MagSafe Dual-Layer"
   quantity: number;
 }
 
@@ -21,11 +23,13 @@ interface CartStore {
   promoDiscount: number;
 
   addItem: (item: Omit<CartItem, "quantity">) => void;
-  removeItem: (productId: string, modelId: string) => void;
+  removeItem: (productId: string, modelId: string, finish?: string, caseType?: string) => void;
   updateQuantity: (
     productId: string,
     modelId: string,
-    qty: number
+    qty: number,
+    finish?: string,
+    caseType?: string
   ) => void;
   clearCart: () => void;
   toggleCart: () => void;
@@ -56,6 +60,10 @@ function calculateTierDiscount(subtotal: number): number {
   return Math.round((subtotal * applicablePercent) / 100);
 }
 
+function getItemKey(item: { productId: string; modelId: string; finish?: string; caseType?: string }) {
+  return `${item.productId}-${item.modelId}-${item.finish || "Matte"}-${item.caseType || "Slim"}`;
+}
+
 export const useCartStore = create<CartStore>()(
   persist(
     (set, get) => ({
@@ -66,53 +74,55 @@ export const useCartStore = create<CartStore>()(
 
       addItem: (item) =>
         set((state) => {
-          const existing = state.items.find(
-            (i) =>
-              i.productId === item.productId &&
-              i.modelId === item.modelId
+          const itemKey = getItemKey(item);
+          const existingIndex = state.items.findIndex(
+            (i) => getItemKey(i) === itemKey
           );
 
-          if (existing) {
-            return {
-              items: state.items.map((i) =>
-                i.productId === item.productId &&
-                i.modelId === item.modelId
-                  ? { ...i, quantity: Math.min(i.quantity + 1, 10) }
-                  : i
-              ),
+          if (existingIndex > -1) {
+            const updated = [...state.items];
+            updated[existingIndex] = {
+              ...updated[existingIndex],
+              quantity: Math.min(updated[existingIndex].quantity + 1, 10),
             };
+            return { items: updated };
           }
 
           return {
-            items: [...state.items, { ...item, quantity: 1 }],
+            items: [
+              ...state.items,
+              {
+                ...item,
+                finish: item.finish || "Matte",
+                caseType: item.caseType || "Slim Precision",
+                quantity: 1,
+              },
+            ],
           };
         }),
 
-      removeItem: (productId, modelId) =>
-        set((state) => ({
-          items: state.items.filter(
-            (i) =>
-              !(i.productId === productId && i.modelId === modelId)
-          ),
-        })),
+      removeItem: (productId, modelId, finish, caseType) =>
+        set((state) => {
+          const targetKey = getItemKey({ productId, modelId, finish, caseType });
+          return {
+            items: state.items.filter((i) => getItemKey(i) !== targetKey),
+          };
+        }),
 
-      updateQuantity: (productId, modelId, qty) =>
-        set((state) => ({
-          items:
-            qty <= 0
-              ? state.items.filter(
-                  (i) =>
-                    !(
-                      i.productId === productId &&
-                      i.modelId === modelId
-                    )
-                )
-              : state.items.map((i) =>
-                  i.productId === productId && i.modelId === modelId
-                    ? { ...i, quantity: Math.min(qty, 10) }
-                    : i
-                ),
-        })),
+      updateQuantity: (productId, modelId, qty, finish, caseType) =>
+        set((state) => {
+          const targetKey = getItemKey({ productId, modelId, finish, caseType });
+          return {
+            items:
+              qty <= 0
+                ? state.items.filter((i) => getItemKey(i) !== targetKey)
+                : state.items.map((i) =>
+                    getItemKey(i) === targetKey
+                      ? { ...i, quantity: Math.min(qty, 10) }
+                      : i
+                  ),
+          };
+        }),
 
       clearCart: () =>
         set({ items: [], promoCode: null, promoDiscount: 0 }),

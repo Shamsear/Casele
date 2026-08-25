@@ -72,6 +72,8 @@ export function CartDrawer() {
       items: items.map((item) => ({
         name: item.name,
         model: item.modelName,
+        finish: item.finish,
+        caseType: item.caseType,
         qty: item.quantity,
         price: item.price,
       })),
@@ -179,7 +181,7 @@ export function CartDrawer() {
             <div className="space-y-3">
               {items.map((item) => (
                 <div
-                  key={`${item.productId}-${item.modelId}`}
+                  key={`${item.productId}-${item.modelId}-${item.finish}-${item.caseType}`}
                   className="flex gap-3.5 rounded-2xl border border-neutral-200/80 bg-neutral-50/50 p-3 transition-colors hover:bg-neutral-50"
                 >
                   {/* Thumbnail */}
@@ -195,15 +197,27 @@ export function CartDrawer() {
 
                   {/* Details */}
                   <div className="flex flex-1 flex-col min-w-0">
-                    <span className="text-[10px] font-semibold text-neutral-400 uppercase tracking-wider">{item.modelName}</span>
-                    <span className="text-xs font-semibold text-neutral-950 truncate">{item.name}</span>
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      <span className="text-[10px] font-bold text-neutral-500 uppercase tracking-wider">{item.modelName}</span>
+                      {item.finish && (
+                        <span className="rounded bg-neutral-200/70 px-1.5 py-0.2 text-[9px] font-semibold text-neutral-800 uppercase">
+                          {item.finish}
+                        </span>
+                      )}
+                      {item.caseType && item.caseType.includes("MagSafe") && (
+                        <span className="rounded bg-[#FBF8EF] border border-[#E8DCB8] px-1.5 py-0.2 text-[9px] font-semibold text-[#8C6D28] uppercase">
+                          MagSafe
+                        </span>
+                      )}
+                    </div>
+                    <span className="text-xs font-semibold text-neutral-950 truncate mt-0.5">{item.name}</span>
                     <Price price={item.price} size="sm" showBadge={false} />
 
                     {/* Quantity Controls */}
                     <div className="mt-auto flex items-center justify-between pt-2">
                       <div className="flex items-center rounded-lg border border-neutral-200 bg-white">
                         <button
-                          onClick={() => updateQuantity(item.productId, item.modelId, item.quantity - 1)}
+                          onClick={() => updateQuantity(item.productId, item.modelId, item.quantity - 1, item.finish, item.caseType)}
                           className="flex h-6 w-6 items-center justify-center text-neutral-600 hover:text-neutral-950 hover:bg-neutral-100 rounded-l transition-colors cursor-pointer"
                           aria-label="Decrease quantity"
                         >
@@ -211,7 +225,7 @@ export function CartDrawer() {
                         </button>
                         <span className="w-6 text-center text-xs font-semibold text-neutral-950">{item.quantity}</span>
                         <button
-                          onClick={() => updateQuantity(item.productId, item.modelId, item.quantity + 1)}
+                          onClick={() => updateQuantity(item.productId, item.modelId, item.quantity + 1, item.finish, item.caseType)}
                           className="flex h-6 w-6 items-center justify-center text-neutral-600 hover:text-neutral-950 hover:bg-neutral-100 rounded-r transition-colors cursor-pointer"
                           aria-label="Increase quantity"
                         >
@@ -220,7 +234,7 @@ export function CartDrawer() {
                       </div>
 
                       <button
-                        onClick={() => removeItem(item.productId, item.modelId)}
+                        onClick={() => removeItem(item.productId, item.modelId, item.finish, item.caseType)}
                         className="flex items-center gap-1 text-[11px] font-medium text-neutral-400 hover:text-red-600 transition-colors cursor-pointer"
                       >
                         <Trash2 className="h-3 w-3" />
@@ -265,7 +279,7 @@ export function CartDrawer() {
             <div className="space-y-2">
               <input
                 type="text"
-                placeholder="Full Name (for delivery)"
+                placeholder="Full Name (for delivery in Qatar)"
                 value={customerName}
                 onChange={(e) => setCustomerName(e.target.value)}
                 className="w-full rounded-xl border border-neutral-200 bg-white px-3.5 py-2 text-xs text-neutral-950 placeholder:text-neutral-400 focus:border-neutral-950 focus:outline-none shadow-2xs"

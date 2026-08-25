@@ -1,394 +1,318 @@
 "use client";
 
-import { useState, useMemo } from "react";
-import Link from "next/link";
+import { useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { ProductCard } from "@/components/products/product-card";
-import { Price } from "@/components/ui/price";
-import type { ProductWithRelations, ModelWithCount, CategoryWithCount } from "@/lib/db/products";
-import { useI18n } from "@/lib/i18n/context";
+import { MarqueeTicker } from "@/components/home/marquee-ticker";
+import { ComparisonSlider } from "@/components/home/comparison-slider";
+import { ExplodedLayers } from "@/components/home/exploded-layers";
+import { TestimonialsSection } from "@/components/home/testimonials-section";
+import type { ProductWithRelations, CategoryWithCount } from "@/lib/db/products";
 import {
-  Smartphone,
+  ArrowRight,
   ShieldCheck,
   Truck,
   Sparkles,
-  ArrowRight,
-  CheckCircle2,
+  Smartphone,
+  CheckCircle,
+  MessageSquare,
+  Zap,
   SlidersHorizontal
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface HomePageClientProps {
-  featured: ProductWithRelations[];
-  models: ModelWithCount[];
+  initialProducts: ProductWithRelations[];
+  featuredProducts: ProductWithRelations[];
   categories: CategoryWithCount[];
 }
 
-export function HomePageClient({ featured, models, categories }: HomePageClientProps) {
-  const { t } = useI18n();
-  const [activeFilter, setActiveFilter] = useState("All");
+const FILTER_TABS = [
+  { id: "all", label: "All Enclosures" },
+  { id: "bestsellers", label: "Best Sellers" },
+  { id: "new", label: "New Releases" },
+  { id: "premium", label: "Luxe Leather" },
+  { id: "minimal", label: "Matte Minimal" },
+  { id: "sport", label: "Carbon Armor" },
+];
 
-  // Collection pills
-  const filterPills = [
-    { id: "All", label: "All Cases" },
-    { id: "bestseller", label: "Best Sellers" },
-    { id: "new", label: "New Releases" },
-    { id: "Premium", label: "Luxe Series" },
-    { id: "Classic", label: "Classic Minimal" },
-    { id: "Sport", label: "Carbon Sport" },
-  ];
+export function HomePageClient({
+  initialProducts,
+  featuredProducts,
+  categories,
+}: HomePageClientProps) {
+  const [activeTab, setActiveTab] = useState("all");
 
-  const filteredProducts = useMemo(() => {
-    if (activeFilter === "All") return featured;
-    if (activeFilter === "bestseller") return featured.filter((p) => p.badge?.toLowerCase() === "bestseller");
-    if (activeFilter === "new") return featured.filter((p) => p.badge?.toLowerCase() === "new");
-    return featured.filter((p) => p.categoryName.toLowerCase().includes(activeFilter.toLowerCase()));
-  }, [featured, activeFilter]);
-
-  const heroFeatured = featured[0] || null;
+  const filteredProducts = initialProducts.filter((product) => {
+    if (activeTab === "all") return true;
+    if (activeTab === "bestsellers") return product.badge === "BESTSELLER" || product.isFeatured;
+    if (activeTab === "new") return product.badge === "NEW";
+    if (activeTab === "premium") return product.categorySlug === "premium" || product.name.toLowerCase().includes("leather");
+    if (activeTab === "minimal") return product.categorySlug === "minimal" || product.name.toLowerCase().includes("silicone");
+    if (activeTab === "sport") return product.categorySlug === "protection" || product.name.toLowerCase().includes("carbon");
+    return true;
+  });
 
   return (
     <div className="min-h-screen bg-neutral-50 text-neutral-950">
-      {/* ═══════ 1. EDITORIAL HERO SECTION ═══════ */}
-      <section className="relative border-b border-neutral-200/70 bg-gradient-to-b from-white via-white to-neutral-50/50">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-8 pb-16 sm:pt-12 sm:pb-20 lg:py-20">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
-            {/* Left: Brand Identity & Editorial Narrative */}
-            <div className="lg:col-span-7 space-y-6">
-              {/* Atelier Micro Badge */}
-              <div className="inline-flex items-center gap-2 rounded-full border border-neutral-200/90 bg-neutral-50 px-3.5 py-1 shadow-2xs">
-                <span className="h-2 w-2 rounded-full bg-[#C5A869] animate-pulse" />
-                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-neutral-800">
-                  Doha Luxury Atelier • 2026 Edition
-                </span>
-              </div>
+      {/* 1. HERO SECTION: Editorial High-Conversion DTC Showcase */}
+      <section className="relative overflow-hidden pt-8 pb-16 sm:pt-14 sm:pb-24">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="relative rounded-3xl border border-neutral-200/80 bg-white p-8 sm:p-14 lg:p-16 shadow-xs overflow-hidden">
+            {/* Ambient Background Gradient Spot */}
+            <div className="pointer-events-none absolute -top-24 -right-24 h-96 w-96 rounded-full bg-amber-50/60 blur-3xl" />
+            <div className="pointer-events-none absolute -bottom-24 -left-24 h-96 w-96 rounded-full bg-neutral-100/80 blur-3xl" />
 
-              {/* High-Impact Headline */}
-              <h1 className="font-display text-4xl sm:text-6xl lg:text-7xl font-normal tracking-tight text-neutral-950 leading-[1.05]">
-                Refined Protection.
-                <br />
-                <span className="italic font-light text-neutral-700">Uncompromised Design.</span>
-              </h1>
-
-              {/* Sub-headline */}
-              <p className="max-w-xl text-sm sm:text-base leading-relaxed text-neutral-600 font-normal">
-                Engineered with aerospace-grade composites and bespoke finishes. Tailored specifically for discerning flagship users across Qatar.
-              </p>
-
-              {/* Action Buttons */}
-              <div className="flex flex-wrap items-center gap-3 pt-2">
-                <Link
-                  href="/shop"
-                  className="inline-flex items-center justify-center gap-2 rounded-xl bg-neutral-950 px-7 py-3.5 text-xs font-semibold uppercase tracking-widest text-white transition-all duration-200 hover:bg-neutral-800 active:scale-[0.98] shadow-sm"
-                >
-                  <span>Explore Collection</span>
-                  <ArrowRight className="h-4 w-4" />
-                </Link>
-                <Link
-                  href="/track"
-                  className="inline-flex items-center justify-center rounded-xl border border-neutral-300 bg-white px-7 py-3.5 text-xs font-semibold uppercase tracking-widest text-neutral-900 transition-all duration-200 hover:bg-neutral-100 hover:border-neutral-400 active:scale-[0.98]"
-                >
-                  Track Order
-                </Link>
-              </div>
-
-              {/* 3-Column Trust Metric Strip */}
-              <div className="grid grid-cols-3 gap-4 pt-6 border-t border-neutral-200/70">
-                <div className="space-y-1">
-                  <div className="flex items-center gap-1.5 text-neutral-950 font-semibold text-xs uppercase tracking-wider">
-                    <ShieldCheck className="h-4 w-4 text-[#A88B4D]" />
-                    <span>0.1mm Precision</span>
-                  </div>
-                  <p className="text-[11px] text-neutral-500">Aerospace Tolerances</p>
+            <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
+              {/* Left Editorial Copy (7 Cols) */}
+              <div className="lg:col-span-7 space-y-6">
+                {/* Live Atelier Badge */}
+                <div className="inline-flex items-center gap-2 rounded-full border border-neutral-200 bg-neutral-50 px-3.5 py-1.5 shadow-2xs">
+                  <span className="flex h-2 w-2 rounded-full bg-[#C5A869] animate-ping" />
+                  <span className="text-[10px] font-bold tracking-[0.18em] uppercase text-neutral-900">
+                    Doha Atelier • 2026 Collection
+                  </span>
                 </div>
 
-                <div className="space-y-1">
-                  <div className="flex items-center gap-1.5 text-neutral-950 font-semibold text-xs uppercase tracking-wider">
-                    <Truck className="h-4 w-4 text-[#A88B4D]" />
-                    <span>Doha Express</span>
-                  </div>
-                  <p className="text-[11px] text-neutral-500">Same-Day Dispatch</p>
-                </div>
+                {/* Main Headline */}
+                <h1 className="font-display text-4xl sm:text-6xl lg:text-7xl font-normal leading-[1.05] tracking-tight text-neutral-950">
+                  Refined Protection. <br />
+                  <span className="italic font-light text-neutral-700">Uncompromised Design.</span>
+                </h1>
 
-                <div className="space-y-1">
-                  <div className="flex items-center gap-1.5 text-neutral-950 font-semibold text-xs uppercase tracking-wider">
-                    <Sparkles className="h-4 w-4 text-[#A88B4D]" />
+                {/* Subtitle */}
+                <p className="max-w-xl text-xs sm:text-sm lg:text-base leading-relaxed text-neutral-600">
+                  Engineered with aerospace composites, surgical tolerances, and tactile metallic accents. Hand-finished for contemporary iPhone and Galaxy flagships in Qatar.
+                </p>
+
+                {/* Dual CTAs */}
+                <div className="flex flex-wrap items-center gap-3.5 pt-2">
+                  <Link
+                    href="/shop"
+                    className="inline-flex items-center gap-2 rounded-xl bg-neutral-950 px-7 py-3.5 text-xs font-semibold uppercase tracking-widest text-white shadow-sm transition-all hover:bg-neutral-800 active:scale-[0.98]"
+                  >
+                    <span>Shop All Cases</span>
+                    <ArrowRight className="h-3.5 w-3.5" />
+                  </Link>
+
+                  <a
+                    href="https://wa.me/97455364455?text=Hello%20CASEL%C3%89%20Atelier%2C%20I%20would%20like%20to%20inquire%20about%20your%20protective%20cases."
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 rounded-xl border border-neutral-300 bg-white px-6 py-3.5 text-xs font-semibold uppercase tracking-widest text-neutral-900 transition-all hover:bg-neutral-50 active:scale-[0.98]"
+                  >
+                    <MessageSquare className="h-3.5 w-3.5" />
                     <span>WhatsApp Concierge</span>
+                  </a>
+                </div>
+
+                {/* Trust Points */}
+                <div className="grid grid-cols-3 gap-4 pt-6 border-t border-neutral-100">
+                  <div>
+                    <span className="block text-sm font-bold text-neutral-950 font-mono">0.1mm</span>
+                    <span className="text-[11px] text-neutral-500 font-medium">Precision Fit</span>
                   </div>
-                  <p className="text-[11px] text-neutral-500">Direct Checkout</p>
+                  <div>
+                    <span className="block text-sm font-bold text-neutral-950 font-mono">24H Express</span>
+                    <span className="text-[11px] text-neutral-500 font-medium">Doha Dispatch</span>
+                  </div>
+                  <div>
+                    <span className="block text-sm font-bold text-neutral-950 font-mono">100% Fit</span>
+                    <span className="text-[11px] text-neutral-500 font-medium">7-Day Guarantee</span>
+                  </div>
                 </div>
               </div>
-            </div>
 
-            {/* Right: Studio Product Spotlight */}
-            <div className="lg:col-span-5">
-              {heroFeatured && (
-                <div className="relative rounded-3xl border border-neutral-200/80 bg-white p-6 sm:p-7 shadow-xl shadow-neutral-900/5 transition-all duration-300 hover:shadow-2xl">
-                  {/* Spotlight Header */}
-                  <div className="flex items-center justify-between pb-4 mb-2 border-b border-neutral-100">
-                    <div className="flex items-center gap-2">
-                      <span className="flex h-2 w-2 rounded-full bg-emerald-500" />
-                      <span className="text-[10px] font-bold uppercase tracking-widest text-neutral-500">
-                        Atelier Spotlight
-                      </span>
-                    </div>
-                    <span className="rounded-full bg-neutral-100 px-2.5 py-0.5 text-[10px] font-bold text-neutral-800 uppercase tracking-wider">
-                      {heroFeatured.modelName}
+              {/* Right Hero Product Spotlight (5 Cols) */}
+              <div className="lg:col-span-5 flex justify-center">
+                <div className="group relative w-full max-w-sm aspect-[4/5] rounded-3xl bg-neutral-100/80 border border-neutral-200/80 p-8 flex items-center justify-center shadow-md transition-all duration-500 hover:shadow-xl">
+                  {/* Floating Tag */}
+                  <div className="absolute top-4 left-4 z-10">
+                    <span className="inline-flex items-center rounded-full bg-white/90 backdrop-blur-md border border-neutral-200/80 px-3 py-1 text-[10px] font-bold text-neutral-900 uppercase tracking-wider shadow-2xs">
+                      Studio Spotlight
                     </span>
                   </div>
 
-                  {/* High-Resolution Hero Product Image */}
-                  <div className="relative aspect-[4/5] max-h-[360px] w-full overflow-hidden rounded-2xl bg-neutral-100/60 flex items-center justify-center group">
+                  {/* Product Image */}
+                  <div className="relative h-full w-full">
                     <Image
-                      src={heroFeatured.images[0]}
-                      alt={heroFeatured.name}
+                      src={featuredProducts[0]?.images[0] || "/products/leather-case-black.png"}
+                      alt="Featured Case"
                       fill
-                      className="object-contain p-4 sm:p-6 transition-transform duration-700 ease-out group-hover:scale-105"
                       priority
-                      sizes="(max-width: 1024px) 100vw, 40vw"
+                      className="object-contain p-4 transition-transform duration-700 group-hover:scale-105 drop-shadow-2xl"
+                      sizes="(max-width: 768px) 80vw, 400px"
                     />
-                    {heroFeatured.images[1] && (
-                      <Image
-                        src={heroFeatured.images[1]}
-                        alt={`${heroFeatured.name} angle`}
-                        fill
-                        className="object-contain p-4 sm:p-6 transition-opacity duration-500 opacity-0 group-hover:opacity-100"
-                        sizes="(max-width: 1024px) 100vw, 40vw"
-                      />
-                    )}
                   </div>
 
-                  {/* Product Metadata & Price */}
-                  <div className="mt-5 flex items-baseline justify-between">
-                    <div>
-                      <h3 className="font-display text-xl text-neutral-950 font-semibold tracking-tight">
-                        {heroFeatured.name}
-                      </h3>
-                      <p className="text-xs text-neutral-500 mt-0.5">
-                        Hand-finished matte composite
-                      </p>
-                    </div>
-                    <Price price={heroFeatured.price} comparePrice={heroFeatured.comparePrice} size="md" />
+                  {/* Floating Price Pill */}
+                  <div className="absolute bottom-4 right-4 z-10 rounded-2xl bg-white/95 backdrop-blur-md border border-neutral-200/80 px-3.5 py-1.5 shadow-sm text-right">
+                    <p className="text-[9px] font-bold text-neutral-400 uppercase tracking-wider">Titanium Frame</p>
+                    <p className="text-xs font-bold text-neutral-950">QR 85</p>
                   </div>
-
-                  {/* View Details Link */}
-                  <Link
-                    href={`/shop/${heroFeatured.modelSlug}/${heroFeatured.slug}`}
-                    className="mt-4 flex w-full items-center justify-center gap-1.5 rounded-xl border border-neutral-200 bg-neutral-50 py-3 text-xs font-semibold uppercase tracking-wider text-neutral-950 hover:bg-neutral-950 hover:text-white transition-all duration-200"
-                  >
-                    <span>View Product Details</span>
-                    <ArrowRight className="h-3.5 w-3.5" />
-                  </Link>
                 </div>
-              )}
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* ═══════ 2. CURATED COLLECTION FILTER BAR & SIGNATURE GRID ═══════ */}
-      <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8 pb-5 border-b border-neutral-200/70">
-          <div>
-            <div className="inline-flex items-center gap-1.5 text-[11px] font-bold text-[#A88B4D] tracking-widest uppercase mb-1.5">
-              <SlidersHorizontal className="h-3.5 w-3.5" />
-              <span>Curated Selection</span>
+      {/* 2. INFINITE MARQUEE TICKER */}
+      <MarqueeTicker />
+
+      {/* 3. CURATED COLLECTION SECTION WITH PILL FILTERS */}
+      <section className="py-16 sm:py-24">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          {/* Header & Filter Bar */}
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 mb-10 pb-6 border-b border-neutral-200/70">
+            <div>
+              <span className="text-[10px] font-bold text-[#A88B4D] tracking-widest uppercase mb-1.5 block">
+                Catalog Archive
+              </span>
+              <h2 className="font-display text-3xl sm:text-4xl font-normal text-neutral-950">
+                Curated Flagship Enclosures
+              </h2>
             </div>
-            <h2 className="font-display text-3xl sm:text-4xl text-neutral-950 font-normal">
-              Signature Collection
-            </h2>
-          </div>
 
-          <Link
-            href="/shop"
-            className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-widest text-neutral-600 hover:text-neutral-950 transition-colors self-start md:self-auto"
-          >
-            <span>View All Styles</span>
-            <ArrowRight className="h-3.5 w-3.5" />
-          </Link>
-        </div>
-
-        {/* Horizontal Category Pill Filter Bar */}
-        <div className="mb-8 overflow-x-auto no-scrollbar pb-2">
-          <div className="flex items-center gap-2 min-w-max">
-            {filterPills.map((pill) => {
-              const isActive = activeFilter === pill.id;
-              return (
+            {/* Filter Pills */}
+            <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-2 sm:pb-0">
+              {FILTER_TABS.map((tab) => (
                 <button
-                  key={pill.id}
-                  onClick={() => setActiveFilter(pill.id)}
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
                   className={cn(
-                    "px-4 py-2 rounded-full text-xs font-semibold uppercase tracking-wider transition-all duration-200 cursor-pointer select-none",
-                    isActive
-                      ? "bg-neutral-950 text-white shadow-sm scale-102"
-                      : "bg-white border border-neutral-200/80 text-neutral-600 hover:border-neutral-400 hover:text-neutral-950"
+                    "px-4 py-2 rounded-xl text-xs font-semibold uppercase tracking-wider transition-all duration-200 whitespace-nowrap cursor-pointer select-none",
+                    activeTab === tab.id
+                      ? "bg-neutral-950 text-white shadow-sm"
+                      : "border border-neutral-200/80 bg-white text-neutral-600 hover:border-neutral-400 hover:text-neutral-950"
                   )}
                 >
-                  {pill.label}
+                  {tab.label}
                 </button>
+              ))}
+            </div>
+          </div>
+
+          {/* 4:5 Aspect Ratio Product Grid */}
+          <div className="grid grid-cols-2 gap-4 sm:gap-6 lg:grid-cols-4">
+            {filteredProducts.map((product, index) => (
+              <ProductCard key={product.id} product={product} index={index} />
+            ))}
+          </div>
+
+          {/* Catalog View All Link */}
+          <div className="mt-14 text-center">
+            <Link
+              href="/shop"
+              className="inline-flex items-center gap-2 rounded-2xl border border-neutral-300 bg-white px-8 py-3.5 text-xs font-bold uppercase tracking-widest text-neutral-900 transition-all hover:bg-neutral-950 hover:text-white hover:border-neutral-950 active:scale-[0.98] shadow-xs"
+            >
+              <span>Explore Complete Collection</span>
+              <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* 4. INTERACTIVE FINISH COMPARISON SLIDER (Matte vs Glossy) */}
+      <ComparisonSlider />
+
+      {/* 5. DEVICE COMPATIBILITY MATRIX */}
+      <section className="py-16 sm:py-24 bg-white border-t border-neutral-200/70">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="text-center space-y-3 mb-12">
+            <span className="text-[10px] font-bold text-[#A88B4D] tracking-widest uppercase block">
+              Precision Tooling
+            </span>
+            <h2 className="font-display text-3xl sm:text-4xl font-normal text-neutral-950">
+              Engineered For Your Model
+            </h2>
+            <p className="text-xs sm:text-sm text-neutral-600 max-w-md mx-auto">
+              Select your flagship device for tailored case options with micron-level alignment.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+            {[
+              { name: "iPhone 15 Pro Max", slug: "iphone-15-pro-max", count: "12 Styles", icon: Smartphone },
+              { name: "iPhone 15 Pro", slug: "iphone-15-pro", count: "12 Styles", icon: Smartphone },
+              { name: "Galaxy S24 Ultra", slug: "samsung-galaxy-s24-ultra", count: "10 Styles", icon: Smartphone },
+              { name: "Pixel 8 Pro", slug: "google-pixel-8-pro", count: "8 Styles", icon: Smartphone },
+            ].map((device) => {
+              const Icon = device.icon;
+              return (
+                <Link
+                  key={device.slug}
+                  href={`/shop/${device.slug}`}
+                  className="group flex flex-col items-center justify-center rounded-2xl border border-neutral-200/80 bg-neutral-50/70 p-6 text-center transition-all duration-300 hover:border-neutral-950 hover:bg-white hover:shadow-md hover:-translate-y-1"
+                >
+                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white border border-neutral-200/80 text-neutral-900 group-hover:bg-neutral-950 group-hover:text-white transition-colors">
+                    <Icon className="h-6 w-6" />
+                  </div>
+                  <h3 className="mt-4 font-bold text-xs sm:text-sm text-neutral-950">{device.name}</h3>
+                  <span className="mt-1 text-[11px] text-neutral-500 font-medium">{device.count}</span>
+                </Link>
               );
             })}
           </div>
         </div>
-
-        {/* 4:5 Responsive Product Grid */}
-        <div className="grid grid-cols-2 gap-4 sm:gap-6 lg:grid-cols-4">
-          {filteredProducts.slice(0, 8).map((product, i) => (
-            <ProductCard key={product.id} product={product} index={i} />
-          ))}
-        </div>
-
-        {filteredProducts.length === 0 && (
-          <div className="py-20 text-center rounded-2xl border border-neutral-200/80 bg-white">
-            <p className="text-sm font-semibold text-neutral-900">No cases found in this category</p>
-            <p className="mt-1 text-xs text-neutral-500">Try selecting &quot;All Cases&quot; to browse our entire portfolio.</p>
-            <button
-              onClick={() => setActiveFilter("All")}
-              className="mt-4 rounded-xl bg-neutral-950 px-5 py-2.5 text-xs font-semibold uppercase tracking-wider text-white hover:bg-neutral-800"
-            >
-              Reset Filter
-            </button>
-          </div>
-        )}
       </section>
 
-      {/* ═══════ 3. ARCHITECTURAL MODEL SELECTOR ═══════ */}
-      <section className="border-t border-neutral-200/70 bg-white py-16 sm:py-20">
+      {/* 6. EXPLODED 4-LAYER 3D ARCHITECTURE VISUALIZER */}
+      <ExplodedLayers />
+
+      {/* 7. VERIFIED PATRON TESTIMONIALS */}
+      <TestimonialsSection />
+
+      {/* 8. WHITE-GLOVE SERVICE & CRAFTSMANSHIP PILLARS */}
+      <section className="py-16 sm:py-24 border-t border-neutral-200/70 bg-neutral-900 text-white">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-xl mx-auto mb-12">
-            <span className="text-[11px] font-bold text-[#A88B4D] tracking-widest uppercase mb-1.5 block">
-              Device Compatibility
-            </span>
-            <h2 className="font-display text-3xl sm:text-4xl text-neutral-950 font-normal">
-              Shop by Phone Model
-            </h2>
-            <p className="mt-2 text-xs sm:text-sm text-neutral-600 leading-relaxed">
-              Every case is bespoke tailored to the exact millimeter dimensions of your device.
-            </p>
-          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+            <div className="lg:col-span-6 space-y-6">
+              <span className="text-[10px] font-bold text-[#DFCA9B] uppercase tracking-[0.2em]">
+                Atelier Standards
+              </span>
+              <h2 className="font-display text-3xl sm:text-5xl font-normal text-white leading-tight">
+                Crafted for Discerning Device Owners.
+              </h2>
+              <p className="text-xs sm:text-sm leading-relaxed text-neutral-400 max-w-lg">
+                Every CASELÉ piece is inspected for millimeter-perfect button travel, non-yellowing composite stability, and MagSafe magnetic force.
+              </p>
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3.5">
-            {models.map((model) => (
-              <Link
-                key={model.id}
-                href={`/shop/${model.slug}`}
-                className="group rounded-2xl border border-neutral-200/80 bg-neutral-50/50 p-5 text-center transition-all duration-300 hover:border-neutral-400 hover:bg-white hover:shadow-[0_8px_25px_rgb(0,0,0,0.05)] hover:-translate-y-0.5"
-              >
-                <div className="mx-auto mb-3 flex h-11 w-11 items-center justify-center rounded-xl bg-white border border-neutral-200/70 text-neutral-800 group-hover:bg-neutral-950 group-hover:text-white transition-colors shadow-2xs">
-                  <Smartphone className="h-5 w-5" />
+              <div className="space-y-4 pt-2">
+                {[
+                  { title: "Same-Day Dispatch Across Qatar", desc: "Express routing within Doha, Lusail, Al Wakrah, and Al Khor." },
+                  { title: "Direct WhatsApp Ordering", desc: "No complex checkouts. Communicate directly with our Doha team." },
+                  { title: "7-Day Satisfaction Fit Guarantee", desc: "Hassle-free replacement if the enclosure does not meet your expectations." },
+                ].map((item, idx) => (
+                  <div key={idx} className="flex items-start gap-3">
+                    <CheckCircle className="h-4 w-4 text-[#DFCA9B] shrink-0 mt-0.5" />
+                    <div>
+                      <h4 className="text-xs font-bold text-white uppercase tracking-wider">{item.title}</h4>
+                      <p className="text-[11px] text-neutral-400 mt-0.5">{item.desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="lg:col-span-6 flex justify-center">
+              <div className="relative w-full max-w-md aspect-square rounded-3xl border border-white/10 bg-white/5 p-8 flex flex-col items-center justify-center text-center space-y-4">
+                <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-white/10 text-white border border-white/20">
+                  <ShieldCheck className="h-8 w-8" />
                 </div>
-                <p className="text-xs font-semibold text-neutral-950 group-hover:text-neutral-950 transition-colors">
-                  {model.name}
+                <h3 className="font-display text-2xl text-white font-normal">Complimentary Doha Delivery</h3>
+                <p className="text-xs text-neutral-400 max-w-xs leading-relaxed">
+                  Enjoy complimentary express courier delivery on all orders over QR 100 in the State of Qatar.
                 </p>
-                <p className="mt-1 text-[10px] text-neutral-400 uppercase tracking-wider font-medium">
-                  {model.count} {t("cases_count") || "styles"}
-                </p>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ═══════ 4. EDITORIAL DESIGN SERIES ═══════ */}
-      {categories.length > 0 && (
-        <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
-          <div className="mb-10 pb-5 border-b border-neutral-200/70">
-            <span className="text-[11px] font-bold text-[#A88B4D] tracking-widest uppercase mb-1.5 block">
-              Design Architecture
-            </span>
-            <h2 className="font-display text-3xl sm:text-4xl text-neutral-950 font-normal">
-              Explore Design Series
-            </h2>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-            {categories.map((cat) => (
-              <Link
-                key={cat.slug}
-                href={`/category/${cat.slug}`}
-                className="group relative rounded-2xl border border-neutral-200/80 bg-white p-6 sm:p-7 flex flex-col justify-between min-h-[220px] transition-all duration-300 hover:border-neutral-400 hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:-translate-y-0.5"
-              >
-                <div>
-                  <p className="font-display text-2xl text-neutral-950 font-medium group-hover:text-neutral-700 transition-colors">
-                    {cat.name}
-                  </p>
-                  <p className="mt-2.5 text-xs text-neutral-600 leading-relaxed line-clamp-2">
-                    {cat.description}
-                  </p>
-                </div>
-                <div className="mt-6 pt-4 border-t border-neutral-100 flex items-center justify-between">
-                  <span className="text-[10px] uppercase tracking-widest text-neutral-400 font-semibold">
-                    {cat.count} models
-                  </span>
-                  <span className="inline-flex items-center gap-1 text-xs text-neutral-950 font-semibold group-hover:translate-x-1 transition-transform">
-                    <span>Explore</span>
-                    <ArrowRight className="h-3.5 w-3.5" />
-                  </span>
-                </div>
-              </Link>
-            ))}
-          </div>
-        </section>
-      )}
-
-      {/* ═══════ 5. BRAND CRAFTSMANSHIP / PILLARS ═══════ */}
-      <section className="border-t border-neutral-200/70 bg-white py-16 sm:py-20">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 sm:gap-12">
-            <div className="space-y-3">
-              <span className="text-[10px] font-bold text-[#A88B4D] uppercase tracking-[0.2em]">01 / Material Architecture</span>
-              <h3 className="font-display text-2xl text-neutral-950 font-medium">
-                High-Impact Aerospace Composites
-              </h3>
-              <p className="text-xs leading-relaxed text-neutral-600">
-                Crafted from ballistic-grade polycarbonates and supple treated leathers to ensure maximum shock dissipation while maintaining a razor-thin profile.
-              </p>
-            </div>
-
-            <div className="space-y-3">
-              <span className="text-[10px] font-bold text-[#A88B4D] uppercase tracking-[0.2em]">02 / Dimensional Tolerance</span>
-              <h3 className="font-display text-2xl text-neutral-950 font-medium">
-                0.1mm Precision Enclosure
-              </h3>
-              <p className="text-xs leading-relaxed text-neutral-600">
-                Laser-calibrated cutouts for tactile buttons, camera island bevels, and unobstructed wireless charging compatibility.
-              </p>
-            </div>
-
-            <div className="space-y-3">
-              <span className="text-[10px] font-bold text-[#A88B4D] uppercase tracking-[0.2em]">03 / White-Glove Service</span>
-              <h3 className="font-display text-2xl text-neutral-950 font-medium">
-                Doha WhatsApp Concierge
-              </h3>
-              <p className="text-xs leading-relaxed text-neutral-600">
-                Experience friction-free ordering via WhatsApp with same-day express delivery across Doha, Al Wakrah, and Al Khor.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ═══════ 6. FINAL STATEMENT BANNER ═══════ */}
-      <section className="border-t border-neutral-200/70 bg-neutral-900 text-white">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16 sm:py-20 text-center">
-          <div className="max-w-xl mx-auto space-y-5">
-            <span className="text-[10px] font-bold text-[#DFCA9B] uppercase tracking-[0.25em]">
-              Elevate Your Daily Carry
-            </span>
-            <h2 className="font-display text-3xl sm:text-5xl font-normal leading-tight text-white">
-              Ready to experience uncompromising protection?
-            </h2>
-            <p className="text-xs sm:text-sm text-neutral-300 max-w-md mx-auto leading-relaxed">
-              Explore our full collection or connect with our Doha concierge team on WhatsApp for bespoke inquiries.
-            </p>
-            <div className="pt-3">
-              <Link
-                href="/shop"
-                className="inline-flex items-center justify-center gap-2 rounded-xl bg-white px-8 py-3.5 text-xs font-semibold uppercase tracking-widest text-neutral-950 hover:bg-[#C5A869] transition-colors shadow-lg active:scale-[0.98]"
-              >
-                <span>Browse All Cases</span>
-                <ArrowRight className="h-4 w-4" />
-              </Link>
+                <Link
+                  href="/shop"
+                  className="mt-2 inline-flex items-center gap-2 rounded-xl bg-white px-6 py-3 text-xs font-bold uppercase tracking-widest text-neutral-950 hover:bg-[#C5A869] transition-colors shadow-sm"
+                >
+                  <span>Order Now</span>
+                  <ArrowRight className="h-3.5 w-3.5" />
+                </Link>
+              </div>
             </div>
           </div>
         </div>

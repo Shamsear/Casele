@@ -3,6 +3,8 @@ import { formatPrice } from "./utils";
 interface WhatsAppItem {
   name: string;
   model: string;
+  finish?: string;
+  caseType?: string;
   qty: number;
   price: number;
 }
@@ -24,44 +26,53 @@ interface WhatsAppOrder {
 export function buildWhatsAppMessage(order: WhatsAppOrder): string {
   const lines: string[] = [];
 
-  lines.push("CASELÉ Order");
+  lines.push("👑 *CASELÉ ATELIER DOHA — ORDER REQUEST*");
   lines.push("");
-  lines.push(`Name: ${order.customerName}`);
-  lines.push(`Phone: ${order.customerPhone}`);
+  lines.push(`👤 *Client:* ${order.customerName}`);
+  lines.push(`📱 *Contact:* ${order.customerPhone}`);
   lines.push(
-    `Address: ${order.address || "Not provided — please confirm with customer"}`
+    `📍 *Delivery Location:* ${order.address || "Doha, Qatar (Please confirm area/zone)"}`
   );
   lines.push("");
-  lines.push("Items:");
+  lines.push("📦 *Selected Enclosures:*");
 
   for (const item of order.items) {
+    const specs = [
+      item.model,
+      item.finish ? `${item.finish} Finish` : null,
+      item.caseType || null,
+    ].filter(Boolean).join(" • ");
+
     lines.push(
-      `• ${item.name} (${item.model}) × ${item.qty} — ${formatPrice(item.price)}`
+      `• *${item.name}* [${specs}] × ${item.qty} — ${formatPrice(item.price)}`
     );
   }
 
   lines.push("");
-  lines.push(`Subtotal: ${formatPrice(order.subtotal)}`);
+  lines.push(`💵 *Subtotal:* ${formatPrice(order.subtotal)}`);
 
   if (order.tierDiscount > 0) {
-    lines.push(`Tier discount: -${formatPrice(order.tierDiscount)}`);
+    lines.push(`✨ *Tier Bundle Savings:* -${formatPrice(order.tierDiscount)}`);
   }
   if (order.flashDiscount > 0) {
-    lines.push(`Flash sale: -${formatPrice(order.flashDiscount)}`);
+    lines.push(`⚡ *Flash Promotion:* -${formatPrice(order.flashDiscount)}`);
   }
   if (order.bundleDiscount > 0) {
-    lines.push(`Bundle discount: -${formatPrice(order.bundleDiscount)}`);
+    lines.push(`🎁 *Bundle Discount:* -${formatPrice(order.bundleDiscount)}`);
   }
   if (order.promoDiscount > 0) {
     lines.push(
-      `Promo (${order.promoCode}): -${formatPrice(order.promoDiscount)}`
+      `🏷️ *Promo Code (${order.promoCode}):* -${formatPrice(order.promoDiscount)}`
     );
   }
 
   lines.push("─────────────");
-  lines.push(`Total: ${formatPrice(order.total)}`);
+  lines.push(`💎 *Total Due:* ${formatPrice(order.total)}`);
   lines.push("");
-  lines.push("Thank you for choosing CASELÉ!");
+  lines.push("🚀 *Delivery Guarantee:* Doha Express (Same-Day / 24H Dispatch)");
+  lines.push("💳 *Payment:* Cash on Delivery / Direct Transfer");
+  lines.push("");
+  lines.push("Thank you for choosing CASELÉ Luxury Enclosures.");
 
   return lines.join("\n");
 }
