@@ -105,8 +105,8 @@ export function CartDrawer() {
 
       {/* Slide-Over Drawer */}
       <div
-        className={`fixed right-0 top-0 z-50 flex h-full w-full max-w-md flex-col bg-white border-l border-neutral-200/80 shadow-2xl transition-transform duration-300 ease-out text-neutral-950 ${
-          isOpen ? "translate-x-0" : "translate-x-full"
+        className={`fixed right-0 top-0 z-50 flex h-full w-full max-w-md flex-col bg-white border-l border-neutral-200/80 shadow-2xl transition-all duration-300 ease-out text-neutral-950 ${
+          isOpen ? "translate-x-0 opacity-100 visible pointer-events-auto" : "translate-x-full opacity-0 invisible pointer-events-none"
         }`}
       >
         {/* Header */}
