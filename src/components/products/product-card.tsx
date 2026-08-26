@@ -42,8 +42,6 @@ export function ProductCard({ product, className }: ProductCardProps) {
 
   const modelSlug = product.modelSlug || "iphone-15-pro";
   const imageUrl = product.images[0] || "/images/products/midnight-black.svg";
-  const hasSecondImage = product.images.length > 1;
-  const secondImageUrl = hasSecondImage ? product.images[1] : null;
 
   const isOutOfStock = product.inStock === false || (product.stock !== undefined && product.stock <= 0);
 
@@ -112,29 +110,17 @@ export function ProductCard({ product, className }: ProductCardProps) {
         href={`/shop/${modelSlug}/${product.slug}`}
         className="relative aspect-[3/4] w-full block bg-transparent"
       >
-        {/* Primary Phone Case Image */}
+        {/* Primary Phone Case Image — stays on hover with gentle zoom */}
         <Image
           src={imageUrl}
           alt={product.name}
           fill
           className={cn(
-            "object-contain p-2 sm:p-3 transition-all duration-500 ease-out group-hover:scale-105 drop-shadow-[0_12px_24px_rgba(0,0,0,0.09)]",
-            hasSecondImage && "group-hover:opacity-0",
+            "object-contain p-2 sm:p-3 transition-transform duration-500 ease-out group-hover:scale-105 drop-shadow-[0_12px_24px_rgba(0,0,0,0.09)]",
             isOutOfStock && "opacity-60 grayscale-[30%]"
           )}
           sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
         />
-
-        {/* Alternate Angle on Hover */}
-        {secondImageUrl && !isOutOfStock && (
-          <Image
-            src={secondImageUrl}
-            alt={`${product.name} alternate view`}
-            fill
-            className="object-contain p-2 sm:p-3 transition-all duration-500 ease-out opacity-0 group-hover:opacity-100 group-hover:scale-105 drop-shadow-[0_12px_24px_rgba(0,0,0,0.09)]"
-            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-          />
-        )}
 
         {/* Badges / Sold Out Indicator */}
         <div className="absolute top-2 left-2 flex flex-col gap-1 z-10 pointer-events-none">
