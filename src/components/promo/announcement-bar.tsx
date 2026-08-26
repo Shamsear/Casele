@@ -28,6 +28,7 @@ export function AnnouncementBar() {
   const [isDismissed, setIsDismissed] = useState<boolean | null>(null);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [deliveryThreshold, setDeliveryThreshold] = useState(100);
+  const [freeDeliveryEnabled, setFreeDeliveryEnabled] = useState(true);
   const [customAnnouncement, setCustomAnnouncement] = useState("");
 
   // Sync dismissal state and fetch settings on mount
@@ -43,6 +44,9 @@ export function AnnouncementBar() {
       .then((res) => res.json())
       .then((data) => {
         if (data.settings) {
+          if (data.settings.free_delivery_enabled !== undefined) {
+            setFreeDeliveryEnabled(data.settings.free_delivery_enabled !== "false");
+          }
           if (data.settings.free_delivery_threshold) {
             const val = Number(data.settings.free_delivery_threshold);
             if (val > 0) setDeliveryThreshold(val);
@@ -84,11 +88,17 @@ export function AnnouncementBar() {
   }
 
   const announcementsList = [
-    {
-      text: customAnnouncement || `Complimentary Doha Express Delivery on Orders Over QR ${deliveryThreshold}`,
-      badge: "FREE DELIVERY",
-      link: "/shop",
-    },
+    ...(freeDeliveryEnabled
+      ? [
+          {
+            text:
+              customAnnouncement ||
+              `Complimentary Doha Express Delivery on Orders Over QR ${deliveryThreshold}`,
+            badge: "FREE DELIVERY",
+            link: "/shop",
+          },
+        ]
+      : []),
     {
       text: "20% OFF Your First Order — Use Code: WELCOME20",
       badge: "EXCLUSIVE",

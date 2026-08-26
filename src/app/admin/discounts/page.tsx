@@ -51,6 +51,7 @@ export default function AdminDiscountsPage() {
   const [bundleBuy2, setBundleBuy2] = useState("5");
   const [bundleBuy3, setBundleBuy3] = useState("10");
   const [freeDeliveryThreshold, setFreeDeliveryThreshold] = useState("100");
+  const [freeDeliveryEnabled, setFreeDeliveryEnabled] = useState("true");
   const [bundleEnabled, setBundleEnabled] = useState("true");
   const [tierEnabled, setTierEnabled] = useState("true");
   const [savingSettings, setSavingSettings] = useState(false);
@@ -100,6 +101,7 @@ export default function AdminDiscountsPage() {
           if (data.settings.bundle_buy_2_discount) setBundleBuy2(data.settings.bundle_buy_2_discount);
           if (data.settings.bundle_buy_3_discount) setBundleBuy3(data.settings.bundle_buy_3_discount);
           if (data.settings.free_delivery_threshold) setFreeDeliveryThreshold(data.settings.free_delivery_threshold);
+          if (data.settings.free_delivery_enabled !== undefined) setFreeDeliveryEnabled(data.settings.free_delivery_enabled);
           if (data.settings.bundle_discounts_enabled) setBundleEnabled(data.settings.bundle_discounts_enabled);
           if (data.settings.tier_discounts_enabled) setTierEnabled(data.settings.tier_discounts_enabled);
         }
@@ -279,6 +281,7 @@ export default function AdminDiscountsPage() {
             bundle_buy_2_discount: bundleBuy2,
             bundle_buy_3_discount: bundleBuy3,
             free_delivery_threshold: freeDeliveryThreshold,
+            free_delivery_enabled: freeDeliveryEnabled,
             bundle_discounts_enabled: bundleEnabled,
             tier_discounts_enabled: tierEnabled,
           },
@@ -709,10 +712,26 @@ export default function AdminDiscountsPage() {
           </div>
 
           <div className="rounded-2xl border border-neutral-200/80 bg-white p-6 shadow-2xs space-y-4">
-            <h3 className="text-base font-bold text-neutral-950">Free Express Delivery Threshold</h3>
-            <p className="text-xs text-neutral-500">
-              Orders at or above this amount automatically receive complimentary same-day Doha delivery.
-            </p>
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-neutral-100 pb-3">
+              <div>
+                <h3 className="text-base font-bold text-neutral-950">Free Express Delivery Threshold</h3>
+                <p className="text-xs text-neutral-500">
+                  Orders at or above this amount automatically receive complimentary same-day Doha delivery.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setFreeDeliveryEnabled(freeDeliveryEnabled === "false" ? "true" : "false")}
+                className={`inline-flex items-center gap-1.5 rounded-xl px-3 py-1 text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer ${
+                  freeDeliveryEnabled !== "false"
+                    ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                    : "bg-neutral-100 text-neutral-500 border border-neutral-200"
+                }`}
+              >
+                {freeDeliveryEnabled !== "false" ? <Power className="h-3 w-3" /> : <PowerOff className="h-3 w-3" />}
+                <span>{freeDeliveryEnabled !== "false" ? "Free Delivery Active" : "Free Delivery Deactivated"}</span>
+              </button>
+            </div>
             <div className="max-w-xs pt-1 space-y-1">
               <label className="text-[11px] font-bold uppercase tracking-wider text-neutral-700">Free Delivery Minimum (QR)</label>
               <input
@@ -720,7 +739,8 @@ export default function AdminDiscountsPage() {
                 value={freeDeliveryThreshold}
                 onChange={(e) => setFreeDeliveryThreshold(e.target.value)}
                 placeholder="100"
-                className="w-full rounded-xl border border-neutral-200 bg-white py-2.5 px-3 text-xs text-neutral-950 placeholder:text-neutral-400 focus:border-neutral-950 focus:outline-none shadow-2xs"
+                disabled={freeDeliveryEnabled === "false"}
+                className="w-full rounded-xl border border-neutral-200 bg-white py-2.5 px-3 text-xs text-neutral-950 placeholder:text-neutral-400 focus:border-neutral-950 focus:outline-none shadow-2xs disabled:opacity-50"
               />
             </div>
           </div>

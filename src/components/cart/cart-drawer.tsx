@@ -31,6 +31,7 @@ export function CartDrawer() {
   const { formatPrice } = useI18n();
 
   const [deliveryThreshold, setDeliveryThreshold] = useState(100);
+  const [freeDeliveryEnabled, setFreeDeliveryEnabled] = useState(true);
 
   // Automatically close cart drawer when navigating to another page
   useEffect(() => {
@@ -43,6 +44,9 @@ export function CartDrawer() {
     fetch("/api/settings")
       .then((res) => res.json())
       .then((data) => {
+        if (data.settings?.free_delivery_enabled !== undefined) {
+          setFreeDeliveryEnabled(data.settings.free_delivery_enabled !== "false");
+        }
         if (data.settings?.free_delivery_threshold) {
           const val = Number(data.settings.free_delivery_threshold);
           if (val > 0) setDeliveryThreshold(val);
@@ -142,32 +146,34 @@ export function CartDrawer() {
         </div>
 
         {/* Free Delivery Progress Bar */}
-        <div className="mx-6 mt-4 rounded-xl bg-neutral-50 border border-neutral-200/70 p-3.5">
-          {qualifiesForFreeDelivery ? (
-            <div className="flex items-center gap-2 text-xs font-semibold text-emerald-700">
-              <Truck className="h-4 w-4 text-emerald-600" />
-              <span>You have unlocked <strong>Complimentary Doha Delivery</strong></span>
-            </div>
-          ) : (
-            <>
-              <div className="flex items-center justify-between text-xs">
-                <div className="flex items-center gap-1.5 font-medium text-neutral-800">
-                  <Truck className="h-3.5 w-3.5 text-neutral-500" />
-                  <span>
-                    Add <strong className="text-neutral-950">QR {Math.ceil(deliveryThreshold - currentSubtotal)}</strong> for FREE Express Delivery
-                  </span>
+        {freeDeliveryEnabled && deliveryThreshold > 0 && (
+          <div className="mx-6 mt-4 rounded-xl bg-neutral-50 border border-neutral-200/70 p-3.5">
+            {qualifiesForFreeDelivery ? (
+              <div className="flex items-center gap-2 text-xs font-semibold text-emerald-700">
+                <Truck className="h-4 w-4 text-emerald-600" />
+                <span>You have unlocked <strong>Complimentary Doha Delivery</strong></span>
+              </div>
+            ) : (
+              <>
+                <div className="flex items-center justify-between text-xs">
+                  <div className="flex items-center gap-1.5 font-medium text-neutral-800">
+                    <Truck className="h-3.5 w-3.5 text-neutral-500" />
+                    <span>
+                      Add <strong className="text-neutral-950">QR {Math.ceil(deliveryThreshold - currentSubtotal)}</strong> for FREE Express Delivery
+                    </span>
+                  </div>
+                  <span className="text-[11px] font-semibold text-neutral-500">{Math.round(progressPercent)}%</span>
                 </div>
-                <span className="text-[11px] font-semibold text-neutral-500">{Math.round(progressPercent)}%</span>
-              </div>
-              <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-neutral-200">
-                <div
-                  className="h-full rounded-full bg-neutral-950 transition-all duration-500"
-                  style={{ width: `${progressPercent}%` }}
-                />
-              </div>
-            </>
-          )}
-        </div>
+                <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-neutral-200">
+                  <div
+                    className="h-full rounded-full bg-neutral-950 transition-all duration-500"
+                    style={{ width: `${progressPercent}%` }}
+                  />
+                </div>
+              </>
+            )}
+          </div>
+        )}
 
         {/* Cart Item List */}
         <div className="flex-1 overflow-y-auto px-6 py-4">
