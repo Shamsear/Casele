@@ -38,9 +38,17 @@ export function CartDrawer() {
     setOpen(false);
   }, [pathname, setOpen]);
 
-  // Fetch WhatsApp number and delivery threshold on mount
+  // Fetch WhatsApp number, delivery threshold, and saved customer credentials on mount
   useEffect(() => {
     getWhatsAppNumber().then(setWhatsappNumber);
+
+    if (typeof window !== "undefined") {
+      const savedName = localStorage.getItem("casele_customer_name");
+      const savedPhone = localStorage.getItem("casele_customer_phone");
+      if (savedName) setCustomerName(savedName);
+      if (savedPhone) setCustomerPhone(savedPhone);
+    }
+
     fetch("/api/settings")
       .then((res) => res.json())
       .then((data) => {
@@ -83,9 +91,14 @@ export function CartDrawer() {
   }, [isOpen]);
 
   const handleWhatsAppOrder = () => {
+    if (typeof window !== "undefined") {
+      if (customerName.trim()) localStorage.setItem("casele_customer_name", customerName.trim());
+      if (customerPhone.trim()) localStorage.setItem("casele_customer_phone", customerPhone.trim());
+    }
+
     const message = buildWhatsAppMessage({
       customerName: customerName.trim() || "Customer",
-      customerPhone: customerPhone ? `+974${customerPhone}` : "",
+      customerPhone: customerPhone ? `+974 ${customerPhone}` : "",
       items: items.map((item) => ({
         name: item.name,
         model: item.modelName,
