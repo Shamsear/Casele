@@ -18,7 +18,10 @@ import {
   MapPin,
   CheckCircle2,
   Sparkles,
-  Info
+  Info,
+  Copy,
+  ClipboardCheck,
+  Wand2
 } from "lucide-react";
 
 interface AdminOrder {
@@ -67,6 +70,8 @@ export default function AdminOrdersPage() {
   const [orderStatus, setOrderStatus] = useState("confirmed");
   const [orderNotes, setOrderNotes] = useState("");
   const [orderDiscount, setOrderDiscount] = useState("0");
+  const [pastedWhatsAppText, setPastedWhatsAppText] = useState("");
+  const [showAutoFillBox, setShowAutoFillBox] = useState(false);
   const [orderItems, setOrderItems] = useState<
     { productId: string; name: string; model: string; qty: number; price: number }[]
   >([
@@ -152,6 +157,88 @@ export default function AdminOrdersPage() {
     }
   };
 
+  // ─── 1-Click Copy WhatsApp Order Template ─────────────────────
+  const handleCopyTemplate = () => {
+    const template = `*CASELÉ ATELIER QATAR — ORDER FORM*\nPlease reply with your details to confirm:\n\n• Full Name: \n• Phone (+974): \n• Case Selected: \n• Phone Model (e.g. iPhone 15 Pro Max): \n• Delivery Address in Qatar: \n• Notes (e.g. Cash on delivery): `;
+    navigator.clipboard.writeText(template);
+    toast("WhatsApp Order Template copied to clipboard! Paste it to your client.", "success");
+  };
+
+  // ─── Parse & Auto-Fill from Pasted WhatsApp Text ──────────────
+  const handleAutoFillFromWhatsApp = () => {
+    if (!pastedWhatsAppText.trim()) {
+      toast("Please paste the customer's WhatsApp message first", "error");
+      return;
+    }
+
+    const text = pastedWhatsAppText;
+
+    // Extract Name
+    const nameMatch = text.match(/(?:name|full name|client)[:\s•\-\*]+([^\n\r,•]+)/i);
+    if (nameMatch && nameMatch[1]) {
+      setCustomerName(nameMatch[1].replace(/[\*\_]/g, "").trim());
+    }
+
+    // Extract Phone
+    const phoneMatch = text.match(/(?:phone|mobile|tel|contact|wa)[:\s•\-\*]+([0-9\+\s\-]+)/i) || text.match(/(\+?974\s?[0-9]{8}|[3567][0-9]{7})/);
+    if (phoneMatch && phoneMatch[1]) {
+      let cleanP = phoneMatch[1].replace(/[\*\_]/g, "").trim();
+      if (!cleanP.startsWith("+974") && cleanP.length === 8) {
+        cleanP = "+974 " + cleanP;
+      }
+      setCustomerPhone(cleanP);
+    }
+
+    // Extract Address
+    const addressMatch = text.match(/(?:address|location|delivery address|area)[:\s•\-\*]+([^\n\r•]+)/i);
+    if (addressMatch && addressMatch[1]) {
+      setDeliveryAddress(addressMatch[1].replace(/[\*\_]/g, "").trim());
+    }
+
+    // Extract Notes
+    const notesMatch = text.match(/(?:notes|note|instruction|special)[:\s•\-\*]+([^\n\r•]+)/i);
+    if (notesMatch && notesMatch[1]) {
+      setOrderNotes(notesMatch[1].replace(/[\*\_]/g, "").trim());
+    }
+
+    // Extract Model
+    const modelMatch = text.match(/(?:model|phone model|device)[:\s•\-\*]+([^\n\r,•]+)/i);
+    const extractedModel = modelMatch ? modelMatch[1].replace(/[\*\_]/g, "").trim() : "iPhone 15 Pro Max";
+
+    // Match Product in Catalog
+    const caseMatch = text.match(/(?:case|product|item|selected)[:\s•\-\*]+([^\n\r,•]+)/i);
+    let matchedProduct = productsCatalog[0];
+
+    if (caseMatch && caseMatch[1]) {
+      const query = caseMatch[1].toLowerCase();
+      const found = productsCatalog.find(
+        (p) => p.name.toLowerCase().includes(query) || query.includes(p.name.toLowerCase())
+      );
+      if (found) matchedProduct = found;
+    } else {
+      // search entire text for any product name
+      const foundInText = productsCatalog.find((p) =>
+        text.toLowerCase().includes(p.name.toLowerCase())
+      );
+      if (foundInText) matchedProduct = foundInText;
+    }
+
+    if (matchedProduct) {
+      setOrderItems([
+        {
+          productId: matchedProduct.id,
+          name: matchedProduct.name,
+          model: extractedModel,
+          qty: 1,
+          price: Number(matchedProduct.price) || 85,
+        },
+      ]);
+    }
+
+    toast("Form auto-filled from WhatsApp message!", "success");
+    setShowAutoFillBox(false);
+  };
+
   // ─── Manual Order Creation Handlers ───────────────────────────
   const handleAddItemRow = () => {
     const firstProd = productsCatalog[0];
@@ -159,7 +246,7 @@ export default function AdminOrdersPage() {
       ...prev,
       {
         productId: firstProd?.id || "",
-        name: firstProd?.name || "Custom Case",
+        name: firstProd?.name || "Luxury Case",
         model: firstProd?.models?.[0]?.name || "iPhone 15 Pro Max",
         qty: 1,
         price: Number(firstProd?.price) || 85,
@@ -203,8 +290,8 @@ export default function AdminOrdersPage() {
       return;
     }
 
-    if (orderItems.some((it) => !it.name || it.qty <= 0 || it.price < 0)) {
-      toast("Please ensure all items have valid names, quantities, and prices", "error");
+    if (orderItems.some((it) => !it.productId || it.qty <= 0 || it.price < 0)) {
+      toast("Please select valid products from catalog", "error");
       return;
     }
 
@@ -243,6 +330,7 @@ export default function AdminOrdersPage() {
         setDeliveryAddress("");
         setOrderNotes("");
         setOrderDiscount("0");
+        setPastedWhatsAppText("");
         fetchOrders();
       } else {
         toast("Failed to log order", "error");
@@ -286,15 +374,29 @@ export default function AdminOrdersPage() {
           </p>
         </div>
 
-        {/* Primary Action: Log Manual WhatsApp Order */}
-        <button
-          type="button"
-          onClick={() => setIsCreatingOrder(true)}
-          className="inline-flex items-center gap-2 rounded-xl bg-neutral-950 px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-white shadow-md hover:bg-neutral-800 active:scale-95 transition-all cursor-pointer self-start sm:self-auto"
-        >
-          <Plus className="h-4 w-4" />
-          <span>+ Log WhatsApp Order</span>
-        </button>
+        {/* Action Buttons */}
+        <div className="flex flex-wrap items-center gap-2">
+          {/* 1-Click Copy WhatsApp Template */}
+          <button
+            type="button"
+            onClick={handleCopyTemplate}
+            className="inline-flex items-center gap-1.5 rounded-xl border border-neutral-200 bg-white px-3.5 py-2 text-xs font-semibold text-neutral-800 hover:bg-neutral-50 hover:border-neutral-300 transition-colors shadow-2xs cursor-pointer"
+            title="Copy WhatsApp order form template to send to customer"
+          >
+            <Copy className="h-3.5 w-3.5 text-[#A88B4D]" />
+            <span>Copy WhatsApp Form</span>
+          </button>
+
+          {/* Primary Action: Log Manual WhatsApp Order */}
+          <button
+            type="button"
+            onClick={() => setIsCreatingOrder(true)}
+            className="inline-flex items-center gap-2 rounded-xl bg-neutral-950 px-4 py-2 text-xs font-bold uppercase tracking-wider text-white shadow-md hover:bg-neutral-800 active:scale-95 transition-all cursor-pointer"
+          >
+            <Plus className="h-4 w-4" />
+            <span>+ Log WhatsApp Order</span>
+          </button>
+        </div>
       </div>
 
       {/* Tabs & Search */}
@@ -452,10 +554,10 @@ export default function AdminOrdersPage() {
         </div>
       )}
 
-      {/* ═══ MODAL 1: CREATE MANUAL WHATSAPP ORDER ═══ */}
+      {/* ═══ MODAL 1: CREATE WHATSAPP ORDER WITH AUTO-FILL ═══ */}
       {isCreatingOrder && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-neutral-950/40 backdrop-blur-xs p-4 animate-fade-in overflow-y-auto">
-          <div className="relative w-full max-w-2xl rounded-2xl border border-neutral-200 bg-white p-6 shadow-2xl space-y-6 my-8">
+          <div className="relative w-full max-w-2xl rounded-2xl border border-neutral-200 bg-white p-6 shadow-2xl space-y-6 my-8 max-h-[90vh] overflow-y-auto">
             {/* Header */}
             <div className="flex items-center justify-between border-b border-neutral-100 pb-3">
               <div>
@@ -463,7 +565,7 @@ export default function AdminOrdersPage() {
                   Log WhatsApp Client Order
                 </h3>
                 <p className="text-xs text-neutral-500 font-medium">
-                  Enter details received from customer on WhatsApp to create order in PostgreSQL database
+                  Select cases from your website catalog or paste the customer's WhatsApp message to auto-fill
                 </p>
               </div>
               <button
@@ -472,6 +574,45 @@ export default function AdminOrdersPage() {
               >
                 <X className="h-4 w-4" />
               </button>
+            </div>
+
+            {/* Quick Auto-Fill Tool Banner */}
+            <div className="rounded-xl border border-[#C5A869]/40 bg-[#C5A869]/10 p-3.5 space-y-2">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2 text-xs font-bold text-neutral-900">
+                  <Wand2 className="h-4 w-4 text-[#A88B4D]" />
+                  <span>Fast WhatsApp Message Auto-Fill</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowAutoFillBox(!showAutoFillBox)}
+                  className="text-[11px] font-bold uppercase tracking-wider text-[#A88B4D] hover:underline cursor-pointer"
+                >
+                  {showAutoFillBox ? "Hide Paste Box" : "+ Paste Message to Auto-Fill"}
+                </button>
+              </div>
+
+              {showAutoFillBox && (
+                <div className="space-y-2 pt-1 animate-scale-in">
+                  <textarea
+                    rows={3}
+                    placeholder="Paste customer's WhatsApp response here (Name, Phone, Case, Address)..."
+                    value={pastedWhatsAppText}
+                    onChange={(e) => setPastedWhatsAppText(e.target.value)}
+                    className="w-full rounded-lg border border-neutral-300 bg-white p-2.5 text-xs text-neutral-950 placeholder:text-neutral-400 focus:outline-none focus:border-neutral-950 font-mono"
+                  />
+                  <div className="flex justify-end">
+                    <button
+                      type="button"
+                      onClick={handleAutoFillFromWhatsApp}
+                      className="inline-flex items-center gap-1.5 rounded-lg bg-neutral-950 px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-white hover:bg-neutral-800 transition-all cursor-pointer shadow-xs"
+                    >
+                      <Wand2 className="h-3 w-3" />
+                      <span>Parse & Auto-Fill Fields</span>
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Form Fields */}
@@ -513,11 +654,11 @@ export default function AdminOrdersPage() {
                 />
               </div>
 
-              {/* Case Items Breakdown */}
+              {/* Website Catalog Product Selection */}
               <div className="space-y-3 pt-2 border-t border-neutral-100">
                 <div className="flex items-center justify-between">
                   <span className="text-[11px] font-bold uppercase tracking-wider text-neutral-700">
-                    Ordered Cases ({orderItems.length})
+                    Website Cases Selected ({orderItems.length})
                   </span>
                   <button
                     type="button"
@@ -535,39 +676,25 @@ export default function AdminOrdersPage() {
                       key={idx}
                       className="grid grid-cols-12 gap-2 items-center rounded-xl bg-neutral-50/70 border border-neutral-200/70 p-3"
                     >
-                      {/* Product Selector */}
+                      {/* Product Selector (Strictly from Website Catalog) */}
                       <div className="col-span-5">
-                        <label className="text-[10px] text-neutral-400 font-semibold uppercase">Product</label>
-                        {productsCatalog.length > 0 ? (
-                          <select
-                            value={item.productId}
-                            onChange={(e) => handleProductSelect(idx, e.target.value)}
-                            className="w-full h-8 px-2 rounded-lg border border-neutral-200 bg-white text-neutral-950 text-xs font-semibold focus:outline-none focus:border-neutral-950"
-                          >
-                            {productsCatalog.map((p) => (
-                              <option key={p.id} value={p.id}>
-                                {p.name} (QR {p.price})
-                              </option>
-                            ))}
-                          </select>
-                        ) : (
-                          <input
-                            type="text"
-                            value={item.name}
-                            onChange={(e) =>
-                              setOrderItems((prev) =>
-                                prev.map((it, i) => (i === idx ? { ...it, name: e.target.value } : it))
-                              )
-                            }
-                            placeholder="Case Name"
-                            className="w-full h-8 px-2 rounded-lg border border-neutral-200 bg-white text-xs text-neutral-950"
-                          />
-                        )}
+                        <label className="text-[10px] text-neutral-400 font-semibold uppercase">Product from Catalog</label>
+                        <select
+                          value={item.productId}
+                          onChange={(e) => handleProductSelect(idx, e.target.value)}
+                          className="w-full h-8 px-2 rounded-lg border border-neutral-200 bg-white text-neutral-950 text-xs font-semibold focus:outline-none focus:border-neutral-950"
+                        >
+                          {productsCatalog.map((p) => (
+                            <option key={p.id} value={p.id}>
+                              {p.name} (QR {p.price})
+                            </option>
+                          ))}
+                        </select>
                       </div>
 
                       {/* Phone Model */}
                       <div className="col-span-3">
-                        <label className="text-[10px] text-neutral-400 font-semibold uppercase">Model</label>
+                        <label className="text-[10px] text-neutral-400 font-semibold uppercase">Phone Model</label>
                         <input
                           type="text"
                           value={item.model}
@@ -576,7 +703,7 @@ export default function AdminOrdersPage() {
                               prev.map((it, i) => (i === idx ? { ...it, model: e.target.value } : it))
                             )
                           }
-                          placeholder="e.g. iPhone 15 Pro"
+                          placeholder="e.g. iPhone 15 Pro Max"
                           className="w-full h-8 px-2 rounded-lg border border-neutral-200 bg-white text-xs text-neutral-950 focus:border-neutral-950"
                         />
                       </div>
@@ -616,7 +743,7 @@ export default function AdminOrdersPage() {
                           <button
                             type="button"
                             onClick={() => handleRemoveItemRow(idx)}
-                            className="text-neutral-400 hover:text-rose-600 transition-colors p-1 mt-3"
+                            className="text-neutral-400 hover:text-rose-600 transition-colors p-1 mt-3 cursor-pointer"
                           >
                             <Trash2 className="h-3.5 w-3.5" />
                           </button>
@@ -730,7 +857,7 @@ export default function AdminOrdersPage() {
             <div className="flex flex-col gap-2 pt-2">
               <a
                 href={`https://wa.me/${confirmedOrder.phone.replace(/[^0-9]/g, "")}?text=${encodeURIComponent(
-                  `Hello ${confirmedOrder.customer}, your CASELÉ Atelier order #${confirmedOrder.id} has been confirmed!\n\nTotal: QR ${confirmedOrder.total}\nDelivery: ${confirmedOrder.address}\n\nThank you for choosing CASELÉ Luxury Protection Qatar.`
+                  `Hello ${confirmedOrder.customer}, your CASELÉ Atelier order #${confirmedOrder.id} has been confirmed!\n\nTotal: QR ${confirmedOrder.total}\nDelivery: ${confirmedOrder.address}\n\nTrack live delivery: https://casele.vercel.app/track?id=${confirmedOrder.id}\n\nThank you for choosing CASELÉ Luxury Protection Qatar.`
                 )}`}
                 target="_blank"
                 rel="noopener noreferrer"
