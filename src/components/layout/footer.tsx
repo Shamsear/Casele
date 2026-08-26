@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { Logo } from "@/components/brand/logo";
 import { useI18n } from "@/lib/i18n/context";
@@ -10,6 +10,25 @@ const INSTAGRAM_URL = "https://www.instagram.com/casele_premium_mobile_case?igsi
 
 export function Footer() {
   const { t } = useI18n();
+  const [deliveryThreshold, setDeliveryThreshold] = useState(100);
+  const [freeDeliveryEnabled, setFreeDeliveryEnabled] = useState(true);
+
+  useEffect(() => {
+    fetch("/api/settings")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.settings) {
+          if (data.settings.free_delivery_enabled !== undefined) {
+            setFreeDeliveryEnabled(data.settings.free_delivery_enabled !== "false");
+          }
+          if (data.settings.free_delivery_threshold) {
+            const val = Number(data.settings.free_delivery_threshold);
+            if (val > 0) setDeliveryThreshold(val);
+          }
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   const scrollToTop = useCallback(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -27,7 +46,11 @@ export function Footer() {
               </div>
               <div>
                 <p className="text-xs font-semibold uppercase tracking-wider text-neutral-950">Doha Express Dispatch</p>
-                <p className="text-[11px] text-neutral-500 mt-0.5">Complimentary delivery over QR 100</p>
+                <p className="text-[11px] text-neutral-500 mt-0.5">
+                  {freeDeliveryEnabled && deliveryThreshold > 0
+                    ? `Complimentary delivery over QR ${deliveryThreshold}`
+                    : "Express courier dispatch across Qatar"}
+                </p>
               </div>
             </div>
 

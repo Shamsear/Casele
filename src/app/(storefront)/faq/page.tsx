@@ -22,7 +22,7 @@ const FAQS = [
       },
       {
         q: "Is delivery complimentary?",
-        a: "Yes! Orders over QR 100 qualify for complimentary Doha express delivery.",
+        a: "We offer express courier delivery across Qatar. Qualifying orders may receive complimentary express delivery based on current atelier promotions.",
       },
       {
         q: "What payment methods are supported?",

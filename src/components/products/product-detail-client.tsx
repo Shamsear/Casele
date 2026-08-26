@@ -60,6 +60,8 @@ export function ProductDetailClient({
   const [whatsappNumber, setWhatsappNumber] = useState("+97455364455");
   const [openAccordion, setOpenAccordion] = useState<string | null>("specs");
   const [quickBuyOpen, setQuickBuyOpen] = useState(false);
+  const [deliveryThreshold, setDeliveryThreshold] = useState(100);
+  const [freeDeliveryEnabled, setFreeDeliveryEnabled] = useState(true);
 
   const addItem = useCartStore((s) => s.addItem);
   const toggleWishlist = useWishlistStore((s) => s.toggleItem);
@@ -73,6 +75,21 @@ export function ProductDetailClient({
   useEffect(() => {
     addRecentlyViewed(product.id);
     getWhatsAppNumber().then(setWhatsappNumber);
+
+    fetch("/api/settings")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.settings) {
+          if (data.settings.free_delivery_enabled !== undefined) {
+            setFreeDeliveryEnabled(data.settings.free_delivery_enabled !== "false");
+          }
+          if (data.settings.free_delivery_threshold) {
+            const val = Number(data.settings.free_delivery_threshold);
+            if (val > 0) setDeliveryThreshold(val);
+          }
+        }
+      })
+      .catch(() => {});
   }, [product.id]);
 
   const handleAddToCart = () => {
@@ -291,7 +308,9 @@ export function ProductDetailClient({
                   </button>
                 </div>
                 <span className="text-xs font-medium text-neutral-500">
-                  Includes free Qatar delivery over QR 100
+                  {freeDeliveryEnabled && deliveryThreshold > 0
+                    ? `Includes free Qatar delivery over QR ${deliveryThreshold}`
+                    : "Express Qatar Same-Day Dispatch"}
                 </span>
               </div>
             </div>

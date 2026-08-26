@@ -52,6 +52,8 @@ export function HomePageClient({
   const [heroTitle, setHeroTitle] = useState("Sculpted for Flagships.");
   const [heroSubtitle, setHeroSubtitle] = useState("Artistry in Armor.");
   const [heroDescription, setHeroDescription] = useState("Every silhouette is machined with aerospace-grade composites and tactile metallic accents. Hand-finished in Qatar for discerning device owners.");
+  const [deliveryThreshold, setDeliveryThreshold] = useState(100);
+  const [freeDeliveryEnabled, setFreeDeliveryEnabled] = useState(true);
 
   useEffect(() => {
     fetch("/api/settings")
@@ -62,6 +64,13 @@ export function HomePageClient({
           if (data.settings.hero_title) setHeroTitle(data.settings.hero_title);
           if (data.settings.hero_subtitle) setHeroSubtitle(data.settings.hero_subtitle);
           if (data.settings.hero_description) setHeroDescription(data.settings.hero_description);
+          if (data.settings.free_delivery_enabled !== undefined) {
+            setFreeDeliveryEnabled(data.settings.free_delivery_enabled !== "false");
+          }
+          if (data.settings.free_delivery_threshold) {
+            const val = Number(data.settings.free_delivery_threshold);
+            if (val > 0) setDeliveryThreshold(val);
+          }
         }
       })
       .catch(() => {});
@@ -332,9 +341,15 @@ export function HomePageClient({
                       <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-white/10 text-white border border-white/20">
                         <ShieldCheck className="h-8 w-8 text-[#DFCA9B]" />
                       </div>
-                      <h3 className="font-display text-2xl text-white font-normal">Complimentary Doha Delivery</h3>
+                      <h3 className="font-display text-2xl text-white font-normal">
+                        {freeDeliveryEnabled && deliveryThreshold > 0
+                          ? "Complimentary Doha Delivery"
+                          : "Express Doha Dispatch"}
+                      </h3>
                       <p className="text-xs text-neutral-400 max-w-xs leading-relaxed">
-                        Enjoy complimentary express courier delivery on all orders over QR 100 in the State of Qatar.
+                        {freeDeliveryEnabled && deliveryThreshold > 0
+                          ? `Enjoy complimentary express courier delivery on all orders over QR ${deliveryThreshold} in the State of Qatar.`
+                          : "Enjoy swift express courier dispatch across Doha, Lusail, and all Qatar municipalities."}
                       </p>
                       <Link
                         href="/shop"

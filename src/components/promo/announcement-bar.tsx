@@ -1,25 +1,7 @@
 "use client";
 
-import { useState, useEffect, useSyncExternalStore } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
-
-const ANNOUNCEMENTS = [
-  {
-    text: "Complimentary Doha Express Delivery on Orders Over QR 100",
-    badge: "FREE DELIVERY",
-    link: "/shop",
-  },
-  {
-    text: "20% OFF Your First Order — Use Code: WELCOME20",
-    badge: "EXCLUSIVE",
-    link: "/shop",
-  },
-  {
-    text: "Bespoke Aerospace Composites • 100% Precision Fit Guarantee",
-    badge: "PRECISION FIT",
-    link: "/about",
-  },
-];
 
 const DISMISSED_KEY = "casele_announcement_dismissed_v2";
 
@@ -59,36 +41,8 @@ export function AnnouncementBar() {
       .catch(() => {});
   }, []);
 
-  // Rotate announcements with smooth transition
-  useEffect(() => {
-    if (isDismissed) return;
-
-    const interval = setInterval(() => {
-      setIsTransitioning(true);
-      setTimeout(() => {
-        setCurrent((prev) => (prev + 1) % ANNOUNCEMENTS.length);
-        setIsTransitioning(false);
-      }, 250);
-    }, 5500);
-    return () => clearInterval(interval);
-  }, [isDismissed]);
-
-  const handleDismiss = () => {
-    setIsDismissed(true);
-    try {
-      localStorage.setItem(DISMISSED_KEY, "true");
-    } catch {
-      // Ignore storage errors
-    }
-  };
-
-  // If dismissed or checking initial state, do not render (prevents flash)
-  if (isDismissed === true || isDismissed === null) {
-    return null;
-  }
-
   const announcementsList = [
-    ...(freeDeliveryEnabled
+    ...(freeDeliveryEnabled && deliveryThreshold > 0
       ? [
           {
             text:
@@ -110,6 +64,34 @@ export function AnnouncementBar() {
       link: "/about",
     },
   ];
+
+  // Rotate announcements with smooth transition
+  useEffect(() => {
+    if (isDismissed || announcementsList.length <= 1) return;
+
+    const interval = setInterval(() => {
+      setIsTransitioning(true);
+      setTimeout(() => {
+        setCurrent((prev) => (prev + 1) % announcementsList.length);
+        setIsTransitioning(false);
+      }, 250);
+    }, 5500);
+    return () => clearInterval(interval);
+  }, [isDismissed, announcementsList.length]);
+
+  const handleDismiss = () => {
+    setIsDismissed(true);
+    try {
+      localStorage.setItem(DISMISSED_KEY, "true");
+    } catch {
+      // Ignore storage errors
+    }
+  };
+
+  // If dismissed or checking initial state, do not render
+  if (isDismissed === true || isDismissed === null || announcementsList.length === 0) {
+    return null;
+  }
 
   const item = announcementsList[current % announcementsList.length];
 
@@ -146,26 +128,28 @@ export function AnnouncementBar() {
 
         {/* Right dots & close */}
         <div className="flex items-center gap-3 w-24 justify-end shrink-0">
-          <div className="hidden sm:flex items-center gap-1">
-            {ANNOUNCEMENTS.map((_, i) => (
-              <button
-                key={i}
-                onClick={() => {
-                  setIsTransitioning(true);
-                  setTimeout(() => {
-                    setCurrent(i);
-                    setIsTransitioning(false);
-                  }, 150);
-                }}
-                aria-label={`Go to announcement ${i + 1}`}
-                className={`rounded-full transition-all duration-300 cursor-pointer ${
-                  i === current
-                    ? "w-3.5 h-1 bg-[#C5A869]"
-                    : "w-1 h-1 bg-white/30 hover:bg-white/60"
-                }`}
-              />
-            ))}
-          </div>
+          {announcementsList.length > 1 && (
+            <div className="hidden sm:flex items-center gap-1">
+              {announcementsList.map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => {
+                    setIsTransitioning(true);
+                    setTimeout(() => {
+                      setCurrent(i);
+                      setIsTransitioning(false);
+                    }, 150);
+                  }}
+                  aria-label={`Go to announcement ${i + 1}`}
+                  className={`rounded-full transition-all duration-300 cursor-pointer ${
+                    i === (current % announcementsList.length)
+                      ? "w-3.5 h-1 bg-[#C5A869]"
+                      : "w-1 h-1 bg-white/30 hover:bg-white/60"
+                  }`}
+                />
+              ))}
+            </div>
+          )}
 
           <button
             onClick={handleDismiss}

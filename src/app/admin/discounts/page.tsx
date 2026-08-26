@@ -221,6 +221,55 @@ export default function AdminDiscountsPage() {
   };
 
   // ─── Bundle Settings Actions ──────────────────────────────────
+  const handleToggleBundleMaster = async () => {
+    const nextVal = bundleEnabled === "true" ? "false" : "true";
+    setBundleEnabled(nextVal);
+    try {
+      const res = await fetch("/api/settings", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          settings: {
+            bundle_discounts_enabled: nextVal,
+          },
+        }),
+      });
+      if (res.ok) {
+        toast(
+          `Multi-case bundle discounts are now ${nextVal === "true" ? "ACTIVE" : "DEACTIVATED"}`,
+          nextVal === "true" ? "success" : "info"
+        );
+      }
+    } catch {
+      toast("Failed to update bundle discount setting", "error");
+    }
+  };
+
+  const handleToggleFreeDelivery = async () => {
+    const nextVal = freeDeliveryEnabled === "false" ? "true" : "false";
+    setFreeDeliveryEnabled(nextVal);
+    try {
+      const res = await fetch("/api/settings", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          settings: {
+            free_delivery_enabled: nextVal,
+            free_delivery_threshold: freeDeliveryThreshold,
+          },
+        }),
+      });
+      if (res.ok) {
+        toast(
+          `Free delivery threshold is now ${nextVal === "true" ? "ACTIVE" : "DEACTIVATED"} across all store pages`,
+          nextVal === "true" ? "success" : "info"
+        );
+      }
+    } catch {
+      toast("Failed to update free delivery setting", "error");
+    }
+  };
+
   const handleSaveBundleSettings = async () => {
     try {
       setSavingSettings(true);
@@ -554,7 +603,7 @@ export default function AdminDiscountsPage() {
               {/* Deactivate switch */}
               <button
                 type="button"
-                onClick={() => setBundleEnabled(bundleEnabled === "true" ? "false" : "true")}
+                onClick={handleToggleBundleMaster}
                 className={`inline-flex items-center gap-1.5 rounded-xl px-3 py-1 text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer ${
                   bundleEnabled === "true"
                     ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
@@ -599,7 +648,7 @@ export default function AdminDiscountsPage() {
               </div>
               <button
                 type="button"
-                onClick={() => setFreeDeliveryEnabled(freeDeliveryEnabled === "false" ? "true" : "false")}
+                onClick={handleToggleFreeDelivery}
                 className={`inline-flex items-center gap-1.5 rounded-xl px-3 py-1 text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer ${
                   freeDeliveryEnabled !== "false"
                     ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
