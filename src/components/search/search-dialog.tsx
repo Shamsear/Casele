@@ -1,22 +1,22 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useSearchStore } from "@/lib/store/search";
-import { PRODUCTS, MODELS } from "@/lib/data";
-import { Price } from "@/components/ui/price";
-import { Search, Smartphone, X, ArrowRight, Sparkles } from "lucide-react";
+import { PRODUCTS } from "@/lib/data";
+import { getRecentlyViewed, clearRecentlyViewed } from "@/lib/recently-viewed";
+import { Search, X } from "lucide-react";
 
 export function SearchDialog() {
   const { isOpen, query, setOpen, setQuery } = useSearchStore();
   const inputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
-  const [liveProducts, setLiveProducts] = useState(PRODUCTS);
-  const [liveModels, setLiveModels] = useState(MODELS);
 
-  // Fetch live products & models on mount
+  const [liveProducts, setLiveProducts] = useState(PRODUCTS);
+  const [recentIds, setRecentIds] = useState<string[]>([]);
+
+  // Fetch live products on mount
   useEffect(() => {
     fetch("/api/products")
       .then((res) => res.json())
@@ -24,14 +24,14 @@ export function SearchDialog() {
         if (Array.isArray(data) && data.length > 0) setLiveProducts(data);
       })
       .catch(() => {});
-
-    fetch("/api/models")
-      .then((res) => res.json())
-      .then((data) => {
-        if (Array.isArray(data) && data.length > 0) setLiveModels(data);
-      })
-      .catch(() => {});
   }, []);
+
+  // Load recently viewed items when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      setRecentIds(getRecentlyViewed());
+    }
+  }, [isOpen]);
 
   // Keyboard shortcut Cmd/Ctrl + K and Escape
   useEffect(() => {
@@ -49,7 +49,7 @@ export function SearchDialog() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [isOpen, setOpen]);
 
-  // Autofocus input when dialog opens
+  // Autofocus input when dialog opens & lock body scroll
   useEffect(() => {
     if (isOpen) {
       setTimeout(() => {
@@ -66,204 +66,225 @@ export function SearchDialog() {
 
   if (!isOpen) return null;
 
-  const filteredProducts =
-    query.trim().length > 0
-      ? liveProducts.filter(
-          (p) =>
-            p.name.toLowerCase().includes(query.toLowerCase()) ||
-            p.modelName?.toLowerCase().includes(query.toLowerCase()) ||
-            p.description?.toLowerCase().includes(query.toLowerCase())
-        ).slice(0, 6)
-      : [];
-
-  const filteredModels =
-    query.trim().length > 0
-      ? liveModels.filter(
-          (m) =>
-            m.name?.toLowerCase().includes(query.toLowerCase()) ||
-            m.brand?.toLowerCase().includes(query.toLowerCase())
-        ).slice(0, 4)
-      : [];
-
-  const hasResults = filteredProducts.length > 0 || filteredModels.length > 0;
-
   const handleSelect = (url: string) => {
     setOpen(false);
     setQuery("");
     router.push(url);
   };
 
+  const handleClearRecent = () => {
+    clearRecentlyViewed();
+    setRecentIds([]);
+  };
+
+  // Filter products by query
+  const trimmedQuery = query.trim().toLowerCase();
+  const filteredProducts =
+    trimmedQuery.length > 0
+      ? liveProducts.filter(
+          (p) =>
+            p.name.toLowerCase().includes(trimmedQuery) ||
+            p.modelName?.toLowerCase().includes(trimmedQuery) ||
+            p.description?.toLowerCase().includes(trimmedQuery) ||
+            p.categoryName?.toLowerCase().includes(trimmedQuery)
+        )
+      : [];
+
+  // Get recently viewed products (or default top 2 if empty)
+  const resolvedRecentProducts = recentIds
+    .map((id) => liveProducts.find((p) => p.id === id || p.slug === id))
+    .filter((p): p is (typeof liveProducts)[0] => Boolean(p))
+    .slice(0, 4);
+
+  // If no recently viewed in localStorage yet, fallback to top 2 popular products
+  const displayRecentProducts =
+    resolvedRecentProducts.length > 0 ? resolvedRecentProducts : liveProducts.slice(0, 2);
+
+  // Main products grid
+  const allDisplayProducts = liveProducts.slice(0, 8);
+
+  const formatQar = (price: string | number) => {
+    const num = typeof price === "number" ? price : parseFloat(price);
+    return `QAR ${isNaN(num) ? price : num.toFixed(2).replace(".", ",")}`;
+  };
+
   return (
-    <div className="fixed inset-0 z-[100] flex items-start justify-center pt-4 sm:pt-20 px-3 sm:px-4">
+    <div className="fixed inset-0 z-[100] flex items-start justify-center pt-3 sm:pt-16 px-3 sm:px-6">
       {/* Backdrop overlay */}
       <div
-        className="fixed inset-0 bg-neutral-950/60 backdrop-blur-md transition-opacity duration-300 animate-fade-in"
+        className="fixed inset-0 bg-neutral-950/50 backdrop-blur-sm transition-opacity duration-300 animate-fade-in"
         onClick={() => setOpen(false)}
       />
 
-      {/* Search Modal Content */}
-      <div className="relative w-full max-w-2xl overflow-hidden rounded-3xl border border-neutral-200/80 bg-white shadow-2xl z-10 animate-scale-in">
-        {/* Search Input Bar */}
-        <div className="flex items-center gap-3 border-b border-neutral-200/80 px-4 sm:px-5 py-3.5 sm:py-4">
-          <Search className="h-5 w-5 text-neutral-400 shrink-0" />
+      {/* Search Modal Card */}
+      <div className="relative w-full max-w-2xl overflow-hidden rounded-2xl sm:rounded-3xl border border-neutral-200/90 bg-white shadow-[0_20px_60px_rgba(0,0,0,0.2)] z-10 animate-scale-in flex flex-col max-h-[85vh]">
+        {/* Search Header */}
+        <div className="flex items-center gap-3 border-b border-neutral-100 px-5 sm:px-6 py-3.5 sm:py-4">
+          <Search className="h-4 w-4 sm:h-5 sm:w-5 text-neutral-500 shrink-0 stroke-[2.2]" />
           <input
             ref={inputRef}
             type="text"
-            placeholder="Search cases, flagships, or styles..."
+            placeholder="Search"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            className="flex-1 bg-transparent text-sm sm:text-base text-neutral-950 placeholder:text-neutral-400 focus:outline-none font-medium"
+            className="flex-1 bg-transparent text-sm sm:text-base text-neutral-900 placeholder:text-neutral-500 focus:outline-none font-normal"
           />
-          {query ? (
-            <button
-              onClick={() => setQuery("")}
-              className="flex h-7 w-7 items-center justify-center rounded-full text-neutral-400 hover:text-neutral-950 hover:bg-neutral-100 transition-colors cursor-pointer"
-              aria-label="Clear search query"
-            >
-              <X className="h-4 w-4" />
-            </button>
-          ) : (
-            <kbd className="hidden sm:inline-flex items-center gap-0.5 rounded-md border border-neutral-200 bg-neutral-50 px-2 py-0.5 text-[10px] font-semibold text-neutral-400 font-mono">
-              ESC
-            </kbd>
-          )}
           <button
-            onClick={() => setOpen(false)}
-            className="sm:hidden text-xs font-bold uppercase tracking-wider text-neutral-500 hover:text-neutral-950 px-2 py-1 cursor-pointer"
+            onClick={() => {
+              if (query) {
+                setQuery("");
+                inputRef.current?.focus();
+              } else {
+                setOpen(false);
+              }
+            }}
+            className="text-neutral-700 hover:text-neutral-950 p-1 transition-colors cursor-pointer"
+            aria-label="Close search"
           >
-            Cancel
+            <X className="h-4 w-4 sm:h-5 sm:w-5 stroke-[2]" />
           </button>
         </div>
 
-        {/* Results Container */}
-        <div className="max-h-[60vh] sm:max-h-[65vh] overflow-y-auto p-4 sm:p-5">
-          {query.trim().length === 0 ? (
-            <div className="space-y-4">
-              <div className="flex items-center gap-2">
-                <Sparkles className="h-4 w-4 text-[#A88B4D]" />
-                <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-widest">
-                  Trending Collections & Flagships
-                </span>
+        {/* Search Body Content */}
+        <div className="overflow-y-auto p-5 sm:p-6 space-y-6 sm:space-y-7">
+          {trimmedQuery.length > 0 ? (
+            /* ═══ Active Search Results ═══ */
+            <div>
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-xs sm:text-sm font-normal text-neutral-600">
+                  Products ({filteredProducts.length})
+                </h3>
               </div>
-              <div className="flex flex-wrap gap-2">
-                {[
-                  "iPhone 15 Pro",
-                  "Samsung S24 Ultra",
-                  "Luxe Leather",
-                  "Carbon Armor",
-                  "Matte Velvet",
-                  "Crystal Clear",
-                  "Titanium Gray",
-                ].map((term) => (
-                  <button
-                    key={term}
-                    onClick={() => {
-                      setQuery(term);
-                      inputRef.current?.focus();
-                    }}
-                    className="rounded-xl border border-neutral-200/80 bg-neutral-50/80 px-3.5 py-1.5 text-xs font-medium text-neutral-700 transition-all hover:border-neutral-950 hover:bg-neutral-950 hover:text-white cursor-pointer"
-                  >
-                    {term}
-                  </button>
-                ))}
-              </div>
-            </div>
-          ) : !hasResults ? (
-            <div className="py-12 text-center">
-              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-neutral-100 text-neutral-400 mb-3">
-                <Search className="h-6 w-6" />
-              </div>
-              <p className="text-sm font-semibold text-neutral-900">
-                No cases found matching &ldquo;{query}&rdquo;
-              </p>
-              <p className="mt-1 text-xs text-neutral-500">
-                Try searching by model (e.g. iPhone 15, S24) or finish type (Matte, Glossy).
-              </p>
+
+              {filteredProducts.length === 0 ? (
+                <div className="py-12 text-center space-y-2">
+                  <p className="text-sm font-medium text-neutral-900">
+                    No cases found for &ldquo;{query}&rdquo;
+                  </p>
+                  <p className="text-xs text-neutral-400">
+                    Try searching by model (e.g. iPhone 15, S24) or collection
+                  </p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-5">
+                  {filteredProducts.map((product) => (
+                    <button
+                      key={product.id}
+                      onClick={() => handleSelect(`/shop/${product.modelSlug || "iphone-15-pro"}/${product.slug}`)}
+                      className="group flex flex-col text-left transition-all hover:opacity-85 cursor-pointer"
+                    >
+                      {/* Portrait Image Canvas */}
+                      <div className="relative aspect-[3/4] w-full overflow-hidden rounded-2xl bg-neutral-50 p-2 sm:p-3 flex items-center justify-center">
+                        <Image
+                          src={product.images[0] || "/images/products/midnight-black.svg"}
+                          alt={product.name}
+                          fill
+                          className="object-contain p-1.5 transition-transform duration-300 group-hover:scale-105"
+                          sizes="(max-width: 640px) 50vw, 25vw"
+                        />
+                      </div>
+
+                      {/* Product Title & Pricing */}
+                      <div className="mt-2 space-y-0.5">
+                        <p className="text-xs sm:text-sm font-normal text-neutral-800 leading-snug line-clamp-2">
+                          {product.name} | Phone Case
+                        </p>
+                        <p className="text-xs sm:text-sm text-neutral-500 font-normal">
+                          {formatQar(product.price)}
+                        </p>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
           ) : (
-            <div className="space-y-6">
-              {/* Compatible Device Models */}
-              {filteredModels.length > 0 && (
-                <div>
-                  <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-widest block mb-2.5">
-                    Compatible Flagships
-                  </span>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                    {filteredModels.map((model) => (
-                      <button
-                        key={model.id}
-                        onClick={() => handleSelect(`/shop/${model.slug}`)}
-                        className="flex items-center justify-between rounded-2xl border border-neutral-200/80 bg-neutral-50/60 p-3 text-left transition-all hover:border-neutral-950 hover:bg-white hover:shadow-xs group cursor-pointer"
-                      >
-                        <div className="flex items-center gap-3">
-                          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-white border border-neutral-200/80 text-neutral-800 group-hover:bg-neutral-950 group-hover:text-white transition-colors">
-                            <Smartphone className="h-4 w-4" />
-                          </div>
-                          <div>
-                            <p className="text-xs font-bold text-neutral-950">{model.name}</p>
-                            <p className="text-[10px] text-neutral-500">{model.count} Styles Available</p>
-                          </div>
-                        </div>
-                        <ArrowRight className="h-4 w-4 text-neutral-400 opacity-0 group-hover:opacity-100 transition-opacity" />
-                      </button>
-                    ))}
-                  </div>
+            /* ═══ Default View: Recently Viewed + Products ═══ */
+            <>
+              {/* Section 1: Recently Viewed */}
+              <div>
+                <div className="flex items-center justify-between mb-3.5">
+                  <h3 className="text-xs sm:text-sm font-normal text-neutral-600">
+                    Recently viewed
+                  </h3>
+                  {displayRecentProducts.length > 0 && (
+                    <button
+                      onClick={handleClearRecent}
+                      className="text-xs text-neutral-400 hover:text-neutral-700 transition-colors cursor-pointer"
+                    >
+                      Clear
+                    </button>
+                  )}
                 </div>
-              )}
 
-              {/* Matching Case Products */}
-              {filteredProducts.length > 0 && (
-                <div>
-                  <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-widest block mb-2.5">
-                    Protective Cases ({filteredProducts.length})
-                  </span>
-                  <div className="space-y-2">
-                    {filteredProducts.map((product) => (
-                      <button
-                        key={product.id}
-                        onClick={() => handleSelect(`/shop/${product.modelSlug}/${product.slug}`)}
-                        className="flex w-full items-center gap-3.5 rounded-2xl border border-neutral-200/80 bg-white p-3 text-left transition-all hover:border-neutral-950 hover:shadow-xs group cursor-pointer"
-                      >
-                        <div className="relative h-12 w-12 flex-shrink-0 overflow-hidden rounded-xl bg-neutral-100 border border-neutral-200/60">
-                          <Image
-                            src={product.images[0]}
-                            alt={product.name}
-                            fill
-                            className="object-contain p-1.5 transition-transform group-hover:scale-105"
-                            sizes="48px"
-                          />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-xs font-bold text-neutral-950 truncate group-hover:text-[#A88B4D] transition-colors">
-                            {product.name}
-                          </p>
-                          <div className="flex items-center gap-2 mt-0.5">
-                            <span className="text-[10px] font-medium text-neutral-500">{product.modelName}</span>
-                            <span className="text-[9px] font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.2 rounded">In Stock</span>
-                          </div>
-                        </div>
-                        <Price price={product.price} size="sm" showBadge={false} />
-                      </button>
-                    ))}
-                  </div>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-5">
+                  {displayRecentProducts.map((product) => (
+                    <button
+                      key={product.id}
+                      onClick={() => handleSelect(`/shop/${product.modelSlug || "iphone-15-pro"}/${product.slug}`)}
+                      className="group flex flex-col text-left transition-all hover:opacity-85 cursor-pointer"
+                    >
+                      <div className="relative aspect-[3/4] w-full overflow-hidden rounded-2xl bg-neutral-50 p-2 sm:p-3 flex items-center justify-center">
+                        <Image
+                          src={product.images[0] || "/images/products/midnight-black.svg"}
+                          alt={product.name}
+                          fill
+                          className="object-contain p-1.5 transition-transform duration-300 group-hover:scale-105"
+                          sizes="(max-width: 640px) 50vw, 25vw"
+                        />
+                      </div>
+                      <div className="mt-2 space-y-0.5">
+                        <p className="text-xs sm:text-sm font-normal text-neutral-800 leading-snug line-clamp-2">
+                          {product.name} | Phone Case
+                        </p>
+                        <p className="text-xs sm:text-sm text-neutral-500 font-normal">
+                          {formatQar(product.price)}
+                        </p>
+                      </div>
+                    </button>
+                  ))}
                 </div>
-              )}
-            </div>
+              </div>
+
+              {/* Section 2: Products */}
+              <div>
+                <div className="flex items-center justify-between mb-3.5">
+                  <h3 className="text-xs sm:text-sm font-normal text-neutral-600">
+                    Products
+                  </h3>
+                </div>
+
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-5">
+                  {allDisplayProducts.map((product) => (
+                    <button
+                      key={product.id}
+                      onClick={() => handleSelect(`/shop/${product.modelSlug || "iphone-15-pro"}/${product.slug}`)}
+                      className="group flex flex-col text-left transition-all hover:opacity-85 cursor-pointer"
+                    >
+                      <div className="relative aspect-[3/4] w-full overflow-hidden rounded-2xl bg-neutral-50 p-2 sm:p-3 flex items-center justify-center">
+                        <Image
+                          src={product.images[0] || "/images/products/midnight-black.svg"}
+                          alt={product.name}
+                          fill
+                          className="object-contain p-1.5 transition-transform duration-300 group-hover:scale-105"
+                          sizes="(max-width: 640px) 50vw, 25vw"
+                        />
+                      </div>
+                      <div className="mt-2 space-y-0.5">
+                        <p className="text-xs sm:text-sm font-normal text-neutral-800 leading-snug line-clamp-2">
+                          {product.name} | Phone Case
+                        </p>
+                        <p className="text-xs sm:text-sm text-neutral-500 font-normal">
+                          {formatQar(product.price)}
+                        </p>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </>
           )}
         </div>
-
-        {/* Footer with Search Page Shortcut */}
-        {query.trim().length > 0 && (
-          <div className="border-t border-neutral-200/80 bg-neutral-50 px-4 py-3 text-center sm:text-right">
-            <button
-              onClick={() => handleSelect(`/search?q=${encodeURIComponent(query)}`)}
-              className="text-xs font-bold uppercase tracking-wider text-neutral-900 hover:text-[#A88B4D] inline-flex items-center gap-1.5 transition-colors cursor-pointer"
-            >
-              <span>View all results for &ldquo;{query}&rdquo;</span>
-              <ArrowRight className="h-3.5 w-3.5" />
-            </button>
-          </div>
-        )}
       </div>
     </div>
   );
