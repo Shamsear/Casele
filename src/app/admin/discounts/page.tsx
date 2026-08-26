@@ -54,7 +54,6 @@ export default function AdminDiscountsPage() {
   const [freeDeliveryThreshold, setFreeDeliveryThreshold] = useState("100");
   const [freeDeliveryEnabled, setFreeDeliveryEnabled] = useState(true);
   const [bundleEnabled, setBundleEnabled] = useState(true);
-  const [tierEnabled, setTierEnabled] = useState("true");
   const [savingSettings, setSavingSettings] = useState(false);
   const [togglingBundle, setTogglingBundle] = useState(false);
   const [togglingDelivery, setTogglingDelivery] = useState(false);
@@ -117,45 +116,36 @@ export default function AdminDiscountsPage() {
           setFreeDeliveryEnabled(Boolean(data.config.isFreeDeliveryActive));
         }
       }
-
-      // 3. Fetch Tier Master Setting
-      const resSettings = await fetch(`/api/settings?_t=${Date.now()}`);
-      if (resSettings.ok) {
-        const data = await resSettings.json();
-        if (data.settings?.tier_discounts_enabled !== undefined) {
-          setTierEnabled(String(data.settings.tier_discounts_enabled));
-        }
-      }
     } catch (err) {
       console.error("Failed to load rules:", err);
     }
   };
 
   // ─── Tiers Actions ─────────────────────────────────────────────
+  const isAnyTierActive = tiers.some((t) => t.isActive);
+
   const handleToggleTierMaster = async () => {
-    const nextVal = tierEnabled === "true" ? "false" : "true";
-    setTierEnabled(nextVal);
+    const nextActive = !isAnyTierActive;
     try {
-      const res = await fetch("/api/settings", {
+      const res = await fetch("/api/admin/discounts/tiered", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          settings: {
-            tier_discounts_enabled: nextVal,
-          },
+          toggleAll: true,
+          isActive: nextActive,
         }),
       });
       if (res.ok) {
         toast(
-          `Tiered spend discounts are now ${nextVal === "true" ? "ACTIVE" : "DISABLED"}`,
-          nextVal === "true" ? "success" : "info"
+          `All spend tiers are now ${nextActive ? "ACTIVE" : "DISABLED"} in database`,
+          nextActive ? "success" : "info"
         );
+        setTiers((prev) => prev.map((t) => ({ ...t, isActive: nextActive })));
       } else {
-        const err = await res.json().catch(() => ({}));
-        toast(err.error || "Failed to update tier discount setting", "error");
+        toast("Failed to update tier status", "error");
       }
     } catch {
-      toast("Failed to update tier discount setting", "error");
+      toast("Failed to update tier status", "error");
     }
   };
 
@@ -172,7 +162,7 @@ export default function AdminDiscountsPage() {
       });
 
       if (res.ok) {
-        toast(`Spend Tier (QR ${tier.minAmount}+) is now ${nextActive ? "ACTIVE" : "DISABLED"}`, nextActive ? "success" : "info");
+        toast(`Spend Tier (QR ${tier.minAmount}+) is now ${nextActive ? "ACTIVE" : "DISABLED"} in database`, nextActive ? "success" : "info");
         setTiers((prev) =>
           prev.map((t) => (t.id === tier.id ? { ...t, isActive: nextActive } : t))
         );
@@ -215,7 +205,7 @@ export default function AdminDiscountsPage() {
 
       if (res.ok) {
         toast(
-          `Flash sale is now ${nextActive ? "ACTIVE" : "DISABLED"}`,
+          `Flash sale is now ${nextActive ? "ACTIVE" : "DISABLED"} in database`,
           nextActive ? "success" : "info"
         );
         setFlashSales((prev) =>
@@ -409,15 +399,17 @@ export default function AdminDiscountsPage() {
         <div className="rounded-2xl border border-neutral-200/80 bg-white p-6 shadow-2xs space-y-6">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-neutral-100 pb-4">
             <div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2.5">
                 <h3 className="text-base font-bold text-neutral-950">Spend Tier Rules</h3>
-                {tierEnabled === "false" && (
-                  <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2 py-0.5 text-[10px] font-bold text-amber-700 border border-amber-200 uppercase">
-                    Disabled
-                  </span>
-                )}
+                <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border ${
+                  isAnyTierActive
+                    ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                    : "bg-neutral-100 text-neutral-500 border-neutral-200"
+                }`}>
+                  {isAnyTierActive ? "Active in DB" : "Disabled in DB"}
+                </span>
               </div>
-              <p className="text-xs text-neutral-500">
+              <p className="text-xs text-neutral-500 mt-0.5">
                 Automatic percentage savings triggered when cart subtotal reaches target amount
               </p>
             </div>
@@ -427,13 +419,13 @@ export default function AdminDiscountsPage() {
                 type="button"
                 onClick={handleToggleTierMaster}
                 className={`inline-flex items-center gap-1.5 rounded-xl px-3.5 py-2 text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer shadow-2xs ${
-                  tierEnabled === "true"
+                  isAnyTierActive
                     ? "bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100"
                     : "bg-neutral-100 text-neutral-600 border border-neutral-200 hover:bg-neutral-200"
                 }`}
               >
-                {tierEnabled === "true" ? <Power className="h-3.5 w-3.5 text-emerald-600" /> : <PowerOff className="h-3.5 w-3.5 text-neutral-400" />}
-                <span>{tierEnabled === "true" ? "Tiers Enabled" : "Tiers Disabled"}</span>
+                {isAnyTierActive ? <Power className="h-3.5 w-3.5 text-emerald-600" /> : <PowerOff className="h-3.5 w-3.5 text-neutral-400" />}
+                <span>{isAnyTierActive ? "Disable All Tiers" : "Enable All Tiers"}</span>
               </button>
 
               <Link
@@ -469,7 +461,7 @@ export default function AdminDiscountsPage() {
                 <div
                   key={tier.id}
                   className={`flex items-center justify-between gap-4 rounded-xl border p-4 transition-all hover:bg-neutral-50 ${
-                    tier.isActive && tierEnabled === "true"
+                    tier.isActive
                       ? "bg-neutral-50/50 border-neutral-200/70"
                       : "bg-neutral-50/20 border-neutral-200/40 opacity-70"
                   }`}
@@ -562,6 +554,7 @@ export default function AdminDiscountsPage() {
                     <div className="space-y-1">
                       <div className="flex items-center gap-2">
                         <h4 className="font-bold text-neutral-950 text-sm">{sale.name}</h4>
+                        {/* Live Timing Badge */}
                         {isLive && (
                           <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-emerald-700 border border-emerald-200">
                             <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
