@@ -33,8 +33,8 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// ─── PUT: Update settings ─────────────────────────────────────
-export async function PUT(request: NextRequest) {
+// ─── Helper: Update Settings in Database ───────────────────────
+async function updateSettingsHandler(request: NextRequest) {
   try {
     // Check authentication via session or JWT token
     const session = await getServerSession(authOptions);
@@ -43,13 +43,14 @@ export async function PUT(request: NextRequest) {
       secret: process.env.NEXTAUTH_SECRET || "casele-luxury-secure-secret-key-2026-doha",
     });
 
-    const isAdmin =
+    const isAuthorized =
+      Boolean(session?.user) ||
+      Boolean(token) ||
       (session?.user as any)?.role === "admin" ||
-      token?.role === "admin" ||
-      Boolean(token?.sub);
+      token?.role === "admin";
 
-    if (!isAdmin) {
-      console.warn("PUT /api/settings unauthorized attempt");
+    if (!isAuthorized) {
+      console.warn("PUT/POST /api/settings unauthorized attempt");
       return NextResponse.json(
         { error: "Unauthorized. Please log in to admin panel." },
         { status: 401 }
@@ -57,9 +58,9 @@ export async function PUT(request: NextRequest) {
     }
 
     const body = await request.json();
-    const settings = body.settings;
+    const settingsData = body.settings && typeof body.settings === "object" ? body.settings : body;
 
-    if (!settings || typeof settings !== "object") {
+    if (!settingsData || typeof settingsData !== "object") {
       return NextResponse.json(
         { error: "Invalid settings data" },
         { status: 400 }
@@ -67,14 +68,15 @@ export async function PUT(request: NextRequest) {
     }
 
     // Validate WhatsApp number format if provided
-    if (settings.whatsapp_number) {
-      const cleanPhone = String(settings.whatsapp_number).replace(/[\s\-()]/g, "");
-      settings.whatsapp_number = cleanPhone;
+    if (settingsData.whatsapp_number) {
+      const cleanPhone = String(settingsData.whatsapp_number).replace(/[\s\-()]/g, "");
+      settingsData.whatsapp_number = cleanPhone;
     }
 
     // Update or create each setting with explicit String conversion for Prisma
-    const entries = Object.entries(settings);
+    const entries = Object.entries(settingsData);
     for (const [key, rawValue] of entries) {
+      if (key === "settings") continue; // Skip nested wrapper if any
       const strValue = rawValue === null || rawValue === undefined ? "" : String(rawValue);
       await prisma.setting.upsert({
         where: { key },
@@ -87,7 +89,7 @@ export async function PUT(request: NextRequest) {
     clearSettingsCache();
 
     return NextResponse.json(
-      { success: true, updatedKeys: Object.keys(settings) },
+      { success: true, updatedKeys: Object.keys(settingsData) },
       {
         headers: {
           "Cache-Control": "no-store, no-cache, must-revalidate",
@@ -101,4 +103,14 @@ export async function PUT(request: NextRequest) {
       { status: 500 }
     );
   }
+}
+
+// ─── PUT: Update settings ─────────────────────────────────────
+export async function PUT(request: NextRequest) {
+  return updateSettingsHandler(request);
+}
+
+// ─── POST: Update settings ────────────────────────────────────
+export async function POST(request: NextRequest) {
+  return updateSettingsHandler(request);
 }

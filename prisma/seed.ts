@@ -92,49 +92,49 @@ async function main() {
     {
       name: "Midnight Black Premium Case", slug: "midnight-black-premium-case",
       description: "Crafted from premium materials, this case offers exceptional protection without compromising on style. The midnight black finish adds a touch of sophistication to your device.",
-      price: 79, comparePrice: 99, images: ["/images/products/midnight-black.jpg", "/images/products/midnight-black-angle.jpg"],
+      price: 79, comparePrice: 99, images: ["/images/products/midnight-black.svg", "/images/products/midnight-black-angle.svg"],
       badge: "bestseller", isFeatured: true, categoryId: premiumCat?.id,
     },
     {
       name: "Gold Edge Luxe Case", slug: "gold-edge-luxe-case",
       description: "A statement piece for those who appreciate the finer things. Gold accents frame this premium case, making your device stand out from the crowd.",
-      price: 129, comparePrice: null, images: ["/images/products/gold-edge.jpg", "/images/products/gold-edge-angle.jpg"],
+      price: 129, comparePrice: null, images: ["/images/products/gold-edge.svg", "/images/products/gold-edge-angle.svg"],
       badge: "new", isFeatured: true, categoryId: premiumCat?.id,
     },
     {
       name: "Royal Blue Classic Case", slug: "royal-blue-classic-case",
       description: "Classic design meets modern protection. The deep royal blue color gives your phone a regal look while keeping it safe from daily wear.",
-      price: 59, comparePrice: 79, images: ["/images/products/royal-blue.jpg", "/images/products/royal-blue-angle.jpg"],
+      price: 59, comparePrice: 79, images: ["/images/products/royal-blue.svg", "/images/products/royal-blue-angle.svg"],
       badge: "sale", isFeatured: false, categoryId: classicCat?.id,
     },
     {
       name: "Matte Carbon Fiber Case", slug: "matte-carbon-fiber-case",
       description: "Lightweight yet incredibly strong. The carbon fiber texture adds a sporty, tech-forward aesthetic to your device.",
-      price: 89, comparePrice: null, images: ["/images/products/carbon-fiber.jpg", "/images/products/carbon-fiber-angle.jpg"],
+      price: 89, comparePrice: null, images: ["/images/products/carbon-fiber.svg", "/images/products/carbon-fiber-angle.svg"],
       badge: null, isFeatured: true, categoryId: sportCat?.id,
     },
     {
       name: "Clear Crystal Case", slug: "clear-crystal-case",
       description: "Show off your phone's original design while keeping it protected. Crystal clear, anti-yellowing material.",
-      price: 49, comparePrice: null, images: ["/images/products/clear-crystal.jpg"],
+      price: 49, comparePrice: null, images: ["/images/products/clear-crystal.svg"],
       badge: null, isFeatured: false, categoryId: classicCat?.id,
     },
     {
       name: "Rose Gold Slim Case", slug: "rose-gold-slim-case",
       description: "Ultra-slim profile with a stunning rose gold finish. Elegant protection that slips easily into your pocket.",
-      price: 69, comparePrice: 89, images: ["/images/products/rose-gold.jpg"],
+      price: 69, comparePrice: 89, images: ["/images/products/rose-gold.svg"],
       badge: "sale", isFeatured: false, categoryId: designerCat?.id,
     },
     {
       name: "Forest Green Leather Case", slug: "forest-green-leather-case",
       description: "Premium leather with a rich forest green hue. Ages beautifully over time, developing a unique patina.",
-      price: 119, comparePrice: null, images: ["/images/products/forest-green.jpg"],
+      price: 119, comparePrice: null, images: ["/images/products/forest-green.svg"],
       badge: "new", isFeatured: true, categoryId: premiumCat?.id,
     },
     {
       name: "Matte Black Armor Case", slug: "matte-black-armor-case",
       description: "Maximum protection with a tactical look. Reinforced corners and raised edges for ultimate device safety.",
-      price: 99, comparePrice: null, images: ["/images/products/matte-black.jpg"],
+      price: 99, comparePrice: null, images: ["/images/products/matte-black.svg"],
       badge: "bestseller", isFeatured: true, categoryId: sportCat?.id,
     },
   ];
@@ -142,7 +142,9 @@ async function main() {
   for (const product of products) {
     const created = await prisma.product.upsert({
       where: { slug: product.slug },
-      update: {},
+      update: {
+        images: product.images,
+      },
       create: {
         name: product.name,
         slug: product.slug,
@@ -226,22 +228,40 @@ async function main() {
     { key: "tax_rate", value: "0" }, // Qatar has no sales tax
     { key: "country", value: "Qatar" },
     { key: "city", value: "Doha" },
+    { key: "free_delivery_threshold", value: "100" },
+    { key: "free_delivery_enabled", value: "true" },
+    { key: "express_delivery_fee", value: "20" },
+    { key: "bundle_buy_2_discount", value: "5" },
+    { key: "bundle_buy_3_discount", value: "10" },
+    { key: "bundle_discounts_enabled", value: "true" },
+    { key: "tier_discounts_enabled", value: "true" },
+    { key: "social_proof_enabled", value: "true" },
+    { key: "flash_sale_banner_enabled", value: "true" },
+    { key: "bundle_suggestions_enabled", value: "true" },
+    { key: "hero_badge", value: "Doha, Qatar • Luxury Protection" },
+    { key: "hero_title", value: "Sculpted for Flagships." },
+    { key: "hero_subtitle", value: "Artistry in Armor." },
+    { key: "hero_description", value: "Every silhouette is machined with aerospace-grade composites and tactile metallic accents. Hand-finished in Qatar for discerning device owners." },
+    { key: "announcement_text", value: "Complimentary Doha Express Delivery on Orders Over QR 100" },
+    { key: "meta_title", value: "CASELÉ — Premium Phone Cases in Qatar" },
+    { key: "meta_description", value: "Premium mobile phone cases designed for style and durability. Shop now in Qatar." },
+    { key: "instagram", value: "https://www.instagram.com/casele_premium_mobile_case?igsi=MW55cTM4MmN6dGF3ag%3D%3D&utm_source=qr" },
+    { key: "website", value: "www.casele.co" },
   ];
 
   for (const setting of defaultSettings) {
     await prisma.setting.upsert({
       where: { key: setting.key },
-      update: {},
+      update: { value: setting.value },
       create: setting,
     });
   }
 
-  console.log("✅ Settings created");
+  console.log("✅ All settings created & synchronized");
 
   console.log("\n🎉 Seed complete!");
   console.log(`\n📧 Admin login: ${adminEmail}`);
   console.log(`🔑 Admin password: ${adminPassword}`);
-  console.log("\n⚠️  Change the admin password in production!");
 }
 
 main()
