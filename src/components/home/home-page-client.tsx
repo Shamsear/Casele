@@ -10,6 +10,7 @@ import { ExplodedLayers } from "@/components/home/exploded-layers";
 import { TestimonialsSection } from "@/components/home/testimonials-section";
 import { Reveal } from "@/components/ui/reveal";
 import { TiltCard } from "@/components/ui/tilt-card";
+import { HeroSpotlightCard } from "@/components/home/hero-spotlight-card";
 import type { ProductWithRelations, CategoryWithCount, ModelWithCount } from "@/lib/db/products";
 import {
   ArrowRight,
@@ -131,28 +132,9 @@ export function HomePageClient({
 
               {/* Right Hero Product Spotlight (5 Cols - Visible on desktop) */}
               <div className="hidden lg:flex lg:col-span-5 justify-center">
-                <Reveal animation="scale-up" delay={150} className="w-full max-w-[260px] xl:max-w-[285px]">
-                  <TiltCard maxTilt={6} scale={1.02}>
-                    <div className="group relative w-full aspect-[4/5] rounded-3xl bg-white border border-neutral-200/80 p-3.5 xl:p-4 flex items-center justify-center shadow-md transition-shadow duration-500 hover:shadow-xl">
-                      {/* Floating Tag */}
-                      <div className="absolute top-2.5 left-2.5 z-10">
-                        <span className="inline-flex items-center rounded-full bg-neutral-950 px-2 py-0.5 text-[8.5px] font-bold text-white uppercase tracking-wider shadow-xs">
-                          Studio Spotlight
-                        </span>
-                      </div>
-
-                      {/* Spotlight Product Image */}
-                      <div className="relative h-full w-full">
-                        <Image
-                          src={featuredProducts[0]?.images[0] || "/images/products/gold-edge.svg"}
-                          alt="CASELÉ Bespoke Protection"
-                          fill
-                          priority
-                          className="object-contain transition-transform duration-700 ease-out group-hover:scale-105"
-                          sizes="285px"
-                        />
-                      </div>
-                    </div>
+                <Reveal animation="scale-up" delay={150} className="w-full max-w-[280px] xl:max-w-[310px]">
+                  <TiltCard maxTilt={5} scale={1.01}>
+                    <HeroSpotlightCard products={featuredProducts.length > 0 ? featuredProducts : allProducts} />
                   </TiltCard>
                 </Reveal>
               </div>
