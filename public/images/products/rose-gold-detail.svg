@@ -3,7 +3,7 @@
     <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#0D0D0D"/><stop offset="100%" style="stop-color:#111"/></linearGradient>
     <linearGradient id="rose" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" style="stop-color:#C48B8B"/><stop offset="50%" style="stop-color:#E8B4B8"/><stop offset="100%" style="stop-color:#D4A0A0"/></linearGradient>
   </defs>
-  <rect width="400" height="400" fill="url(#bg)"/>
+  
   <g transform="translate(30,50) scale(1.15)">
     <rect x="0" y="0" width="300" height="260" rx="18" fill="#D4A0A0" stroke="url(#rose)" stroke-width="2"/>
     <line x1="0" y1="130" x2="300" y2="130" stroke="url(#rose)" stroke-width="1.5" opacity="0.4"/>

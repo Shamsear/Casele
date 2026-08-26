@@ -10,7 +10,7 @@
       <stop offset="100%" style="stop-color:#D4AF37"/>
     </linearGradient>
   </defs>
-  <rect width="400" height="400" fill="url(#bg)"/>
+  
   <!-- Close-up of gold edge detail -->
   <g transform="translate(30,60) scale(1.1)">
     <rect x="0" y="0" width="300" height="280" rx="20" fill="#1a1a1a" stroke="url(#gold)" stroke-width="3"/>

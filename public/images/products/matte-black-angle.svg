@@ -4,7 +4,7 @@
     <linearGradient id="armor" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#111"/><stop offset="50%" style="stop-color:#0D0D0D"/><stop offset="100%" style="stop-color:#1a1a1a"/></linearGradient>
     <filter id="sh"><feDropShadow dx="4" dy="8" stdDeviation="12" flood-color="#000" flood-opacity="0.6"/></filter>
   </defs>
-  <rect width="400" height="400" fill="url(#bg)"/>
+  
   <g transform="translate(200,200) rotate(-8) translate(-160,-200)" filter="url(#sh)">
     <!-- Reinforced corners -->
     <rect x="-4" y="-4" width="328" height="408" rx="32" fill="#1a1a1a" stroke="#333" stroke-width="1"/>

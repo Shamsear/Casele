@@ -5,7 +5,7 @@
       <stop offset="100%" style="stop-color:#111"/>
     </linearGradient>
   </defs>
-  <rect width="400" height="400" fill="url(#bg2)"/>
+  
   <!-- Close-up of corner/texture -->
   <g transform="translate(50,30) scale(1.2)">
     <rect x="0" y="0" width="280" height="280" rx="20" fill="#0D0D0D" stroke="#222" stroke-width="0.5"/>

@@ -13,7 +13,7 @@
       <feDropShadow dx="4" dy="8" stdDeviation="12" flood-color="#000" flood-opacity="0.5"/>
     </filter>
   </defs>
-  <rect width="400" height="400" fill="url(#bg)"/>
+  
   <!-- Phone body angled -->
   <g transform="translate(200,200) rotate(-8) translate(-160,-200)" filter="url(#shadow1)">
     <rect x="0" y="0" width="320" height="400" rx="28" fill="#111" stroke="#222" stroke-width="1"/>
