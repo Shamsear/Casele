@@ -16,6 +16,8 @@ interface ProductGalleryProps {
 export function ProductGallery({ images, alt, badge, discount }: ProductGalleryProps) {
   const [activeIndex, setActiveIndex] = useState(0);
   const [lightbox, setLightbox] = useState(false);
+  const [isZoomed, setIsZoomed] = useState(false);
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
 
   const touchStartX = useRef<number>(0);
   const touchStartY = useRef<number>(0);
@@ -77,57 +79,80 @@ export function ProductGallery({ images, alt, badge, discount }: ProductGalleryP
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [goToNext, goToPrev, hasMultiple]);
 
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width) * 100;
+    const y = ((e.clientY - rect.top) / rect.height) * 100;
+    setMousePos({ x, y });
+  };
+
   return (
     <>
-      <div className="flex flex-col gap-4 select-none">
-        {/* Main Stage Container */}
+      <div className="flex flex-col gap-5 select-none w-full">
+        {/* Huge Unconstrained Stage — Shelled style (No container box, No gray border) */}
         <div
-          className="product-gallery-primary-img relative aspect-square w-full overflow-hidden rounded-3xl bg-neutral-100/60 border border-neutral-200/80 touch-pan-y group"
+          className="product-gallery-primary-img relative aspect-[4/5] sm:aspect-[4/5] lg:aspect-[3/4] xl:aspect-[4/5] w-full max-h-[780px] overflow-hidden rounded-2xl touch-pan-y group cursor-zoom-in"
           onTouchStart={handleTouchStart}
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
+          onMouseEnter={() => setIsZoomed(true)}
+          onMouseLeave={() => setIsZoomed(false)}
+          onMouseMove={handleMouseMove}
+          onClick={() => setLightbox(true)}
         >
           {/* Images */}
           {allImages.map((img, idx) => (
             <div
               key={idx}
               className={cn(
-                "absolute inset-0 transition-opacity duration-300 cursor-pointer flex items-center justify-center",
+                "absolute inset-0 transition-opacity duration-300 flex items-center justify-center",
                 idx === activeIndex ? "opacity-100 z-0" : "opacity-0 pointer-events-none -z-10"
               )}
-              onClick={() => setLightbox(true)}
             >
               <Image
                 src={img}
                 alt={`${alt} view ${idx + 1}`}
                 fill
-                className="object-contain p-6 sm:p-12 transition-transform duration-700 group-hover:scale-102"
+                className={cn(
+                  "object-contain p-0 transition-transform duration-300 ease-out drop-shadow-2xl",
+                  isZoomed && idx === activeIndex ? "scale-125" : "scale-100"
+                )}
+                style={
+                  isZoomed && idx === activeIndex
+                    ? {
+                        transformOrigin: `${mousePos.x}% ${mousePos.y}%`,
+                      }
+                    : undefined
+                }
                 priority={idx === 0}
-                sizes="(max-width: 1024px) 100vw, 55vw"
+                sizes="(max-width: 1024px) 100vw, 65vw"
               />
             </div>
           ))}
 
-          {/* Badges */}
-          <div className="absolute top-4 left-4 flex gap-1.5 z-10 pointer-events-none">
+          {/* Floating Badges */}
+          <div className="absolute top-3 left-3 flex gap-2 z-10 pointer-events-none">
             {badge && <ProductBadge badge={badge} />}
             {discount && discount > 0 ? (
-              <span className="rounded-md bg-red-50 border border-red-200 px-2 py-0.5 text-[9px] font-bold tracking-wider text-red-700 uppercase">
+              <span className="rounded-full bg-neutral-950/90 text-white px-3 py-1 text-[10px] font-bold tracking-widest uppercase shadow-md backdrop-blur-sm">
                 Save {discount}%
               </span>
             ) : null}
           </div>
 
-          {/* Zoom button */}
+          {/* Expand Button */}
           <button
-            onClick={() => setLightbox(true)}
+            onClick={(e) => {
+              e.stopPropagation();
+              setLightbox(true);
+            }}
             aria-label="Expand image"
-            className="absolute top-4 right-4 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 backdrop-blur-sm border border-neutral-200/80 text-neutral-600 hover:text-neutral-950 transition-all opacity-0 group-hover:opacity-100 shadow-xs cursor-pointer"
+            className="absolute top-3 right-3 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-white/80 backdrop-blur-md text-neutral-800 hover:text-neutral-950 hover:bg-white transition-all opacity-0 group-hover:opacity-100 shadow-md cursor-pointer"
           >
-            <Maximize2 className="h-3.5 w-3.5" />
+            <Maximize2 className="h-4 w-4" />
           </button>
 
-          {/* Left Arrow Button */}
+          {/* Left Navigation Arrow */}
           {hasMultiple && (
             <button
               onClick={(e) => {
@@ -135,13 +160,13 @@ export function ProductGallery({ images, alt, badge, discount }: ProductGalleryP
                 goToPrev();
               }}
               aria-label="Previous Image"
-              className="absolute left-3 top-1/2 -translate-y-1/2 z-20 flex h-9 w-9 items-center justify-center rounded-full bg-white/90 border border-neutral-200 text-neutral-800 transition-all hover:bg-white hover:scale-105 active:scale-95 shadow-sm cursor-pointer"
+              className="absolute left-3 top-1/2 -translate-y-1/2 z-20 flex h-11 w-11 items-center justify-center rounded-full bg-white/85 backdrop-blur-md text-neutral-900 transition-all hover:bg-white hover:scale-110 active:scale-95 opacity-0 group-hover:opacity-100 shadow-lg cursor-pointer"
             >
-              <ChevronLeft className="w-4 h-4" />
+              <ChevronLeft className="w-5 h-5" />
             </button>
           )}
 
-          {/* Right Arrow Button */}
+          {/* Right Navigation Arrow */}
           {hasMultiple && (
             <button
               onClick={(e) => {
@@ -149,15 +174,15 @@ export function ProductGallery({ images, alt, badge, discount }: ProductGalleryP
                 goToNext();
               }}
               aria-label="Next Image"
-              className="absolute right-3 top-1/2 -translate-y-1/2 z-20 flex h-9 w-9 items-center justify-center rounded-full bg-white/90 border border-neutral-200 text-neutral-800 transition-all hover:bg-white hover:scale-105 active:scale-95 shadow-sm cursor-pointer"
+              className="absolute right-3 top-1/2 -translate-y-1/2 z-20 flex h-11 w-11 items-center justify-center rounded-full bg-white/85 backdrop-blur-md text-neutral-900 transition-all hover:bg-white hover:scale-110 active:scale-95 opacity-0 group-hover:opacity-100 shadow-lg cursor-pointer"
             >
-              <ChevronRight className="w-4 h-4" />
+              <ChevronRight className="w-5 h-5" />
             </button>
           )}
 
-          {/* Bottom Dot Indicators */}
+          {/* Bottom Indicators */}
           {hasMultiple && (
-            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1.5 rounded-full bg-white/90 px-3 py-1.5 border border-neutral-200/80 backdrop-blur-sm shadow-xs">
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1.5 rounded-full bg-neutral-950/40 backdrop-blur-md px-3.5 py-1.5 shadow-sm">
               {allImages.map((_, i) => (
                 <button
                   key={i}
@@ -169,39 +194,34 @@ export function ProductGallery({ images, alt, badge, discount }: ProductGalleryP
                   className={cn(
                     "rounded-full transition-all cursor-pointer",
                     i === activeIndex
-                      ? "w-4 h-1.5 bg-neutral-950"
-                      : "w-1.5 h-1.5 bg-neutral-300 hover:bg-neutral-500"
+                      ? "w-5 h-1.5 bg-white shadow-xs"
+                      : "w-1.5 h-1.5 bg-white/50 hover:bg-white/80"
                   )}
                 />
               ))}
             </div>
           )}
-
-          {/* Counter */}
-          <div className="absolute bottom-4 right-4 text-[10px] uppercase tracking-widest text-neutral-400 font-mono hidden sm:block pointer-events-none font-semibold">
-            {activeIndex + 1} / {allImages.length}
-          </div>
         </div>
 
-        {/* Thumbnail Row */}
+        {/* Minimal Floating Thumbnails Row */}
         {hasMultiple && (
-          <div className="grid grid-cols-4 sm:grid-cols-6 gap-3">
+          <div className="flex items-center gap-3 overflow-x-auto pb-2 scrollbar-none">
             {allImages.map((image, index) => (
               <button
                 key={index}
                 onClick={() => setActiveIndex(index)}
                 className={cn(
-                  "relative aspect-square overflow-hidden rounded-2xl bg-neutral-100/60 border transition-all cursor-pointer",
+                  "relative h-20 w-20 sm:h-24 sm:w-24 shrink-0 overflow-hidden rounded-xl transition-all cursor-pointer",
                   activeIndex === index
-                    ? "border-neutral-950 ring-2 ring-neutral-950/10 shadow-xs"
-                    : "border-neutral-200/80 hover:border-neutral-400"
+                    ? "ring-2 ring-neutral-950 scale-105 shadow-sm opacity-100"
+                    : "opacity-60 hover:opacity-100 hover:scale-102"
                 )}
               >
                 <Image
                   src={image}
-                  alt={`${alt} thumb ${index + 1}`}
+                  alt={`${alt} thumbnail ${index + 1}`}
                   fill
-                  className="object-contain p-2"
+                  className="object-contain p-1"
                   sizes="100px"
                 />
               </button>
@@ -210,15 +230,15 @@ export function ProductGallery({ images, alt, badge, discount }: ProductGalleryP
         )}
       </div>
 
-      {/* Clean Lightbox */}
+      {/* High-Resolution Full-Screen Lightbox */}
       {lightbox && (
         <div
-          className="fixed inset-0 z-[200] flex items-center justify-center bg-neutral-950/90 backdrop-blur-md p-6"
+          className="fixed inset-0 z-[200] flex items-center justify-center bg-neutral-950/95 backdrop-blur-xl p-4 sm:p-8"
           onClick={() => setLightbox(false)}
         >
           <button
             onClick={() => setLightbox(false)}
-            className="absolute top-6 right-6 flex items-center gap-1.5 rounded-full bg-white/10 px-4 py-2 text-xs font-semibold uppercase tracking-widest text-white hover:bg-white/20 transition-colors cursor-pointer"
+            className="absolute top-6 right-6 flex items-center gap-2 rounded-full bg-white/10 px-5 py-2.5 text-xs font-bold uppercase tracking-widest text-white hover:bg-white/20 transition-all cursor-pointer backdrop-blur-md"
           >
             <span>Close</span>
             <X className="h-4 w-4" />
@@ -231,7 +251,7 @@ export function ProductGallery({ images, alt, badge, discount }: ProductGalleryP
                   e.stopPropagation();
                   goToPrev();
                 }}
-                className="absolute left-6 top-1/2 -translate-y-1/2 rounded-full bg-white/10 p-3 text-white hover:bg-white/20 transition-colors cursor-pointer"
+                className="absolute left-6 top-1/2 -translate-y-1/2 rounded-full bg-white/10 p-4 text-white hover:bg-white/25 transition-all cursor-pointer backdrop-blur-md"
               >
                 <ChevronLeft className="w-6 h-6" />
               </button>
@@ -240,20 +260,21 @@ export function ProductGallery({ images, alt, badge, discount }: ProductGalleryP
                   e.stopPropagation();
                   goToNext();
                 }}
-                className="absolute right-6 top-1/2 -translate-y-1/2 rounded-full bg-white/10 p-3 text-white hover:bg-white/20 transition-colors cursor-pointer"
+                className="absolute right-6 top-1/2 -translate-y-1/2 rounded-full bg-white/10 p-4 text-white hover:bg-white/25 transition-all cursor-pointer backdrop-blur-md"
               >
                 <ChevronRight className="w-6 h-6" />
               </button>
             </>
           )}
 
-          <div className="relative w-full max-w-2xl aspect-square">
+          <div className="relative w-full max-w-4xl h-[80vh]">
             <Image
               src={allImages[activeIndex]}
               alt={alt}
               fill
-              className="object-contain"
+              className="object-contain drop-shadow-2xl"
               sizes="100vw"
+              priority
             />
           </div>
         </div>

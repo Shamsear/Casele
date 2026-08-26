@@ -135,7 +135,7 @@ export function ProductDetailClient({
       />
       <FAQSchema faqs={DEFAULT_FAQS} />
 
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 lg:py-14">
+      <div className="mx-auto max-w-[1380px] px-4 sm:px-6 lg:px-8 py-6 lg:py-10">
         <Breadcrumbs
           items={[
             { label: "Collection", href: "/shop" },
@@ -144,9 +144,9 @@ export function ProductDetailClient({
           ]}
         />
 
-        <div className="mt-8 grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-start">
-          {/* Left: Interactive Multi-Angle Gallery (7 Cols) */}
-          <div className="lg:col-span-7">
+        <div className="mt-6 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 xl:gap-16 items-start">
+          {/* Left: Huge Product Showcase — No container box */}
+          <div className="lg:col-span-7 xl:col-span-7">
             <ProductGallery
               images={product.images}
               alt={`${product.name} — ${selectedModel.name}`}
@@ -155,8 +155,8 @@ export function ProductDetailClient({
             />
           </div>
 
-          {/* Right: Product Purchase Details & Customizer (5 Cols) */}
-          <div className="lg:col-span-5 space-y-6 rounded-3xl border border-neutral-200/80 bg-white p-6 sm:p-8 shadow-xs">
+          {/* Right: Sticky Purchase Details & Customizer */}
+          <div className="lg:col-span-5 xl:col-span-5 lg:sticky lg:top-24 space-y-6 rounded-3xl border border-neutral-200/80 bg-white p-6 sm:p-8 shadow-xs">
             {/* Header / Live Stock Status */}
             <div>
               <div className="flex items-center justify-between gap-2 mb-2">
