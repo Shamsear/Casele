@@ -26,7 +26,12 @@ export default withAuth(
           return true;
         }
 
-        // All other /admin routes require valid authentication
+        // Allow API routes to handle their own JSON error responses
+        if (pathname.startsWith("/api/admin")) {
+          return true;
+        }
+
+        // All other /admin UI pages require valid authentication
         return !!token;
       },
     },
