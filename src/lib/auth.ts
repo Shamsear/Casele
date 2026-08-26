@@ -67,5 +67,5 @@ export const authOptions: NextAuthOptions = {
       return session;
     },
   },
-  secret: process.env.NEXTAUTH_SECRET,
+  secret: process.env.NEXTAUTH_SECRET || "casele-luxury-secure-secret-key-2026-doha",
 };

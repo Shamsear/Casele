@@ -6,28 +6,32 @@ export default withAuth(
     const token = req.nextauth.token;
     const pathname = req.nextUrl.pathname;
 
-    // Admin routes require admin role
-    if (pathname.startsWith("/admin")) {
-      // Allow login page without auth
-      if (pathname === "/admin/login") {
-        // If already logged in, redirect to admin dashboard
-        if (token) {
-          return NextResponse.redirect(new URL("/admin", req.url));
-        }
-        return NextResponse.next();
+    // If user is already logged in as admin and visits /admin/login, redirect to /admin dashboard
+    if (pathname === "/admin/login") {
+      if (token && (token as any).role === "admin") {
+        return NextResponse.redirect(new URL("/admin", req.url));
       }
-
-      // Check if user is authenticated and has admin role
-      if (!token || token.role !== "admin") {
-        return NextResponse.redirect(new URL("/admin/login", req.url));
-      }
+      return NextResponse.next();
     }
 
     return NextResponse.next();
   },
   {
     callbacks: {
-      authorized: ({ token }) => !!token,
+      authorized: ({ req, token }) => {
+        const pathname = req.nextUrl.pathname;
+
+        // CRITICAL: Always allow public access to /admin/login to prevent infinite redirect loops
+        if (pathname === "/admin/login") {
+          return true;
+        }
+
+        // All other /admin routes require valid authentication
+        return !!token;
+      },
+    },
+    pages: {
+      signIn: "/admin/login",
     },
   }
 );
