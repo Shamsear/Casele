@@ -412,6 +412,7 @@ export async function getAdminStats() {
     ]);
 
     const totalRevenue = await prisma.order.aggregate({
+      where: { status: { not: "cancelled" } },
       _sum: { total: true },
     });
 

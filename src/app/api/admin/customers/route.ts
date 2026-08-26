@@ -59,11 +59,15 @@ export async function GET(request: NextRequest) {
         items: itemsList,
       };
 
+      const isCancelled = o.status === "cancelled";
+
       const existing = customerMap.get(phoneKey);
 
       if (existing) {
-        existing.orders += 1;
-        existing.totalSpend += orderTotal;
+        if (!isCancelled) {
+          existing.orders += 1;
+          existing.totalSpend += orderTotal;
+        }
         existing.orderHistory.push(orderEntry);
 
         if (o.createdAt > existing.lastOrderDate) {
@@ -80,9 +84,9 @@ export async function GET(request: NextRequest) {
         customerMap.set(phoneKey, {
           phone: phoneKey,
           name: o.customerName,
-          orders: 1,
-          totalSpend: orderTotal,
-          averageOrderValue: orderTotal,
+          orders: isCancelled ? 0 : 1,
+          totalSpend: isCancelled ? 0 : orderTotal,
+          averageOrderValue: isCancelled ? 0 : orderTotal,
           primaryAddress: o.address || "Doha, Qatar",
           firstOrderDate: o.createdAt,
           lastOrderDate: o.createdAt,

@@ -14,7 +14,8 @@ import {
   MessageSquare,
   Clock,
   ShieldCheck,
-  Sparkles
+  Sparkles,
+  X
 } from "lucide-react";
 
 interface OrderItem {
@@ -199,44 +200,56 @@ function TrackPageContent() {
                     </div>
                   </div>
 
-                  {/* Visual Status Stepper */}
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between px-2">
-                      {statusSteps.map((step, i) => {
-                        const isComplete = i <= activeIdx;
-                        const isCurrent = i === activeIdx;
-                        return (
-                          <div key={step.key} className="flex flex-1 items-center">
-                            <div className="flex flex-col items-center">
-                              <div
-                                className={`flex h-9 w-9 items-center justify-center rounded-full text-xs font-bold transition-all ${
-                                  isComplete
-                                    ? "bg-neutral-950 text-white shadow-xs"
-                                    : "bg-neutral-100 text-neutral-400 border border-neutral-200"
-                                } ${isCurrent ? "ring-4 ring-[#C5A869]/30" : ""}`}
-                              >
-                                {isComplete ? <Check className="h-4 w-4" /> : i + 1}
-                              </div>
-                              <span
-                                className={`mt-2 text-[10px] uppercase tracking-wider font-semibold text-center ${
-                                  isCurrent ? "text-neutral-950 font-bold" : "text-neutral-400"
-                                }`}
-                              >
-                                {step.label}
-                              </span>
-                            </div>
-                            {i < statusSteps.length - 1 && (
-                              <div
-                                className={`mx-2 h-0.5 flex-1 mb-5 transition-colors ${
-                                  i < activeIdx ? "bg-neutral-950" : "bg-neutral-200"
-                                }`}
-                              />
-                            )}
-                          </div>
-                        );
-                      })}
+                  {/* Status Banner or Stepper */}
+                  {order.status === "cancelled" ? (
+                    <div className="rounded-2xl border border-rose-200 bg-rose-50/80 p-4 space-y-1 text-center">
+                      <div className="inline-flex items-center gap-1.5 text-xs font-bold text-rose-800 uppercase tracking-wider">
+                        <X className="h-4 w-4" />
+                        <span>Order Cancelled</span>
+                      </div>
+                      <p className="text-xs text-rose-700">
+                        This order was cancelled per customer request on WhatsApp.
+                      </p>
                     </div>
-                  </div>
+                  ) : (
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between px-2">
+                        {statusSteps.map((step, i) => {
+                          const isComplete = i <= activeIdx;
+                          const isCurrent = i === activeIdx;
+                          return (
+                            <div key={step.key} className="flex flex-1 items-center">
+                              <div className="flex flex-col items-center">
+                                <div
+                                  className={`flex h-9 w-9 items-center justify-center rounded-full text-xs font-bold transition-all ${
+                                    isComplete
+                                      ? "bg-neutral-950 text-white shadow-xs"
+                                      : "bg-neutral-100 text-neutral-400 border border-neutral-200"
+                                  } ${isCurrent ? "ring-4 ring-[#C5A869]/30" : ""}`}
+                                >
+                                  {isComplete ? <Check className="h-4 w-4" /> : i + 1}
+                                </div>
+                                <span
+                                  className={`mt-2 text-[10px] uppercase tracking-wider font-semibold text-center ${
+                                    isCurrent ? "text-neutral-950 font-bold" : "text-neutral-400"
+                                  }`}
+                                >
+                                  {step.label}
+                                </span>
+                              </div>
+                              {i < statusSteps.length - 1 && (
+                                <div
+                                  className={`mx-2 h-0.5 flex-1 mb-5 transition-colors ${
+                                    i < activeIdx ? "bg-neutral-950" : "bg-neutral-200"
+                                  }`}
+                                />
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
 
                   {/* Delivery Location & Instructions */}
                   <div className="rounded-2xl bg-neutral-50/70 border border-neutral-200/80 p-4 space-y-2 text-xs">
