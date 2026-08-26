@@ -16,7 +16,6 @@ import {
   Users,
   Settings,
   Activity,
-  ExternalLink,
   LogOut,
   ChevronRight
 } from "lucide-react";
@@ -136,19 +135,7 @@ export function AdminSidebar({ onCloseMobile }: AdminSidebarProps) {
       </div>
 
       {/* Bottom Footer Actions */}
-      <div className="border-t border-neutral-200/80 p-3 space-y-1 bg-neutral-50/70">
-        <Link
-          href="/"
-          target="_blank"
-          className="flex items-center justify-between rounded-xl px-3 py-2 text-xs font-semibold text-neutral-600 hover:bg-white hover:text-neutral-950 hover:shadow-2xs transition-all"
-        >
-          <span className="flex items-center gap-2">
-            <ExternalLink className="h-3.5 w-3.5 text-neutral-400" />
-            View Storefront
-          </span>
-          <span className="text-[10px] text-neutral-400">↗</span>
-        </Link>
-
+      <div className="border-t border-neutral-200/80 p-3 bg-neutral-50/70">
         <button
           onClick={() => signOut({ callbackUrl: "/admin/login" })}
           className="w-full flex items-center gap-2 rounded-xl px-3 py-2 text-xs font-semibold text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer"
