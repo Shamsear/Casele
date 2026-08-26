@@ -48,19 +48,21 @@ export default function AdminDiscountsPage() {
   const [flashSales, setFlashSales] = useState<FlashSale[]>([]);
   const [loadingFlash, setLoadingFlash] = useState(true);
 
-  // Bundle & Threshold settings
+  // Dedicated Bundle & Threshold settings
   const [bundleBuy2, setBundleBuy2] = useState("5");
   const [bundleBuy3, setBundleBuy3] = useState("10");
   const [freeDeliveryThreshold, setFreeDeliveryThreshold] = useState("100");
-  const [freeDeliveryEnabled, setFreeDeliveryEnabled] = useState("true");
-  const [bundleEnabled, setBundleEnabled] = useState("true");
+  const [freeDeliveryEnabled, setFreeDeliveryEnabled] = useState(true);
+  const [bundleEnabled, setBundleEnabled] = useState(true);
   const [tierEnabled, setTierEnabled] = useState("true");
   const [savingSettings, setSavingSettings] = useState(false);
+  const [togglingBundle, setTogglingBundle] = useState(false);
+  const [togglingDelivery, setTogglingDelivery] = useState(false);
 
   useEffect(() => {
     fetchTiers();
     fetchFlashSales();
-    fetchSettings();
+    fetchRules();
   }, []);
 
   const fetchTiers = async () => {
@@ -93,22 +95,39 @@ export default function AdminDiscountsPage() {
     }
   };
 
-  const fetchSettings = async () => {
+  const fetchRules = async () => {
     try {
-      const res = await fetch(`/api/settings?_t=${Date.now()}`);
-      if (res.ok) {
-        const data = await res.json();
-        if (data.settings) {
-          if (data.settings.bundle_buy_2_discount !== undefined) setBundleBuy2(data.settings.bundle_buy_2_discount);
-          if (data.settings.bundle_buy_3_discount !== undefined) setBundleBuy3(data.settings.bundle_buy_3_discount);
-          if (data.settings.free_delivery_threshold !== undefined) setFreeDeliveryThreshold(data.settings.free_delivery_threshold);
-          if (data.settings.free_delivery_enabled !== undefined) setFreeDeliveryEnabled(String(data.settings.free_delivery_enabled));
-          if (data.settings.bundle_discounts_enabled !== undefined) setBundleEnabled(String(data.settings.bundle_discounts_enabled));
-          if (data.settings.tier_discounts_enabled !== undefined) setTierEnabled(String(data.settings.tier_discounts_enabled));
+      // 1. Fetch Bundle Rule from dedicated table
+      const resBundle = await fetch(`/api/admin/discounts/bundle-rule?_t=${Date.now()}`);
+      if (resBundle.ok) {
+        const data = await resBundle.json();
+        if (data.config) {
+          setBundleBuy2(String(data.config.buy2Percent ?? 5));
+          setBundleBuy3(String(data.config.buy3Percent ?? 10));
+          setBundleEnabled(Boolean(data.config.isActive));
+        }
+      }
+
+      // 2. Fetch Delivery Rule from dedicated table
+      const resDelivery = await fetch(`/api/admin/discounts/delivery-rule?_t=${Date.now()}`);
+      if (resDelivery.ok) {
+        const data = await resDelivery.json();
+        if (data.config) {
+          setFreeDeliveryThreshold(String(data.config.freeThreshold ?? 100));
+          setFreeDeliveryEnabled(Boolean(data.config.isFreeDeliveryActive));
+        }
+      }
+
+      // 3. Fetch Tier Master Setting
+      const resSettings = await fetch(`/api/settings?_t=${Date.now()}`);
+      if (resSettings.ok) {
+        const data = await resSettings.json();
+        if (data.settings?.tier_discounts_enabled !== undefined) {
+          setTierEnabled(String(data.settings.tier_discounts_enabled));
         }
       }
     } catch (err) {
-      console.error("Failed to load settings:", err);
+      console.error("Failed to load rules:", err);
     }
   };
 
@@ -226,34 +245,103 @@ export default function AdminDiscountsPage() {
     }
   };
 
-  // ─── Save All Bundle & Delivery Settings ──────────────────────
-  const handleSaveBundleSettings = async () => {
+  // ─── Instant Toggle Handlers (Dedicated Database Tables) ───────
+  const handleToggleBundleActive = async (nextActive: boolean) => {
+    setBundleEnabled(nextActive);
+    setTogglingBundle(true);
     try {
-      setSavingSettings(true);
-      const res = await fetch("/api/settings", {
+      const res = await fetch("/api/admin/discounts/bundle-rule", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          settings: {
-            bundle_buy_2_discount: String(bundleBuy2),
-            bundle_buy_3_discount: String(bundleBuy3),
-            free_delivery_threshold: String(freeDeliveryThreshold),
-            free_delivery_enabled: String(freeDeliveryEnabled),
-            bundle_discounts_enabled: String(bundleEnabled),
-            tier_discounts_enabled: String(tierEnabled),
-          },
+          isActive: nextActive,
+          buy2Percent: Number(bundleBuy2),
+          buy3Percent: Number(bundleBuy3),
         }),
       });
 
       if (res.ok) {
-        toast("Bundle savings and delivery rules saved successfully!", "success");
+        toast(
+          `Multi-case bundle discounts are now ${nextActive ? "ACTIVE" : "DISABLED"} in database`,
+          nextActive ? "success" : "info"
+        );
       } else {
         const err = await res.json().catch(() => ({}));
-        toast(err.error || "Failed to save settings. Please check your admin session.", "error");
+        toast(err.error || "Failed to update bundle status", "error");
+        setBundleEnabled(!nextActive);
+      }
+    } catch {
+      toast("Failed to update bundle status", "error");
+      setBundleEnabled(!nextActive);
+    } finally {
+      setTogglingBundle(false);
+    }
+  };
+
+  const handleToggleDeliveryActive = async (nextActive: boolean) => {
+    setFreeDeliveryEnabled(nextActive);
+    setTogglingDelivery(true);
+    try {
+      const res = await fetch("/api/admin/discounts/delivery-rule", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          isFreeDeliveryActive: nextActive,
+          freeThreshold: Number(freeDeliveryThreshold),
+        }),
+      });
+
+      if (res.ok) {
+        toast(
+          `Free Express Delivery threshold is now ${nextActive ? "ACTIVE" : "DISABLED"} in database`,
+          nextActive ? "success" : "info"
+        );
+      } else {
+        const err = await res.json().catch(() => ({}));
+        toast(err.error || "Failed to update delivery rule", "error");
+        setFreeDeliveryEnabled(!nextActive);
+      }
+    } catch {
+      toast("Failed to update delivery rule", "error");
+      setFreeDeliveryEnabled(!nextActive);
+    } finally {
+      setTogglingDelivery(false);
+    }
+  };
+
+  // ─── Save All Bundle & Delivery Rule Numbers ──────────────────
+  const handleSaveBundleAndDelivery = async () => {
+    try {
+      setSavingSettings(true);
+
+      const [resBundle, resDelivery] = await Promise.all([
+        fetch("/api/admin/discounts/bundle-rule", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            buy2Percent: Number(bundleBuy2),
+            buy3Percent: Number(bundleBuy3),
+            isActive: bundleEnabled,
+          }),
+        }),
+        fetch("/api/admin/discounts/delivery-rule", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            freeThreshold: Number(freeDeliveryThreshold),
+            isFreeDeliveryActive: freeDeliveryEnabled,
+          }),
+        }),
+      ]);
+
+      if (resBundle.ok && resDelivery.ok) {
+        toast("Bundle savings and delivery rules saved successfully in database!", "success");
+      } else {
+        toast("Failed to save some settings. Please check your admin session.", "error");
       }
     } catch (error) {
-      console.error("Save bundle settings error:", error);
-      toast("Failed to save settings due to network error", "error");
+      console.error("Save rules error:", error);
+      toast("Failed to save rules due to network error", "error");
     } finally {
       setSavingSettings(false);
     }
@@ -335,7 +423,6 @@ export default function AdminDiscountsPage() {
             </div>
 
             <div className="flex flex-wrap items-center gap-2 self-start sm:self-auto">
-              {/* Master Toggle Button */}
               <button
                 type="button"
                 onClick={handleToggleTierMaster}
@@ -475,7 +562,6 @@ export default function AdminDiscountsPage() {
                     <div className="space-y-1">
                       <div className="flex items-center gap-2">
                         <h4 className="font-bold text-neutral-950 text-sm">{sale.name}</h4>
-                        {/* Live Timing Badge */}
                         {isLive && (
                           <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-emerald-700 border border-emerald-200">
                             <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
@@ -546,7 +632,7 @@ export default function AdminDiscountsPage() {
         </div>
       )}
 
-      {/* ═══ TAB 3: MULTI-CASE BUNDLES & DELIVERY ═══ */}
+      {/* ═══ TAB 3: MULTI-CASE BUNDLES & DELIVERY (DEDICATED TABLES & INSTANT TOGGLES) ═══ */}
       {activeTab === "bundle" && (
         <div className="space-y-6">
           {/* Card 1: Multi-Case Bundle Discounts */}
@@ -556,11 +642,11 @@ export default function AdminDiscountsPage() {
                 <div className="flex items-center gap-2.5">
                   <h3 className="text-base font-bold text-neutral-950">Multi-Case Bundle Volume Discounts</h3>
                   <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border ${
-                    bundleEnabled === "true"
+                    bundleEnabled
                       ? "bg-emerald-50 text-emerald-700 border-emerald-200"
                       : "bg-neutral-100 text-neutral-500 border-neutral-200"
                   }`}>
-                    {bundleEnabled === "true" ? "Active" : "Disabled"}
+                    {bundleEnabled ? "Active in DB" : "Disabled in DB"}
                   </span>
                 </div>
                 <p className="text-xs text-neutral-500 mt-0.5">
@@ -568,20 +654,21 @@ export default function AdminDiscountsPage() {
                 </p>
               </div>
 
-              {/* Clear Switch Toggle */}
+              {/* Instant Toggle Switch */}
               <div className="flex items-center gap-2.5 self-start sm:self-auto">
                 <span className="text-xs font-semibold text-neutral-700">
-                  {bundleEnabled === "true" ? "Enabled" : "Disabled"}
+                  {bundleEnabled ? "Active" : "Disabled"}
                 </span>
                 <Switch
-                  checked={bundleEnabled === "true"}
-                  onCheckedChange={(checked) => setBundleEnabled(checked ? "true" : "false")}
+                  checked={bundleEnabled}
+                  disabled={togglingBundle}
+                  onCheckedChange={handleToggleBundleActive}
                 />
               </div>
             </div>
 
             <div className={`grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-lg pt-1 transition-opacity ${
-              bundleEnabled === "true" ? "opacity-100" : "opacity-60"
+              bundleEnabled ? "opacity-100" : "opacity-60"
             }`}>
               <div className="space-y-1.5">
                 <label className="text-[11px] font-bold uppercase tracking-wider text-neutral-700">Buy 2 Cases Discount (%)</label>
@@ -613,11 +700,11 @@ export default function AdminDiscountsPage() {
                 <div className="flex items-center gap-2.5">
                   <h3 className="text-base font-bold text-neutral-950">Free Express Delivery Threshold</h3>
                   <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border ${
-                    freeDeliveryEnabled !== "false"
+                    freeDeliveryEnabled
                       ? "bg-emerald-50 text-emerald-700 border-emerald-200"
                       : "bg-neutral-100 text-neutral-500 border-neutral-200"
                   }`}>
-                    {freeDeliveryEnabled !== "false" ? "Active" : "Disabled"}
+                    {freeDeliveryEnabled ? "Active in DB" : "Disabled in DB"}
                   </span>
                 </div>
                 <p className="text-xs text-neutral-500 mt-0.5">
@@ -625,20 +712,21 @@ export default function AdminDiscountsPage() {
                 </p>
               </div>
 
-              {/* Clear Switch Toggle */}
+              {/* Instant Toggle Switch */}
               <div className="flex items-center gap-2.5 self-start sm:self-auto">
                 <span className="text-xs font-semibold text-neutral-700">
-                  {freeDeliveryEnabled !== "false" ? "Enabled" : "Disabled"}
+                  {freeDeliveryEnabled ? "Active" : "Disabled"}
                 </span>
                 <Switch
-                  checked={freeDeliveryEnabled !== "false"}
-                  onCheckedChange={(checked) => setFreeDeliveryEnabled(checked ? "true" : "false")}
+                  checked={freeDeliveryEnabled}
+                  disabled={togglingDelivery}
+                  onCheckedChange={handleToggleDeliveryActive}
                 />
               </div>
             </div>
 
             <div className={`max-w-xs pt-1 space-y-1.5 transition-opacity ${
-              freeDeliveryEnabled !== "false" ? "opacity-100" : "opacity-60"
+              freeDeliveryEnabled ? "opacity-100" : "opacity-60"
             }`}>
               <label className="text-[11px] font-bold uppercase tracking-wider text-neutral-700">Free Delivery Minimum (QR)</label>
               <input
@@ -655,14 +743,14 @@ export default function AdminDiscountsPage() {
           <div className="flex items-center justify-end gap-3 pt-2">
             <button
               type="button"
-              onClick={handleSaveBundleSettings}
+              onClick={handleSaveBundleAndDelivery}
               disabled={savingSettings}
               className="inline-flex items-center gap-2 rounded-xl bg-neutral-950 px-6 py-3 text-xs font-bold uppercase tracking-wider text-white hover:bg-neutral-800 transition-all cursor-pointer shadow-xs disabled:opacity-50"
             >
               {savingSettings ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin" />
-                  <span>Saving Settings...</span>
+                  <span>Saving to Database...</span>
                 </>
               ) : (
                 <>

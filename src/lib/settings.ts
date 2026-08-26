@@ -61,6 +61,66 @@ export async function getAllSettings(): Promise<Record<string, string>> {
 }
 
 /**
+ * Get Bundle Discount Configuration from dedicated table
+ */
+export async function getBundleDiscountConfig(): Promise<{
+  buy2Percent: number;
+  buy3Percent: number;
+  isActive: boolean;
+}> {
+  try {
+    const config = await prisma.bundleDiscountConfig.findFirst();
+    if (config) {
+      return {
+        buy2Percent: config.buy2Percent,
+        buy3Percent: config.buy3Percent,
+        isActive: config.isActive,
+      };
+    }
+  } catch (e) {
+    console.warn("Failed to fetch bundle discount config:", e);
+  }
+
+  // Fallback to settings / defaults
+  const settings = await getAllSettings();
+  return {
+    buy2Percent: Number(settings.bundle_buy_2_discount || 5),
+    buy3Percent: Number(settings.bundle_buy_3_discount || 10),
+    isActive: settings.bundle_discounts_enabled !== "false",
+  };
+}
+
+/**
+ * Get Delivery Configuration from dedicated table
+ */
+export async function getDeliveryConfig(): Promise<{
+  freeThreshold: number;
+  expressFee: number;
+  isFreeDeliveryActive: boolean;
+}> {
+  try {
+    const config = await prisma.deliveryConfig.findFirst();
+    if (config) {
+      return {
+        freeThreshold: Number(config.freeThreshold),
+        expressFee: Number(config.expressFee),
+        isFreeDeliveryActive: config.isFreeDeliveryActive,
+      };
+    }
+  } catch (e) {
+    console.warn("Failed to fetch delivery config:", e);
+  }
+
+  // Fallback to settings / defaults
+  const settings = await getAllSettings();
+  return {
+    freeThreshold: Number(settings.free_delivery_threshold || 100),
+    expressFee: Number(settings.express_delivery_fee || 20),
+    isFreeDeliveryActive: settings.free_delivery_enabled !== "false",
+  };
+}
+
+/**
  * Get WhatsApp number (convenience function)
  */
 export async function getWhatsAppNumber(): Promise<string> {

@@ -239,3 +239,26 @@ model Setting {
 
   @@map("settings")
 }
+
+// ─── Bundle Discount Configuration ────────────────────────────
+model BundleDiscountConfig {
+  id          String   @id @default(uuid()) @db.Uuid
+  buy2Percent Int      @default(5) @map("buy_2_percent")
+  buy3Percent Int      @default(10) @map("buy_3_percent")
+  isActive    Boolean  @default(true) @map("is_active")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("bundle_discount_configs")
+}
+
+// ─── Delivery Configuration ───────────────────────────────────
+model DeliveryConfig {
+  id                   String   @id @default(uuid()) @db.Uuid
+  freeThreshold        Decimal  @default(100) @db.Decimal(10, 2) @map("free_threshold")
+  expressFee           Decimal  @default(20) @db.Decimal(10, 2) @map("express_fee")
+  isFreeDeliveryActive Boolean  @default(true) @map("is_free_delivery_active")
+  updatedAt            DateTime @updatedAt @map("updated_at")
+
+  @@map("delivery_configs")
+}
+

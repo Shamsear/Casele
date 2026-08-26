@@ -257,7 +257,32 @@ async function main() {
     });
   }
 
-  console.log("✅ All settings created & synchronized");
+  // Seed Dedicated Bundle Discount Config
+  const existingBundle = await prisma.bundleDiscountConfig.findFirst();
+  if (!existingBundle) {
+    await prisma.bundleDiscountConfig.create({
+      data: {
+        buy2Percent: 5,
+        buy3Percent: 10,
+        isActive: true,
+      },
+    });
+  }
+
+  // Seed Dedicated Delivery Config
+  const existingDelivery = await prisma.deliveryConfig.findFirst();
+  if (!existingDelivery) {
+    await prisma.deliveryConfig.create({
+      data: {
+        freeThreshold: 100,
+        expressFee: 20,
+        isFreeDeliveryActive: true,
+      },
+    });
+  }
+
+  console.log("✅ All settings & dedicated discount/delivery configurations synchronized");
+
 
   console.log("\n🎉 Seed complete!");
   console.log(`\n📧 Admin login: ${adminEmail}`);
