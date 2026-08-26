@@ -1,6 +1,4 @@
-import { db } from "@/lib/db";
-import { promoCodes, promoCodeUses } from "@/lib/db/schema";
-import { eq, and, lte, gte, count } from "drizzle-orm";
+import { prisma } from "@/lib/db/prisma";
 
 interface PromoResult {
   valid: boolean;
@@ -19,101 +17,86 @@ export async function validatePromoCode(
 ): Promise<PromoResult> {
   const normalizedCode = code.trim().toUpperCase();
 
-  // Find the promo code
-  let promo;
   try {
-    const results = await db
-      .select()
-      .from(promoCodes)
-      .where(eq(promoCodes.code, normalizedCode))
-      .limit(1);
+    const promo = await prisma.promoCode.findUnique({
+      where: { code: normalizedCode },
+    });
 
-    promo = results[0];
-  } catch {
-    return { valid: false, error: "Invalid promo code", discount: 0 };
-  }
+    if (!promo) {
+      return { valid: false, error: "Invalid promo code", discount: 0 };
+    }
 
-  if (!promo) {
-    return { valid: false, error: "Invalid promo code", discount: 0 };
-  }
+    // Check if active in database
+    if (!promo.isActive) {
+      return { valid: false, error: "This promo code is currently disabled", discount: 0 };
+    }
 
-  // Check if active
-  if (!promo.isActive) {
-    return { valid: false, error: "This code is no longer active", discount: 0 };
-  }
+    // Check validity dates
+    const now = new Date();
+    if (promo.validFrom && promo.validFrom > now) {
+      return { valid: false, error: "This code is not yet valid", discount: 0 };
+    }
+    if (promo.validUntil && promo.validUntil < now) {
+      return { valid: false, error: "This code has expired", discount: 0 };
+    }
 
-  // Check validity dates
-  const now = new Date();
-  if (promo.validFrom && promo.validFrom > now) {
-    return { valid: false, error: "This code is not yet valid", discount: 0 };
-  }
-  if (promo.validUntil && promo.validUntil < now) {
-    return { valid: false, error: "This code has expired", discount: 0 };
-  }
+    // Check min order
+    const minOrder = Number(promo.minOrder);
+    if (subtotal < minOrder) {
+      return {
+        valid: false,
+        error: `Minimum order of QR ${minOrder} required`,
+        discount: 0,
+      };
+    }
 
-  // Check min order
-  const minOrder = parseFloat(promo.minOrder ?? "0");
-  if (subtotal < minOrder) {
-    return {
-      valid: false,
-      error: `Minimum order of QR ${minOrder} required`,
-      discount: 0,
-    };
-  }
+    // Check max uses
+    if (promo.maxUses !== null && promo.maxUses > 0 && promo.usedCount >= promo.maxUses) {
+      return {
+        valid: false,
+        error: "This code has reached its maximum usage limit",
+        discount: 0,
+      };
+    }
 
-  // Check max uses
-  if (promo.maxUses !== null && promo.maxUses > 0 && (promo.usedCount ?? 0) >= promo.maxUses) {
-    return {
-      valid: false,
-      error: "This code has been used maximum times",
-      discount: 0,
-    };
-  }
+    // Check per-user limit
+    if (customerPhone && promo.perUserLimit) {
+      const cleanPhone = customerPhone.replace(/[^0-9]/g, "");
+      const usageCount = await prisma.promoCodeUse.count({
+        where: {
+          promoCodeId: promo.id,
+          customerPhone: { contains: cleanPhone },
+        },
+      });
 
-  // Check per-user limit
-  if (customerPhone && promo.perUserLimit) {
-    try {
-      const usageCount = await db
-        .select({ count: count() })
-        .from(promoCodeUses)
-        .where(
-          and(
-            eq(promoCodeUses.promoCodeId, promo.id),
-            eq(promoCodeUses.customerPhone, customerPhone)
-          )
-        );
-
-      if (promo.perUserLimit && usageCount[0].count >= promo.perUserLimit) {
+      if (usageCount >= promo.perUserLimit) {
         return {
           valid: false,
-          error: "You have already used this code",
+          error: "You have already used this promo code",
           discount: 0,
         };
       }
-    } catch {
-      // If DB unavailable, skip per-user check
     }
-  }
 
-  // Calculate discount
-  let discount = 0;
-  if (promo.discountType === "percentage") {
-    discount = Math.round(
-      (subtotal * parseFloat(promo.discountValue)) / 100
-    );
-  } else {
-    discount = Math.min(
-      parseFloat(promo.discountValue),
-      subtotal
-    );
-  }
+    // Calculate discount
+    const discountVal = Number(promo.discountValue);
+    let discount = 0;
+    if (promo.discountType === "percentage") {
+      discount = Math.round((subtotal * discountVal) / 100);
+    } else {
+      discount = Math.min(discountVal, subtotal);
+    }
 
-  return {
-    valid: true,
-    discount,
-    discountType: promo.discountType,
-    discountValue: parseFloat(promo.discountValue),
-    code: normalizedCode,
-    promoCodeId: promo.id,
-  };
+    return {
+      valid: true,
+      discount,
+      discountType: promo.discountType,
+      discountValue: discountVal,
+      code: normalizedCode,
+      promoCodeId: promo.id,
+    };
+  } catch (error) {
+    console.error("validatePromoCode error:", error);
+    return { valid: false, error: "Failed to validate promo code", discount: 0 };
+  }
 }

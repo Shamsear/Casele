@@ -5,15 +5,25 @@ import Link from "next/link";
 
 const DISMISSED_KEY = "casele_announcement_dismissed_v2";
 
+interface ActivePromo {
+  id: string;
+  code: string;
+  discountType: string;
+  discountValue: number;
+  minOrder: number;
+  isActive: boolean;
+}
+
 export function AnnouncementBar() {
   const [current, setCurrent] = useState(0);
   const [isDismissed, setIsDismissed] = useState<boolean | null>(null);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [deliveryThreshold, setDeliveryThreshold] = useState(100);
-  const [freeDeliveryEnabled, setFreeDeliveryEnabled] = useState(true);
+  const [freeDeliveryEnabled, setFreeDeliveryEnabled] = useState(false);
   const [customAnnouncement, setCustomAnnouncement] = useState("");
+  const [activePromo, setActivePromo] = useState<ActivePromo | null>(null);
 
-  // Sync dismissal state and fetch settings on mount
+  // Sync dismissal state and fetch live settings on mount
   useEffect(() => {
     try {
       const dismissed = localStorage.getItem(DISMISSED_KEY) === "true";
@@ -22,23 +32,42 @@ export function AnnouncementBar() {
       setIsDismissed(false);
     }
 
-    fetch("/api/settings")
+    // 1. Fetch live delivery rule from dedicated table
+    fetch("/api/admin/discounts/delivery-rule", { cache: "no-store" })
       .then((res) => res.json())
       .then((data) => {
-        if (data.settings) {
-          if (data.settings.free_delivery_enabled !== undefined) {
-            setFreeDeliveryEnabled(data.settings.free_delivery_enabled !== "false");
+        if (data.config) {
+          setFreeDeliveryEnabled(Boolean(data.config.isFreeDeliveryActive));
+          if (data.config.freeThreshold) {
+            setDeliveryThreshold(Number(data.config.freeThreshold));
           }
-          if (data.settings.free_delivery_threshold) {
-            const val = Number(data.settings.free_delivery_threshold);
-            if (val > 0) setDeliveryThreshold(val);
-          }
-          if (data.settings.announcement_text) {
-            setCustomAnnouncement(data.settings.announcement_text);
-          }
+        } else {
+          setFreeDeliveryEnabled(false);
+        }
+      })
+      .catch(() => setFreeDeliveryEnabled(false));
+
+    // 2. Fetch custom announcement text from settings
+    fetch("/api/settings", { cache: "no-store" })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.settings?.announcement_text) {
+          setCustomAnnouncement(data.settings.announcement_text);
         }
       })
       .catch(() => {});
+
+    // 3. Fetch active promo from database (NEVER hardcode WELCOME20)
+    fetch("/api/promo/active", { cache: "no-store" })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.promo && data.promo.isActive) {
+          setActivePromo(data.promo);
+        } else {
+          setActivePromo(null);
+        }
+      })
+      .catch(() => setActivePromo(null));
   }, []);
 
   const announcementsList = [
@@ -52,12 +81,24 @@ export function AnnouncementBar() {
             link: "/shop",
           },
         ]
+      : customAnnouncement
+      ? [
+          {
+            text: customAnnouncement,
+            badge: "ANNOUNCEMENT",
+            link: "/shop",
+          },
+        ]
       : []),
-    {
-      text: "20% OFF Your First Order — Use Code: WELCOME20",
-      badge: "EXCLUSIVE",
-      link: "/shop",
-    },
+    ...(activePromo
+      ? [
+          {
+            text: `${activePromo.discountType === "percentage" ? `${activePromo.discountValue}% OFF` : `QR ${activePromo.discountValue} OFF`} ${activePromo.minOrder > 0 ? `Orders Over QR ${activePromo.minOrder}` : "Your First Order"} — Use Code: ${activePromo.code}`,
+            badge: "EXCLUSIVE",
+            link: "/shop",
+          },
+        ]
+      : []),
     {
       text: "Bespoke Aerospace Composites • 100% Precision Fit Guarantee",
       badge: "PRECISION FIT",
