@@ -22,7 +22,7 @@ interface CartStore {
   promoCode: string | null;
   promoDiscount: number;
 
-  addItem: (item: Omit<CartItem, "quantity">, quantity?: number) => void;
+  addItem: (item: Omit<CartItem, "quantity">, quantity?: number, openDrawer?: boolean) => void;
   removeItem: (productId: string, modelId: string, finish?: string, caseType?: string) => void;
   updateQuantity: (
     productId: string,
@@ -72,7 +72,7 @@ export const useCartStore = create<CartStore>()(
       promoCode: null,
       promoDiscount: 0,
 
-      addItem: (item, quantity = 1) =>
+      addItem: (item, quantity = 1, openDrawer = false) =>
         set((state) => {
           const itemKey = getItemKey(item);
           const existingIndex = state.items.findIndex(
@@ -85,7 +85,7 @@ export const useCartStore = create<CartStore>()(
               ...updated[existingIndex],
               quantity: Math.min(updated[existingIndex].quantity + quantity, 10),
             };
-            return { items: updated, isOpen: true };
+            return { items: updated, isOpen: openDrawer ? true : state.isOpen };
           }
 
           return {
@@ -98,7 +98,7 @@ export const useCartStore = create<CartStore>()(
                 quantity: Math.min(quantity, 10),
               },
             ],
-            isOpen: true,
+            isOpen: openDrawer ? true : state.isOpen,
           };
         }),
 

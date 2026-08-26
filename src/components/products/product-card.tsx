@@ -9,6 +9,7 @@ import { ProductBadge } from "@/components/ui/badge";
 import { useCartStore } from "@/lib/store/cart";
 import { useWishlistStore } from "@/lib/store/wishlist";
 import { useHaptic } from "@/hooks/use-haptic";
+import { flyToCart } from "@/lib/fly-to-cart";
 import { Heart, Plus, Check } from "lucide-react";
 
 interface ProductCardProps {
@@ -33,6 +34,7 @@ interface ProductCardProps {
 
 export function ProductCard({ product, className }: ProductCardProps) {
   const addItem = useCartStore((s) => s.addItem);
+  const setOpenCart = useCartStore((s) => s.setOpen);
   const toggleWishlist = useWishlistStore((s) => s.toggleItem);
   const isWishlisted = useWishlistStore((s) => s.hasItem(product.id));
   const { vibrate } = useHaptic();
@@ -53,23 +55,32 @@ export function ProductCard({ product, className }: ProductCardProps) {
 
     if (isOutOfStock) return;
 
-    addItem({
-      productId: product.id,
-      name: product.name,
-      image: imageUrl,
-      price: parseFloat(product.price),
-      comparePrice: product.comparePrice
-        ? parseFloat(product.comparePrice)
-        : undefined,
-      modelId: modelSlug,
-      modelName: product.modelName,
-      finish: "Matte",
-      caseType: "Slim Precision",
-    });
+    addItem(
+      {
+        productId: product.id,
+        name: product.name,
+        image: imageUrl,
+        price: parseFloat(product.price),
+        comparePrice: product.comparePrice
+          ? parseFloat(product.comparePrice)
+          : undefined,
+        modelId: modelSlug,
+        modelName: product.modelName,
+        finish: "Matte",
+        caseType: "Slim Precision",
+      },
+      1,
+      false // Run animation first
+    );
 
     vibrate(10);
     setIsAdded(true);
-    setTimeout(() => setIsAdded(false), 1600);
+
+    flyToCart(imageUrl, e.currentTarget as HTMLElement, () => {
+      setOpenCart(true);
+    });
+
+    setTimeout(() => setIsAdded(false), 2000);
   };
 
   const handleWishlist = (e: React.MouseEvent) => {
@@ -153,14 +164,14 @@ export function ProductCard({ product, className }: ProductCardProps) {
                 "w-full flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl text-xs font-semibold uppercase tracking-wider transition-all duration-200 pointer-events-auto cursor-pointer shadow-md",
                 "opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0",
                 isAdded
-                  ? "bg-emerald-600 text-white"
+                  ? "bg-neutral-950 text-[#DFCA9B] border border-neutral-900"
                   : "bg-neutral-950 text-white hover:bg-neutral-800 active:scale-[0.98]"
               )}
             >
               {isAdded ? (
                 <>
-                  <Check className="h-3.5 w-3.5" />
-                  <span>Added to Bag</span>
+                  <Check className="h-3.5 w-3.5 text-[#DFCA9B] stroke-[2.8]" />
+                  <span className="text-white font-bold">Added ✓</span>
                 </>
               ) : (
                 <>
@@ -208,11 +219,11 @@ export function ProductCard({ product, className }: ProductCardProps) {
               className={cn(
                 "sm:hidden flex h-7 items-center justify-center gap-1 px-2.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all cursor-pointer whitespace-nowrap shrink-0",
                 isAdded
-                  ? "bg-emerald-600 text-white"
+                  ? "bg-neutral-950 text-white"
                   : "bg-neutral-950 text-white active:scale-95"
               )}
             >
-              {isAdded ? <Check className="h-3 w-3" /> : "+ Bag"}
+              {isAdded ? <Check className="h-3 w-3 text-[#DFCA9B]" /> : "+ Bag"}
             </button>
           )}
         </div>

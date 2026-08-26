@@ -7,7 +7,9 @@ import { useHaptic } from "@/hooks/use-haptic";
 import { Price } from "@/components/ui/price";
 import { QuickBuyModal } from "@/components/products/quick-buy-modal";
 import { getWhatsAppNumber } from "@/lib/settings";
-import { MessageSquare, ShoppingBag } from "lucide-react";
+import { flyToCart } from "@/lib/fly-to-cart";
+import { MessageSquare, ShoppingBag, Check } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface StickyAddToCartProps {
   productId: string;
@@ -39,7 +41,9 @@ export function StickyAddToCart({
   const [visible, setVisible] = useState(false);
   const [quickBuyOpen, setQuickBuyOpen] = useState(false);
   const [whatsappNumber, setWhatsappNumber] = useState("+97455364455");
+  const [isAdded, setIsAdded] = useState(false);
   const addItem = useCartStore((s) => s.addItem);
+  const setOpenCart = useCartStore((s) => s.setOpen);
   const { vibrate } = useHaptic();
 
   const isOutOfStock = stock !== undefined && stock <= 0;
@@ -54,7 +58,7 @@ export function StickyAddToCart({
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const handleAdd = () => {
+  const handleAdd = (e?: React.MouseEvent) => {
     if (isOutOfStock) return;
     addItem(
       {
@@ -68,9 +72,18 @@ export function StickyAddToCart({
         finish,
         caseType,
       },
-      quantity
+      quantity,
+      false // Run animation first
     );
-    vibrate(10);
+    vibrate(15);
+    setIsAdded(true);
+
+    const sourceEl = document.querySelector(".sticky-thumb-img") as HTMLElement | null;
+    flyToCart(image, sourceEl, () => {
+      setOpenCart(true);
+    });
+
+    setTimeout(() => setIsAdded(false), 2200);
   };
 
   const handleBuyNow = () => {
@@ -86,7 +99,7 @@ export function StickyAddToCart({
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-2.5 sm:gap-4">
           {/* Left: Product Thumbnail & Specifications */}
           <div className="flex items-center gap-2.5 sm:gap-3.5 min-w-0">
-            <div className="relative h-10 w-10 sm:h-12 sm:w-12 flex-shrink-0 overflow-hidden rounded-xl bg-neutral-100 border border-neutral-200/80">
+            <div className="sticky-thumb-img relative h-10 w-10 sm:h-12 sm:w-12 flex-shrink-0 overflow-hidden rounded-xl bg-neutral-100 border border-neutral-200/80">
               <Image
                 src={image}
                 alt={name}
@@ -136,10 +149,24 @@ export function StickyAddToCart({
                   <button
                     onClick={handleAdd}
                     aria-label="Add to Bag"
-                    className="flex items-center gap-1 rounded-xl border border-neutral-300 bg-white p-2 sm:px-3.5 sm:py-2.5 text-[11px] sm:text-xs font-bold uppercase tracking-wider text-neutral-900 hover:bg-neutral-50 active:scale-95 shadow-2xs transition-all cursor-pointer"
+                    className={cn(
+                      "flex items-center gap-1.5 rounded-xl border p-2 sm:px-3.5 sm:py-2.5 text-[11px] sm:text-xs font-bold uppercase tracking-wider transition-all duration-300 active:scale-95 shadow-2xs cursor-pointer",
+                      isAdded
+                        ? "bg-neutral-950 text-white border-neutral-950 ring-2 ring-[#C5A869]/40"
+                        : "border-neutral-300 bg-white text-neutral-900 hover:bg-neutral-50"
+                    )}
                   >
-                    <ShoppingBag className="h-3.5 w-3.5" />
-                    <span className="hidden md:inline">Add to Bag</span>
+                    {isAdded ? (
+                      <>
+                        <Check className="h-3.5 w-3.5 text-[#DFCA9B] stroke-[2.8]" />
+                        <span className="hidden md:inline text-white">Added ✓</span>
+                      </>
+                    ) : (
+                      <>
+                        <ShoppingBag className="h-3.5 w-3.5" />
+                        <span className="hidden md:inline">Add to Bag</span>
+                      </>
+                    )}
                   </button>
                 </>
               )}

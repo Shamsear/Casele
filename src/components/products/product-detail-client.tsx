@@ -10,28 +10,23 @@ import { ProductStructuredData } from "@/components/brand/structured-data";
 import { useCartStore } from "@/lib/store/cart";
 import { useWishlistStore } from "@/lib/store/wishlist";
 import { useHaptic } from "@/hooks/use-haptic";
-import { useToast } from "@/components/ui/toast";
 import { getDiscountPercent } from "@/lib/utils";
 import { useI18n } from "@/lib/i18n/context";
 import { Price } from "@/components/ui/price";
 import { addRecentlyViewed } from "@/lib/recently-viewed";
 import { StickyAddToCart } from "@/components/products/sticky-add-to-cart";
 import { QuickBuyModal } from "@/components/products/quick-buy-modal";
-import { buildWhatsAppMessage, openWhatsApp } from "@/lib/whatsapp";
 import { getWhatsAppNumber } from "@/lib/settings";
+import { flyToCart } from "@/lib/fly-to-cart";
 import type { ProductWithRelations } from "@/lib/db/products";
 import {
   MessageSquare,
   ShoppingBag,
   Heart,
-  Truck,
   ShieldCheck,
-  RefreshCw,
   Plus,
   Minus,
-  ArrowRight,
-  Sparkles,
-  Zap,
+  Check,
   ChevronDown,
   Layers,
   Magnet
@@ -62,12 +57,13 @@ export function ProductDetailClient({
   const [quickBuyOpen, setQuickBuyOpen] = useState(false);
   const [deliveryThreshold, setDeliveryThreshold] = useState(100);
   const [freeDeliveryEnabled, setFreeDeliveryEnabled] = useState(true);
+  const [isAdded, setIsAdded] = useState(false);
 
   const addItem = useCartStore((s) => s.addItem);
+  const setOpenCart = useCartStore((s) => s.setOpen);
   const toggleWishlist = useWishlistStore((s) => s.toggleItem);
   const isWishlisted = useWishlistStore((s) => s.hasItem(product.id));
   const { vibrate } = useHaptic();
-  const { toast } = useToast();
   const { formatPrice } = useI18n();
 
   const discount = getDiscountPercent(product.price, product.comparePrice);
@@ -92,7 +88,7 @@ export function ProductDetailClient({
       .catch(() => {});
   }, [product.id]);
 
-  const handleAddToCart = () => {
+  const handleAddToCart = (e?: React.MouseEvent) => {
     addItem(
       {
         productId: product.id,
@@ -107,9 +103,20 @@ export function ProductDetailClient({
         finish: selectedFinish,
         caseType: selectedStyle,
       },
-      quantity
+      quantity,
+      false // Don't open drawer immediately, fly animation runs first!
     );
-    vibrate(10);
+
+    vibrate(15);
+    setIsAdded(true);
+
+    // Signature fly to cart animation
+    const sourceEl = document.querySelector(".product-gallery-primary-img") as HTMLElement | null;
+    flyToCart(product.images[0], sourceEl, () => {
+      setOpenCart(true);
+    });
+
+    setTimeout(() => setIsAdded(false), 2200);
   };
 
   const handleBuyNow = () => {
@@ -377,10 +384,24 @@ export function ProductDetailClient({
 
                   <button
                     onClick={handleAddToCart}
-                    className="w-full flex items-center justify-center gap-2 rounded-xl border border-neutral-300 bg-white py-4 text-xs font-semibold uppercase tracking-widest text-neutral-900 hover:bg-neutral-50 hover:border-neutral-400 transition-all active:scale-[0.98] cursor-pointer"
+                    className={cn(
+                      "w-full flex items-center justify-center gap-2 rounded-xl py-4 text-xs font-semibold uppercase tracking-widest transition-all duration-300 active:scale-[0.98] cursor-pointer",
+                      isAdded
+                        ? "bg-neutral-950 text-white border border-neutral-950 shadow-md ring-2 ring-[#C5A869]/40"
+                        : "border border-neutral-300 bg-white text-neutral-900 hover:bg-neutral-50 hover:border-neutral-400"
+                    )}
                   >
-                    <ShoppingBag className="h-4 w-4" />
-                    <span>Add to Bag ({selectedFinish})</span>
+                    {isAdded ? (
+                      <>
+                        <Check className="h-4 w-4 text-[#DFCA9B] stroke-[2.8] animate-scale-in" />
+                        <span className="text-white font-bold tracking-wider">Added to Bag ✓</span>
+                      </>
+                    ) : (
+                      <>
+                        <ShoppingBag className="h-4 w-4" />
+                        <span>Add to Bag ({selectedFinish})</span>
+                      </>
+                    )}
                   </button>
                 </>
               )}
@@ -422,75 +443,33 @@ export function ProductDetailClient({
                   </div>
                 )}
               </div>
-
-              {/* Accordion 2: Qatar Express Delivery */}
-              <div className="pt-2.5">
-                <button
-                  onClick={() => setOpenAccordion(openAccordion === "delivery" ? null : "delivery")}
-                  className="flex w-full items-center justify-between text-xs font-bold uppercase tracking-wider text-neutral-950 py-2 cursor-pointer"
-                >
-                  <span className="flex items-center gap-2">
-                    <Truck className="h-4 w-4 text-neutral-700" />
-                    <span>Doha Delivery & Cash on Delivery</span>
-                  </span>
-                  <ChevronDown className={cn("h-4 w-4 transition-transform duration-200", openAccordion === "delivery" && "rotate-180")} />
-                </button>
-                {openAccordion === "delivery" && (
-                  <div className="pt-2 pb-3 text-xs text-neutral-600 leading-relaxed space-y-1.5 animate-fade-in">
-                    <p>• <strong>Doha & Lusail:</strong> Same-day dispatch (within 12-24 hours).</p>
-                    <p>• <strong>Al Wakrah & Al Khor:</strong> Next-day direct drop-off.</p>
-                    <p>• <strong>Payment:</strong> Cash on delivery or instant WhatsApp transfer.</p>
-                  </div>
-                )}
-              </div>
-
-              {/* Accordion 3: 7-Day Guarantee */}
-              <div className="pt-2.5">
-                <button
-                  onClick={() => setOpenAccordion(openAccordion === "guarantee" ? null : "guarantee")}
-                  className="flex w-full items-center justify-between text-xs font-bold uppercase tracking-wider text-neutral-950 py-2 cursor-pointer"
-                >
-                  <span className="flex items-center gap-2">
-                    <RefreshCw className="h-4 w-4 text-neutral-700" />
-                    <span>7-Day Fit Assurance</span>
-                  </span>
-                  <ChevronDown className={cn("h-4 w-4 transition-transform duration-200", openAccordion === "guarantee" && "rotate-180")} />
-                </button>
-                {openAccordion === "guarantee" && (
-                  <div className="pt-2 pb-3 text-xs text-neutral-600 leading-relaxed animate-fade-in">
-                    <p>
-                      If the case does not fit your device with 100% precision or you wish to exchange finishes, our WhatsApp concierge will swap your piece within 7 days.
-                    </p>
-                  </div>
-                )}
-              </div>
             </div>
           </div>
         </div>
 
-        {/* Related Products */}
+        {/* ═══ Related Cases (4:5 Grid) ═══ */}
         {relatedProducts.length > 0 && (
-          <div className="mt-20 border-t border-neutral-200/70 pt-16">
-            <div className="flex items-baseline justify-between mb-8 pb-4 border-b border-neutral-200/70">
+          <div className="mt-16 sm:mt-24 border-t border-neutral-200/70 pt-12">
+            <div className="mb-8 flex items-center justify-between">
               <div>
-                <span className="text-[10px] font-bold text-[#A88B4D] tracking-widest uppercase mb-1 block">
-                  Curated Pairings
+                <span className="text-[11px] font-bold text-[#A88B4D] uppercase tracking-widest block mb-1">
+                  Curated Companions
                 </span>
                 <h2 className="font-display text-2xl sm:text-3xl text-neutral-950 font-normal">
-                  Complementary Pieces
+                  You May Also Admire
                 </h2>
               </div>
               <Link
-                href="/shop"
-                className="inline-flex items-center gap-1 text-xs font-semibold uppercase tracking-widest text-neutral-600 hover:text-neutral-950 transition-colors"
+                href={`/shop/${modelSlug}`}
+                className="text-xs font-bold uppercase tracking-wider text-neutral-700 hover:text-neutral-950 transition-colors"
               >
-                <span>View All</span>
-                <ArrowRight className="h-3.5 w-3.5" />
+                View Collection →
               </Link>
             </div>
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-              {relatedProducts.map((rp, i) => (
-                <ProductCard key={rp.id} product={rp} index={i} />
+
+            <div className="grid grid-cols-2 gap-4 sm:gap-6 lg:grid-cols-4">
+              {relatedProducts.map((p, i) => (
+                <ProductCard key={p.id} product={p} index={i} />
               ))}
             </div>
           </div>
@@ -508,21 +487,7 @@ export function ProductDetailClient({
         finish={selectedFinish}
         caseType={selectedStyle}
         quantity={quantity}
-      />
-
-      <QuickBuyModal
-        isOpen={quickBuyOpen}
-        onClose={() => setQuickBuyOpen(false)}
-        product={{
-          name: product.name,
-          price: parseFloat(product.price),
-          modelName: selectedModel.name,
-          finish: selectedFinish,
-          caseType: selectedStyle,
-          image: product.images[0],
-          quantity,
-        }}
-        whatsappNumber={whatsappNumber}
+        stock={(selectedModel as any).stock ?? product.stock}
       />
     </div>
   );

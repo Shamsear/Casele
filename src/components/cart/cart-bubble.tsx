@@ -1,19 +1,35 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { useCartStore } from "@/lib/store/cart";
 import { useI18n } from "@/lib/i18n/context";
+import { cn } from "@/lib/utils";
 
 export function CartBubble() {
   const itemCount = useCartStore((s) => s.itemCount());
   const total = useCartStore((s) => s.total());
   const toggleCart = useCartStore((s) => s.toggleCart);
   const { formatPrice } = useI18n();
+  const [bouncing, setBouncing] = useState(false);
+
+  useEffect(() => {
+    const handleBounce = () => {
+      setBouncing(true);
+      setTimeout(() => setBouncing(false), 400);
+    };
+    window.addEventListener("cart-bubble-bounce", handleBounce);
+    return () => window.removeEventListener("cart-bubble-bounce", handleBounce);
+  }, []);
 
   return (
     <button
+      id="cart-bubble-target"
       onClick={toggleCart}
       aria-label={`Shopping Bag (${itemCount} items)`}
-      className="group relative flex items-center gap-2 rounded-full border border-white/80 bg-white/80 backdrop-blur-md px-3.5 py-1.5 text-xs font-semibold text-neutral-900 transition-all duration-200 hover:border-neutral-400 hover:bg-white hover:shadow-2xs active:scale-95 cursor-pointer select-none"
+      className={cn(
+        "cart-target-bubble group relative flex items-center gap-2 rounded-full border border-neutral-200/80 bg-white/85 backdrop-blur-md px-3.5 py-1.5 text-xs font-semibold text-neutral-900 transition-all duration-300 hover:border-neutral-400 hover:bg-white hover:shadow-2xs active:scale-95 cursor-pointer select-none",
+        bouncing && "scale-115 ring-2 ring-[#C5A869]/50 shadow-md"
+      )}
     >
       <div className="relative flex items-center justify-center">
         <svg
@@ -21,7 +37,10 @@ export function CartBubble() {
           fill="none"
           stroke="currentColor"
           strokeWidth="1.8"
-          className="w-4 h-4 text-neutral-800 transition-transform group-hover:scale-105"
+          className={cn(
+            "w-4 h-4 text-neutral-800 transition-transform duration-200 group-hover:scale-105",
+            bouncing && "scale-125 text-[#A88B4D]"
+          )}
         >
           <path
             strokeLinecap="round"

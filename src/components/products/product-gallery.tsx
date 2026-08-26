@@ -82,7 +82,7 @@ export function ProductGallery({ images, alt, badge, discount }: ProductGalleryP
       <div className="flex flex-col gap-4 select-none">
         {/* Main Stage Container */}
         <div
-          className="relative aspect-square w-full overflow-hidden rounded-3xl bg-neutral-100/60 border border-neutral-200/80 touch-pan-y group"
+          className="product-gallery-primary-img relative aspect-square w-full overflow-hidden rounded-3xl bg-neutral-100/60 border border-neutral-200/80 touch-pan-y group"
           onTouchStart={handleTouchStart}
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
