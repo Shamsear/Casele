@@ -7,7 +7,13 @@ import { useCartStore } from "@/lib/store/cart";
 import { flyToCart } from "@/lib/fly-to-cart";
 import { useHaptic } from "@/hooks/use-haptic";
 import type { ProductWithRelations } from "@/lib/db/products";
-import { ShoppingBag, Check, Sparkles, ArrowUpRight } from "lucide-react";
+import {
+  ShoppingBag,
+  Check,
+  ChevronLeft,
+  ChevronRight,
+  ArrowUpRight
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface HeroSpotlightCardProps {
@@ -22,8 +28,8 @@ export function HeroSpotlightCard({ products }: HeroSpotlightCardProps) {
   const setOpenCart = useCartStore((s) => s.setOpen);
   const { vibrate } = useHaptic();
 
-  // Curate top showcase cases
-  const showcaseList = products.length > 0 ? products.slice(0, 3) : [];
+  // Curate showcase cases
+  const showcaseList = products.length > 0 ? products.slice(0, 6) : [];
   const currentProduct = showcaseList[activeIndex] || products[0];
 
   if (!currentProduct) return null;
@@ -36,6 +42,20 @@ export function HeroSpotlightCard({ products }: HeroSpotlightCardProps) {
     const num = parseFloat(currentProduct.price);
     return `QR ${isNaN(num) ? currentProduct.price : num}`;
   })();
+
+  const handlePrev = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    vibrate(5);
+    setActiveIndex((prev) => (prev - 1 + showcaseList.length) % showcaseList.length);
+  };
+
+  const handleNext = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    vibrate(5);
+    setActiveIndex((prev) => (prev + 1) % showcaseList.length);
+  };
 
   const handleQuickAdd = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -76,8 +96,9 @@ export function HeroSpotlightCard({ products }: HeroSpotlightCardProps) {
       <div className="pointer-events-none absolute -top-16 -right-16 h-48 w-48 rounded-full bg-amber-100/50 blur-3xl opacity-80" />
       <div className="pointer-events-none absolute -bottom-16 -left-16 h-48 w-48 rounded-full bg-neutral-100/80 blur-2xl" />
 
-      {/* ═══ Header Badge Row ═══ */}
+      {/* ═══ Header Row: Studio Spotlight Badge (Left) + Left/Right Arrow Controls (Right) ═══ */}
       <div className="relative z-10 flex items-center justify-between gap-2">
+        {/* Left: Badge */}
         <div className="inline-flex items-center gap-1.5 rounded-full bg-neutral-950 px-3 py-1 shadow-xs border border-neutral-800">
           <span className="flex h-1.5 w-1.5 rounded-full bg-[#C5A869] animate-ping" />
           <span className="text-[9px] font-bold text-white uppercase tracking-[0.2em]">
@@ -85,30 +106,68 @@ export function HeroSpotlightCard({ products }: HeroSpotlightCardProps) {
           </span>
         </div>
 
-        <div className="inline-flex items-center gap-1 rounded-full bg-neutral-50 border border-neutral-200/80 px-2.5 py-0.5 shadow-2xs">
-          <Sparkles className="h-2.5 w-2.5 text-[#A88B4D]" />
-          <span className="text-[9px] font-semibold text-neutral-600 uppercase tracking-wider">
-            Qatar Flagship
-          </span>
-        </div>
+        {/* Right: Left & Right Navigation Arrows */}
+        {showcaseList.length > 1 && (
+          <div className="flex items-center gap-1">
+            <button
+              onClick={handlePrev}
+              aria-label="Previous case"
+              className="flex h-7 w-7 items-center justify-center rounded-full border border-neutral-200/80 bg-neutral-50/90 text-neutral-700 hover:bg-neutral-950 hover:text-white hover:border-neutral-950 transition-all duration-200 active:scale-95 shadow-2xs cursor-pointer"
+            >
+              <ChevronLeft className="h-3.5 w-3.5" />
+            </button>
+            <button
+              onClick={handleNext}
+              aria-label="Next case"
+              className="flex h-7 w-7 items-center justify-center rounded-full border border-neutral-200/80 bg-neutral-50/90 text-neutral-700 hover:bg-neutral-950 hover:text-white hover:border-neutral-950 transition-all duration-200 active:scale-95 shadow-2xs cursor-pointer"
+            >
+              <ChevronRight className="h-3.5 w-3.5" />
+            </button>
+          </div>
+        )}
       </div>
 
-      {/* ═══ Center Stage Floating Silhouette ═══ */}
-      <Link
-        href={`/shop/${modelSlug}/${productSlug}`}
-        className="relative flex-1 my-2 flex items-center justify-center cursor-pointer"
-      >
-        <div className="hero-spotlight-img relative h-full w-full max-h-[260px] flex items-center justify-center">
-          <Image
-            src={currentImage}
-            alt={currentProduct.name}
-            fill
-            priority
-            className="object-contain p-2 drop-shadow-[0_15px_30px_rgba(0,0,0,0.14)] transition-transform duration-700 ease-out group-hover:scale-106 animate-float-slow"
-            sizes="280px"
-          />
-        </div>
-      </Link>
+      {/* ═══ Center Stage: Floating Case + Side Arrow Controls ═══ */}
+      <div className="relative flex-1 my-1 flex items-center justify-center">
+        {/* Side Floating Left Button */}
+        {showcaseList.length > 1 && (
+          <button
+            onClick={handlePrev}
+            aria-label="Previous case"
+            className="absolute left-0 z-20 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 border border-neutral-200/80 text-neutral-700 shadow-xs hover:bg-neutral-950 hover:text-white hover:scale-105 active:scale-95 transition-all opacity-0 group-hover:opacity-100 cursor-pointer"
+          >
+            <ChevronLeft className="h-4 w-4" />
+          </button>
+        )}
+
+        {/* Floating Case Silhouette Link */}
+        <Link
+          href={`/shop/${modelSlug}/${productSlug}`}
+          className="relative h-full w-full max-h-[260px] flex items-center justify-center cursor-pointer"
+        >
+          <div className="hero-spotlight-img relative h-full w-full flex items-center justify-center">
+            <Image
+              src={currentImage}
+              alt={currentProduct.name}
+              fill
+              priority
+              className="object-contain p-2 drop-shadow-[0_15px_30px_rgba(0,0,0,0.14)] transition-transform duration-700 ease-out group-hover:scale-106 animate-float-slow"
+              sizes="280px"
+            />
+          </div>
+        </Link>
+
+        {/* Side Floating Right Button */}
+        {showcaseList.length > 1 && (
+          <button
+            onClick={handleNext}
+            aria-label="Next case"
+            className="absolute right-0 z-20 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 border border-neutral-200/80 text-neutral-700 shadow-xs hover:bg-neutral-950 hover:text-white hover:scale-105 active:scale-95 transition-all opacity-0 group-hover:opacity-100 cursor-pointer"
+          >
+            <ChevronRight className="h-4 w-4" />
+          </button>
+        )}
+      </div>
 
       {/* ═══ Bottom Information Glass Pill ═══ */}
       <div className="relative z-10 space-y-2">
