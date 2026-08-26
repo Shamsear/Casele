@@ -170,10 +170,10 @@ export function QuickBuyModal({
             <p className="text-[10px] text-neutral-400">8-digit Qatar mobile number.</p>
           </div>
 
-          {/* Delivery & Payment Note */}
+          {/* Delivery Note */}
           <div className="flex items-center gap-2 rounded-xl bg-neutral-50 px-3 py-2 text-[11px] text-neutral-600">
             <Truck className="h-3.5 w-3.5 text-neutral-500 shrink-0" />
-            <span>Same-Day Doha Delivery • Cash on Delivery / Card</span>
+            <span>Direct WhatsApp Order • Fast Qatar Dispatch</span>
           </div>
 
           {/* Submit Action */}

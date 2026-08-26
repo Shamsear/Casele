@@ -26,14 +26,22 @@ interface WhatsAppOrder {
 export function buildWhatsAppMessage(order: WhatsAppOrder): string {
   const lines: string[] = [];
 
-  lines.push("👑 *CASELÉ ATELIER DOHA — ORDER REQUEST*");
+  lines.push("👑 *CASELÉ DOHA — ORDER REQUEST*");
   lines.push("");
-  lines.push(`👤 *Client:* ${order.customerName}`);
-  lines.push(`📱 *Contact:* ${order.customerPhone}`);
-  lines.push(
-    `📍 *Delivery Location:* ${order.address || "Doha, Qatar (Please confirm area/zone)"}`
-  );
-  lines.push("");
+
+  if (order.customerName && order.customerName.toLowerCase() !== "customer") {
+    lines.push(`👤 *Client:* ${order.customerName}`);
+  }
+  if (order.customerPhone && order.customerPhone.trim()) {
+    lines.push(`📱 *Contact:* ${order.customerPhone}`);
+  }
+  if (
+    (order.customerName && order.customerName.toLowerCase() !== "customer") ||
+    (order.customerPhone && order.customerPhone.trim())
+  ) {
+    lines.push("");
+  }
+
   lines.push("📦 *Selected Enclosures:*");
 
   for (const item of order.items) {
@@ -41,7 +49,9 @@ export function buildWhatsAppMessage(order: WhatsAppOrder): string {
       item.model,
       item.finish ? `${item.finish} Finish` : null,
       item.caseType || null,
-    ].filter(Boolean).join(" • ");
+    ]
+      .filter(Boolean)
+      .join(" • ");
 
     lines.push(
       `• *${item.name}* [${specs}] × ${item.qty} — ${formatPrice(item.price)}`
@@ -68,9 +78,6 @@ export function buildWhatsAppMessage(order: WhatsAppOrder): string {
 
   lines.push("─────────────");
   lines.push(`💎 *Total Due:* ${formatPrice(order.total)}`);
-  lines.push("");
-  lines.push("🚀 *Delivery Guarantee:* Doha Express (Same-Day / 24H Dispatch)");
-  lines.push("💳 *Payment:* Cash on Delivery / Direct Transfer");
   lines.push("");
   lines.push("Thank you for choosing CASELÉ Luxury Enclosures.");
 
