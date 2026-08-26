@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useToast } from "@/components/ui/toast";
+import { AdminTableSkeleton } from "@/components/admin/admin-skeletons";
 import { Plus, Trash2, Tag, Percent, DollarSign, Search } from "lucide-react";
 
 interface PromoCode {
@@ -253,35 +254,32 @@ export default function AdminPromoCodesPage() {
         <span className="text-xs text-neutral-500 font-mono font-medium">{filtered.length} total codes</span>
       </div>
 
-      {/* Table */}
-      <div className="rounded-2xl border border-neutral-200/80 bg-white overflow-hidden shadow-2xs">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left">
-            <thead>
-              <tr className="border-b border-neutral-100 bg-neutral-50/70 text-[11px] font-bold uppercase tracking-wider text-neutral-500">
-                <th className="px-5 py-3.5">Code</th>
-                <th className="px-4 py-3.5">Discount</th>
-                <th className="px-4 py-3.5">Min Order</th>
-                <th className="px-4 py-3.5">Usage</th>
-                <th className="px-4 py-3.5">Status</th>
-                <th className="px-5 py-3.5 text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-neutral-100 text-xs">
-              {loading ? (
-                <tr>
-                  <td colSpan={6} className="py-8 text-center text-neutral-400">
-                    Loading promo codes...
-                  </td>
+      {/* Table or Shimmer Skeleton */}
+      {loading ? (
+        <AdminTableSkeleton rows={5} cols={6} />
+      ) : (
+        <div className="rounded-2xl border border-neutral-200/80 bg-white overflow-hidden shadow-2xs">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left">
+              <thead>
+                <tr className="border-b border-neutral-100 bg-neutral-50/70 text-[11px] font-bold uppercase tracking-wider text-neutral-500">
+                  <th className="px-5 py-3.5">Code</th>
+                  <th className="px-4 py-3.5">Discount</th>
+                  <th className="px-4 py-3.5">Min Order</th>
+                  <th className="px-4 py-3.5">Usage</th>
+                  <th className="px-4 py-3.5">Status</th>
+                  <th className="px-5 py-3.5 text-right">Actions</th>
                 </tr>
-              ) : filtered.length === 0 ? (
-                <tr>
-                  <td colSpan={6} className="py-8 text-center text-neutral-400">
-                    No promo codes found.
-                  </td>
-                </tr>
-              ) : (
-                filtered.map((promo) => (
+              </thead>
+              <tbody className="divide-y divide-neutral-100 text-xs">
+                {filtered.length === 0 ? (
+                  <tr>
+                    <td colSpan={6} className="py-8 text-center text-neutral-400">
+                      No promo codes found in database.
+                    </td>
+                  </tr>
+                ) : (
+                  filtered.map((promo) => (
                   <tr key={promo.id} className="hover:bg-neutral-50/60 transition-colors">
                     <td className="px-5 py-3.5">
                       <span className="font-mono text-xs font-bold text-neutral-950 tracking-wider bg-neutral-100 border border-neutral-200 px-2 py-0.5 rounded-lg shadow-2xs">
@@ -326,6 +324,7 @@ export default function AdminPromoCodesPage() {
           </table>
         </div>
       </div>
+      )}
     </div>
   );
 }

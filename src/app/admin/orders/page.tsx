@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useToast } from "@/components/ui/toast";
+import { AdminTableSkeleton } from "@/components/admin/admin-skeletons";
 import { Search, ShoppingBag, MessageSquare, ExternalLink, Filter, Inbox, ChevronDown } from "lucide-react";
 
 interface AdminOrder {
@@ -156,99 +157,97 @@ export default function AdminOrdersPage() {
         </div>
       </div>
 
-      {/* Orders Table */}
-      <div className="rounded-2xl border border-neutral-200/80 bg-white overflow-hidden shadow-2xs">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left">
-            <thead>
-              <tr className="border-b border-neutral-100 bg-neutral-50/70 text-[11px] font-bold uppercase tracking-wider text-neutral-500">
-                <th className="px-5 py-3.5">Order ID</th>
-                <th className="px-4 py-3.5">Client</th>
-                <th className="px-4 py-3.5">Delivery Destination</th>
-                <th className="px-4 py-3.5">Items</th>
-                <th className="px-4 py-3.5">Amount</th>
-                <th className="px-4 py-3.5">Fulfillment Status</th>
-                <th className="px-5 py-3.5 text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-neutral-100 text-xs">
-              {loading ? (
-                <tr>
-                  <td colSpan={7} className="py-12 text-center text-neutral-400">
-                    Loading real orders from database...
-                  </td>
+      {/* Orders Table or Shimmer Skeleton */}
+      {loading ? (
+        <AdminTableSkeleton rows={6} cols={6} />
+      ) : (
+        <div className="rounded-2xl border border-neutral-200/80 bg-white overflow-hidden shadow-2xs">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left">
+              <thead>
+                <tr className="border-b border-neutral-100 bg-neutral-50/70 text-[11px] font-bold uppercase tracking-wider text-neutral-500">
+                  <th className="px-5 py-3.5">Order ID</th>
+                  <th className="px-4 py-3.5">Client</th>
+                  <th className="px-4 py-3.5">Delivery Destination</th>
+                  <th className="px-4 py-3.5">Items</th>
+                  <th className="px-4 py-3.5">Amount</th>
+                  <th className="px-4 py-3.5">Fulfillment Status</th>
+                  <th className="px-5 py-3.5 text-right">Actions</th>
                 </tr>
-              ) : filtered.length === 0 ? (
-                <tr>
-                  <td colSpan={7} className="py-12 text-center">
-                    <div className="space-y-2">
-                      <Inbox className="h-6 w-6 text-neutral-300 mx-auto" />
-                      <p className="text-xs text-neutral-500 font-medium">No orders found in database.</p>
-                      <p className="text-[11px] text-neutral-400">When customers place orders on your store, they will appear here in real time.</p>
-                    </div>
-                  </td>
-                </tr>
-              ) : (
-                filtered.map((order) => {
-                  const badge = STATUS_CONFIG[order.status] || {
-                    bg: "bg-neutral-100",
-                    text: "text-neutral-700",
-                    border: "border-neutral-200",
-                  };
-                  return (
-                    <tr key={order.id} className="hover:bg-neutral-50/60 transition-colors">
-                      <td className="px-5 py-3.5">
-                        <span className="font-mono font-bold text-neutral-950">{order.id}</span>
-                        <p className="text-[10px] text-neutral-400 font-mono">{order.time}</p>
-                      </td>
-                      <td className="px-4 py-3.5">
-                        <span className="font-semibold text-neutral-950">{order.customer}</span>
-                        <p className="text-[11px] text-neutral-500 font-mono">{order.phone}</p>
-                      </td>
-                      <td className="px-4 py-3.5 text-neutral-700 font-medium">
-                        {order.address}
-                      </td>
-                      <td className="px-4 py-3.5 font-mono text-neutral-500 font-medium">
-                        {order.items} cases
-                      </td>
-                      <td className="px-4 py-3.5 font-bold text-neutral-950">
-                        QR {order.total}
-                      </td>
-                      <td className="px-4 py-3.5">
-                        <select
-                          value={order.status}
-                          disabled={updatingId === order.id}
-                          onChange={(e) => handleStatusChange(order.id, e.target.value)}
-                          className={`rounded-lg px-2 py-1 text-[11px] font-bold uppercase tracking-wider border focus:outline-none cursor-pointer ${badge.bg} ${badge.text} ${badge.border}`}
-                        >
-                          <option value="pending">PENDING</option>
-                          <option value="confirmed">CONFIRMED</option>
-                          <option value="dispatched">DISPATCHED</option>
-                          <option value="delivered">DELIVERED</option>
-                          <option value="cancelled">CANCELLED</option>
-                        </select>
-                      </td>
-                      <td className="px-5 py-3.5 text-right">
-                        <div className="inline-flex items-center gap-2">
-                          <a
-                            href={`https://wa.me/${order.phone.replace(/[^0-9]/g, "")}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="p-1.5 rounded-lg border border-neutral-200 bg-white text-emerald-700 hover:border-emerald-300 hover:bg-emerald-50 transition-colors shadow-2xs"
-                            title="Open WhatsApp Chat with Client"
+              </thead>
+              <tbody className="divide-y divide-neutral-100 text-xs">
+                {filtered.length === 0 ? (
+                  <tr>
+                    <td colSpan={7} className="py-12 text-center">
+                      <div className="space-y-2">
+                        <Inbox className="h-6 w-6 text-neutral-300 mx-auto" />
+                        <p className="text-xs text-neutral-500 font-medium">No orders found in database.</p>
+                        <p className="text-[11px] text-neutral-400">When customers place orders on your store, they will appear here in real time.</p>
+                      </div>
+                    </td>
+                  </tr>
+                ) : (
+                  filtered.map((order) => {
+                    const badge = STATUS_CONFIG[order.status] || {
+                      bg: "bg-neutral-100",
+                      text: "text-neutral-700",
+                      border: "border-neutral-200",
+                    };
+                    return (
+                      <tr key={order.id} className="hover:bg-neutral-50/60 transition-colors">
+                        <td className="px-5 py-3.5">
+                          <span className="font-mono font-bold text-neutral-950">{order.id}</span>
+                          <p className="text-[10px] text-neutral-400 font-mono">{order.time}</p>
+                        </td>
+                        <td className="px-4 py-3.5">
+                          <span className="font-semibold text-neutral-950">{order.customer}</span>
+                          <p className="text-[11px] text-neutral-500 font-mono">{order.phone}</p>
+                        </td>
+                        <td className="px-4 py-3.5 text-neutral-700 font-medium">
+                          {order.address}
+                        </td>
+                        <td className="px-4 py-3.5 font-mono text-neutral-500 font-medium">
+                          {order.items} cases
+                        </td>
+                        <td className="px-4 py-3.5 font-bold text-neutral-950">
+                          QR {order.total}
+                        </td>
+                        <td className="px-4 py-3.5">
+                          <select
+                            value={order.status}
+                            disabled={updatingId === order.id}
+                            onChange={(e) => handleStatusChange(order.id, e.target.value)}
+                            className={`rounded-lg px-2 py-1 text-[11px] font-bold uppercase tracking-wider border focus:outline-none cursor-pointer ${badge.bg} ${badge.text} ${badge.border}`}
                           >
-                            <MessageSquare className="h-3.5 w-3.5" />
-                          </a>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })
-              )}
-            </tbody>
-          </table>
+                            <option value="pending">PENDING</option>
+                            <option value="confirmed">CONFIRMED</option>
+                            <option value="dispatched">DISPATCHED</option>
+                            <option value="delivered">DELIVERED</option>
+                            <option value="cancelled">CANCELLED</option>
+                          </select>
+                        </td>
+                        <td className="px-5 py-3.5 text-right">
+                          <div className="inline-flex items-center gap-2">
+                            <a
+                              href={`https://wa.me/${order.phone.replace(/[^0-9]/g, "")}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="p-1.5 rounded-lg border border-neutral-200 bg-white text-emerald-700 hover:border-emerald-300 hover:bg-emerald-50 transition-colors shadow-2xs"
+                              title="Open WhatsApp Chat with Client"
+                            >
+                              <MessageSquare className="h-3.5 w-3.5" />
+                            </a>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

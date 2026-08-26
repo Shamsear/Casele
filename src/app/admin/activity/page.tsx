@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { AdminTableSkeleton } from "@/components/admin/admin-skeletons";
 import { Activity, Inbox } from "lucide-react";
 
 interface AdminActivity {
@@ -53,56 +54,55 @@ export default function AdminActivityPage() {
         </p>
       </div>
 
-      <div className="rounded-2xl border border-neutral-200/80 bg-white overflow-hidden shadow-2xs">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left">
-            <thead>
-              <tr className="border-b border-neutral-100 bg-neutral-50/70 text-[11px] font-bold uppercase tracking-wider text-neutral-500">
-                <th className="px-5 py-3.5">Action</th>
-                <th className="px-4 py-3.5">Details</th>
-                <th className="px-4 py-3.5">Administrator</th>
-                <th className="px-5 py-3.5 text-right">Timestamp</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-neutral-100 text-xs">
-              {loading ? (
-                <tr>
-                  <td colSpan={4} className="py-12 text-center text-neutral-400">
-                    Loading activity records from database...
-                  </td>
+      {/* Table or Shimmer Skeleton */}
+      {loading ? (
+        <AdminTableSkeleton rows={6} cols={4} />
+      ) : (
+        <div className="rounded-2xl border border-neutral-200/80 bg-white overflow-hidden shadow-2xs">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left">
+              <thead>
+                <tr className="border-b border-neutral-100 bg-neutral-50/70 text-[11px] font-bold uppercase tracking-wider text-neutral-500">
+                  <th className="px-5 py-3.5">Action</th>
+                  <th className="px-4 py-3.5">Details</th>
+                  <th className="px-4 py-3.5">Administrator</th>
+                  <th className="px-5 py-3.5 text-right">Timestamp</th>
                 </tr>
-              ) : logs.length === 0 ? (
-                <tr>
-                  <td colSpan={4} className="py-12 text-center">
-                    <div className="space-y-2">
-                      <Activity className="h-6 w-6 text-neutral-300 mx-auto" />
-                      <p className="text-xs text-neutral-500 font-medium">No activity logged in database yet.</p>
-                      <p className="text-[11px] text-neutral-400">Admin operations and store events will be recorded here.</p>
-                    </div>
-                  </td>
-                </tr>
-              ) : (
-                logs.map((log) => (
-                  <tr key={log.id} className="hover:bg-neutral-50/60 transition-colors">
-                    <td className="px-5 py-3.5">
-                      <span
-                        className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider border ${
-                          ACTION_COLORS[log.action] || "bg-neutral-100 text-neutral-700 border-neutral-200"
-                        }`}
-                      >
-                        {log.action.replace(/_/g, " ")}
-                      </span>
+              </thead>
+              <tbody className="divide-y divide-neutral-100 text-xs">
+                {logs.length === 0 ? (
+                  <tr>
+                    <td colSpan={4} className="py-12 text-center">
+                      <div className="space-y-2">
+                        <Activity className="h-6 w-6 text-neutral-300 mx-auto" />
+                        <p className="text-xs text-neutral-500 font-medium">No activity logged in database yet.</p>
+                        <p className="text-[11px] text-neutral-400">Admin operations and store events will be recorded here.</p>
+                      </div>
                     </td>
-                    <td className="px-4 py-3.5 font-semibold text-neutral-900">{log.details}</td>
-                    <td className="px-4 py-3.5 text-neutral-600 font-medium">{log.admin}</td>
-                    <td className="px-5 py-3.5 text-right text-neutral-400 font-mono">{log.time}</td>
                   </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+                ) : (
+                  logs.map((log) => (
+                    <tr key={log.id} className="hover:bg-neutral-50/60 transition-colors">
+                      <td className="px-5 py-3.5">
+                        <span
+                          className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider border ${
+                            ACTION_COLORS[log.action] || "bg-neutral-100 text-neutral-700 border-neutral-200"
+                          }`}
+                        >
+                          {log.action.replace(/_/g, " ")}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3.5 font-semibold text-neutral-900">{log.details}</td>
+                      <td className="px-4 py-3.5 text-neutral-600 font-medium">{log.admin}</td>
+                      <td className="px-5 py-3.5 text-right text-neutral-400 font-mono">{log.time}</td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

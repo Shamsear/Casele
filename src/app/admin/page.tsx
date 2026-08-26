@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { AdminKPISkeleton, AdminTableSkeleton } from "@/components/admin/admin-skeletons";
 import {
   TrendingUp,
   ShoppingBag,
@@ -11,7 +12,6 @@ import {
   Plus,
   Tag,
   Percent,
-  Clock,
   Sparkles,
   Inbox
 } from "lucide-react";
@@ -80,6 +80,28 @@ export default function AdminDashboardPage() {
       });
   }, []);
 
+  if (loading) {
+    return (
+      <div className="space-y-8 animate-fade-in">
+        <div className="space-y-2 animate-pulse">
+          <div className="h-8 w-64 rounded-xl bg-neutral-200" />
+          <div className="h-4 w-96 rounded-lg bg-neutral-100" />
+        </div>
+        <AdminKPISkeleton />
+        <div className="grid gap-6 lg:grid-cols-2">
+          <div className="space-y-3">
+            <div className="h-5 w-32 rounded-lg bg-neutral-200 animate-pulse" />
+            <AdminTableSkeleton rows={4} cols={3} />
+          </div>
+          <div className="space-y-3">
+            <div className="h-5 w-36 rounded-lg bg-neutral-200 animate-pulse" />
+            <AdminTableSkeleton rows={4} cols={3} />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6 sm:space-y-8 animate-fade-in">
       {/* Header Banner */}
@@ -130,7 +152,7 @@ export default function AdminDashboardPage() {
             </div>
           </div>
           <p className="mt-3 font-display text-2xl sm:text-3xl font-bold text-neutral-950 tracking-tight">
-            {loading ? "..." : `QR ${stats?.totalRevenue?.toLocaleString() ?? 0}`}
+            QR {stats?.totalRevenue?.toLocaleString() ?? 0}
           </p>
           <div className="mt-2 flex items-center gap-1.5 text-[11px] font-semibold text-emerald-700">
             <Sparkles className="h-3 w-3" />
@@ -147,7 +169,7 @@ export default function AdminDashboardPage() {
             </div>
           </div>
           <p className="mt-3 font-display text-2xl sm:text-3xl font-bold text-neutral-950 tracking-tight">
-            {loading ? "..." : stats?.totalOrders ?? 0}
+            {stats?.totalOrders ?? 0}
           </p>
           <p className="mt-2 text-[11px] text-neutral-500 font-medium">Customer checkouts</p>
         </div>
@@ -161,7 +183,7 @@ export default function AdminDashboardPage() {
             </div>
           </div>
           <p className="mt-3 font-display text-2xl sm:text-3xl font-bold text-neutral-950 tracking-tight">
-            {loading ? "..." : stats?.totalCustomers ?? 0}
+            {stats?.totalCustomers ?? 0}
           </p>
           <p className="mt-2 text-[11px] text-neutral-500 font-medium">Unique verified shoppers</p>
         </div>
@@ -175,7 +197,7 @@ export default function AdminDashboardPage() {
             </div>
           </div>
           <p className="mt-3 font-display text-2xl sm:text-3xl font-bold text-neutral-950 tracking-tight">
-            {loading ? "..." : stats?.totalProducts ?? 0}
+            {stats?.totalProducts ?? 0}
           </p>
           <p className="mt-2 text-[11px] text-neutral-500 font-medium">Active database products</p>
         </div>

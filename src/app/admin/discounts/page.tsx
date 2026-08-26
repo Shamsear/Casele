@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useToast } from "@/components/ui/toast";
+import { AdminTableSkeleton } from "@/components/admin/admin-skeletons";
 import { Plus, Trash2, Tag, Percent, Sparkles, Clock, Calendar, Power, PowerOff, AlertCircle } from "lucide-react";
 
 interface Tier {
@@ -422,7 +423,7 @@ export default function AdminDiscountsPage() {
 
           {/* Tiers List */}
           {loadingTiers ? (
-            <div className="py-8 text-center text-neutral-400 text-xs">Loading discount tiers from database...</div>
+            <AdminTableSkeleton rows={3} cols={3} />
           ) : tiers.length === 0 ? (
             <div className="py-8 text-center text-neutral-400 text-xs">No spend tiers created in database yet.</div>
           ) : (
@@ -567,7 +568,7 @@ export default function AdminDiscountsPage() {
 
           {/* Flash Sales List */}
           {loadingFlash ? (
-            <div className="py-8 text-center text-neutral-400 text-xs">Loading flash deals from database...</div>
+            <AdminTableSkeleton rows={3} cols={4} />
           ) : flashSales.length === 0 ? (
             <div className="py-8 text-center text-neutral-400 text-xs">No scheduled flash sales in database.</div>
           ) : (

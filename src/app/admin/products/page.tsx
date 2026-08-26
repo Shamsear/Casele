@@ -3,8 +3,9 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { AdminTableSkeleton, AdminGridSkeleton } from "@/components/admin/admin-skeletons";
 import { formatPrice } from "@/lib/utils";
-import { Plus, Search, LayoutGrid, List, Tag, Eye, Edit2, Package, Sparkles } from "lucide-react";
+import { Plus, Search, LayoutGrid, List, Tag, Eye, Edit2, Package, Sparkles, Inbox } from "lucide-react";
 
 interface AdminProduct {
   id: string;
@@ -18,16 +19,8 @@ interface AdminProduct {
   categoryName?: string;
 }
 
-const SAMPLE_PRODUCTS: AdminProduct[] = [
-  { id: "1", name: "Titanium Armor MagSafe Case", price: "85", comparePrice: "110", badge: "bestseller", status: "active", stock: 45, images: ["/products/leather-case-black.png"], categoryName: "Luxe Series" },
-  { id: "2", name: "Gold Edge Bespoke Case", price: "95", comparePrice: null, badge: "new", status: "active", stock: 30, images: ["/products/leather-case-saddle.png"], categoryName: "Designer Atelier" },
-  { id: "3", name: "Midnight Nappa Leather Case", price: "80", comparePrice: "100", badge: "sale", status: "active", stock: 12, images: ["/products/leather-case-blue.png"], categoryName: "Classic" },
-  { id: "4", name: "Matte Carbon Fiber Enclosure", price: "75", comparePrice: null, badge: null, status: "active", stock: 18, images: ["/products/carbon-case.png"], categoryName: "Sport" },
-  { id: "5", name: "Ultra-Clear Anti-Yellow Shield", price: "65", comparePrice: null, badge: null, status: "active", stock: 24, images: ["/products/clear-case.png"], categoryName: "Classic" },
-];
-
 export default function AdminProductsPage() {
-  const [products, setProducts] = useState<AdminProduct[]>(SAMPLE_PRODUCTS);
+  const [products, setProducts] = useState<AdminProduct[]>([]);
   const [view, setView] = useState<"table" | "grid">("table");
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
@@ -36,7 +29,7 @@ export default function AdminProductsPage() {
     fetch("/api/products")
       .then((res) => res.json())
       .then((data) => {
-        if (Array.isArray(data) && data.length > 0) {
+        if (Array.isArray(data)) {
           setProducts(
             data.map((p) => ({
               id: p.id,
@@ -45,7 +38,7 @@ export default function AdminProductsPage() {
               comparePrice: p.comparePrice,
               badge: p.badge,
               status: "active",
-              stock: p.models?.reduce((acc: number, m: any) => acc + (m.stock || 0), 0) || 25,
+              stock: p.models?.reduce((acc: number, m: any) => acc + (m.stock || 0), 0) || 0,
               images: p.images || ["/products/leather-case-black.png"],
               categoryName: p.categoryName || "Collection",
             }))
@@ -124,8 +117,29 @@ export default function AdminProductsPage() {
         </div>
       </div>
 
-      {/* Table View */}
-      {view === "table" && (
+      {/* Shimmer Skeleton or Real Content */}
+      {loading ? (
+        view === "table" ? (
+          <AdminTableSkeleton rows={6} cols={7} />
+        ) : (
+          <AdminGridSkeleton cards={8} />
+        )
+      ) : filtered.length === 0 ? (
+        <div className="rounded-2xl border border-neutral-200/80 bg-white p-12 text-center space-y-3 shadow-2xs">
+          <Package className="h-8 w-8 text-neutral-300 mx-auto" />
+          <h3 className="font-bold text-neutral-950 text-sm">No Products Found in Database</h3>
+          <p className="text-xs text-neutral-500 max-w-sm mx-auto">
+            Get started by adding your first luxury case silhouette to your catalog.
+          </p>
+          <Link
+            href="/admin/products/new"
+            className="inline-flex items-center gap-1.5 rounded-xl bg-neutral-950 px-4 py-2 text-xs font-bold uppercase tracking-wider text-white hover:bg-neutral-800 transition-all"
+          >
+            <Plus className="h-3.5 w-3.5" />
+            <span>Create Product</span>
+          </Link>
+        </div>
+      ) : view === "table" ? (
         <div className="rounded-2xl border border-neutral-200/80 bg-white overflow-hidden shadow-2xs">
           <div className="overflow-x-auto">
             <table className="w-full text-left">
@@ -208,10 +222,7 @@ export default function AdminProductsPage() {
             </table>
           </div>
         </div>
-      )}
-
-      {/* Grid View */}
-      {view === "grid" && (
+      ) : (
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
           {filtered.map((product) => (
             <Link

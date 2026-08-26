@@ -185,14 +185,21 @@ export default function AdminSettingsPage() {
 
   if (loading) {
     return (
-      <div className="space-y-6">
-        <div>
-          <h1 className="font-display text-2xl font-bold text-neutral-950">Store Settings</h1>
-          <p className="mt-1 text-xs text-neutral-500">Loading store preferences...</p>
+      <div className="space-y-8 animate-fade-in">
+        <div className="space-y-2 animate-pulse">
+          <div className="h-8 w-64 rounded-xl bg-neutral-200" />
+          <div className="h-4 w-96 rounded-lg bg-neutral-100" />
         </div>
-        <div className="animate-pulse space-y-4">
-          <div className="h-32 rounded-2xl bg-neutral-200/50" />
-          <div className="h-32 rounded-2xl bg-neutral-200/50" />
+        <div className="space-y-6">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="rounded-2xl border border-neutral-200/80 bg-white p-6 shadow-2xs space-y-4 animate-pulse">
+              <div className="h-5 w-48 rounded-md bg-neutral-200" />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="h-10 rounded-xl bg-neutral-100" />
+                <div className="h-10 rounded-xl bg-neutral-100" />
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     );

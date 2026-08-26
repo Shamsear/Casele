@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useToast } from "@/components/ui/toast";
+import { AdminGridSkeleton } from "@/components/admin/admin-skeletons";
 import { Plus, Trash2, Edit2, Layers, Tag, Percent } from "lucide-react";
 
 interface Category {
@@ -223,9 +224,17 @@ export default function AdminCategoriesPage() {
         </div>
       )}
 
-      {/* Categories Cards Grid */}
+      {/* Categories Cards Grid or Shimmer Skeleton */}
       {loading ? (
-        <div className="py-12 text-center text-neutral-400 text-xs">Loading collections...</div>
+        <AdminGridSkeleton cards={6} />
+      ) : categories.length === 0 ? (
+        <div className="rounded-2xl border border-neutral-200/80 bg-white p-12 text-center space-y-3 shadow-2xs">
+          <Layers className="h-8 w-8 text-neutral-300 mx-auto" />
+          <h3 className="font-bold text-neutral-950 text-sm">No Collections Created in Database</h3>
+          <p className="text-xs text-neutral-500 max-w-sm mx-auto">
+            Organize your luxury phone cases into curated collections.
+          </p>
+        </div>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {categories.map((cat) => (

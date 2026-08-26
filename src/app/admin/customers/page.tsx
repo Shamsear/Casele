@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { AdminTableSkeleton } from "@/components/admin/admin-skeletons";
 import { Search, Users, MessageSquare, Inbox } from "lucide-react";
 
 interface AdminCustomer {
@@ -63,62 +64,61 @@ export default function AdminCustomersPage() {
         />
       </div>
 
-      <div className="rounded-2xl border border-neutral-200/80 bg-white overflow-hidden shadow-2xs">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left">
-            <thead>
-              <tr className="border-b border-neutral-100 bg-neutral-50/70 text-[11px] font-bold uppercase tracking-wider text-neutral-500">
-                <th className="px-5 py-3.5">Client</th>
-                <th className="px-4 py-3.5">Phone Number</th>
-                <th className="px-4 py-3.5">Orders</th>
-                <th className="px-4 py-3.5">Lifetime Spend</th>
-                <th className="px-4 py-3.5">Last Order</th>
-                <th className="px-5 py-3.5 text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-neutral-100 text-xs">
-              {loading ? (
-                <tr>
-                  <td colSpan={6} className="py-12 text-center text-neutral-400">
-                    Loading customer records from database...
-                  </td>
+      {/* Table or Shimmer Skeleton */}
+      {loading ? (
+        <AdminTableSkeleton rows={5} cols={5} />
+      ) : (
+        <div className="rounded-2xl border border-neutral-200/80 bg-white overflow-hidden shadow-2xs">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left">
+              <thead>
+                <tr className="border-b border-neutral-100 bg-neutral-50/70 text-[11px] font-bold uppercase tracking-wider text-neutral-500">
+                  <th className="px-5 py-3.5">Client</th>
+                  <th className="px-4 py-3.5">Phone Number</th>
+                  <th className="px-4 py-3.5">Orders</th>
+                  <th className="px-4 py-3.5">Lifetime Spend</th>
+                  <th className="px-4 py-3.5">Last Order</th>
+                  <th className="px-5 py-3.5 text-right">Actions</th>
                 </tr>
-              ) : filtered.length === 0 ? (
-                <tr>
-                  <td colSpan={6} className="py-12 text-center">
-                    <div className="space-y-2">
-                      <Users className="h-6 w-6 text-neutral-300 mx-auto" />
-                      <p className="text-xs text-neutral-500 font-medium">No customer profiles in database yet.</p>
-                      <p className="text-[11px] text-neutral-400">When shoppers complete orders, their profiles and spend history will automatically be logged here.</p>
-                    </div>
-                  </td>
-                </tr>
-              ) : (
-                filtered.map((customer) => (
-                  <tr key={customer.phone} className="hover:bg-neutral-50/60 transition-colors">
-                    <td className="px-5 py-3.5 font-semibold text-neutral-950">{customer.name}</td>
-                    <td className="px-4 py-3.5 text-neutral-600 font-mono font-medium">{customer.phone}</td>
-                    <td className="px-4 py-3.5 text-neutral-600 font-mono">{customer.orders} orders</td>
-                    <td className="px-4 py-3.5 font-bold text-neutral-950">QR {customer.totalSpend.toLocaleString()}</td>
-                    <td className="px-4 py-3.5 text-neutral-500 font-medium">{customer.lastOrder}</td>
-                    <td className="px-5 py-3.5 text-right">
-                      <a
-                        href={`https://wa.me/${customer.phone.replace(/[^0-9]/g, "")}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1.5 rounded-lg border border-neutral-200 bg-white px-3 py-1 text-xs font-semibold text-emerald-700 hover:bg-emerald-50 hover:border-emerald-300 transition-colors shadow-2xs"
-                      >
-                        <MessageSquare className="h-3 w-3" />
-                        <span>WhatsApp</span>
-                      </a>
+              </thead>
+              <tbody className="divide-y divide-neutral-100 text-xs">
+                {filtered.length === 0 ? (
+                  <tr>
+                    <td colSpan={6} className="py-12 text-center">
+                      <div className="space-y-2">
+                        <Users className="h-6 w-6 text-neutral-300 mx-auto" />
+                        <p className="text-xs text-neutral-500 font-medium">No customer profiles in database yet.</p>
+                        <p className="text-[11px] text-neutral-400">When shoppers complete orders, their profiles and spend history will automatically be logged here.</p>
+                      </div>
                     </td>
                   </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+                ) : (
+                  filtered.map((customer) => (
+                    <tr key={customer.phone} className="hover:bg-neutral-50/60 transition-colors">
+                      <td className="px-5 py-3.5 font-semibold text-neutral-950">{customer.name}</td>
+                      <td className="px-4 py-3.5 text-neutral-600 font-mono font-medium">{customer.phone}</td>
+                      <td className="px-4 py-3.5 text-neutral-600 font-mono">{customer.orders} orders</td>
+                      <td className="px-4 py-3.5 font-bold text-neutral-950">QR {customer.totalSpend.toLocaleString()}</td>
+                      <td className="px-4 py-3.5 text-neutral-500 font-medium">{customer.lastOrder}</td>
+                      <td className="px-5 py-3.5 text-right">
+                        <a
+                          href={`https://wa.me/${customer.phone.replace(/[^0-9]/g, "")}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1.5 rounded-lg border border-neutral-200 bg-white px-3 py-1 text-xs font-semibold text-emerald-700 hover:bg-emerald-50 hover:border-emerald-300 transition-colors shadow-2xs"
+                        >
+                          <MessageSquare className="h-3 w-3" />
+                          <span>WhatsApp</span>
+                        </a>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }
