@@ -31,6 +31,7 @@ export async function GET(request: NextRequest) {
         items: totalItemCount,
         total: Number(order.total),
         status: order.status,
+        deliverySpeed: order.priority || "same_day",
         time: formatOrderTime(order.createdAt),
         createdAt: order.createdAt.toISOString(),
         itemsDetail: itemsList,
@@ -63,6 +64,7 @@ export async function POST(request: NextRequest) {
       discount = 0,
       total,
       status = "confirmed",
+      deliverySpeed = "same_day",
       notes,
     } = body;
 
@@ -86,6 +88,7 @@ export async function POST(request: NextRequest) {
         promoDiscount: Number(discount),
         total: calculatedTotal,
         status: status || "confirmed",
+        priority: deliverySpeed || "same_day",
         notes: notes?.trim() || null,
         whatsappSent: true,
       },
@@ -140,7 +143,7 @@ export async function PUT(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { id, status, notes, address } = body;
+    const { id, status, notes, address, deliverySpeed } = body;
 
     if (!id) {
       return NextResponse.json({ error: "Order ID is required" }, { status: 400 });
@@ -152,6 +155,7 @@ export async function PUT(request: NextRequest) {
         ...(status && { status }),
         ...(notes !== undefined && { notes }),
         ...(address && { address }),
+        ...(deliverySpeed && { priority: deliverySpeed }),
       },
     });
 

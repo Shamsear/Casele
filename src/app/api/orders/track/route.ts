@@ -46,6 +46,7 @@ export async function GET(request: NextRequest) {
         discount: Number(o.promoDiscount || 0) + Number(o.tierDiscount || 0),
         total: Number(o.total),
         status: o.status,
+        deliverySpeed: o.priority || "same_day",
         notes: o.notes || "",
         createdAt: o.createdAt.toISOString(),
         updatedAt: o.updatedAt.toISOString(),

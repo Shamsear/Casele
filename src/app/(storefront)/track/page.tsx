@@ -15,6 +15,8 @@ import {
   Clock,
   ShieldCheck,
   Sparkles,
+  Calendar,
+  Zap,
   X
 } from "lucide-react";
 
@@ -32,11 +34,58 @@ interface Order {
   items: OrderItem[];
   total: number;
   status: string;
+  deliverySpeed?: string;
   createdAt: string;
   updatedAt: string;
   address?: string | null;
   notes?: string | null;
 }
+
+const DELIVERY_SPEED_CONFIG: Record<
+  string,
+  { label: string; icon: any; bg: string; text: string; border: string; desc: string }
+> = {
+  same_day: {
+    label: "Doha Same-Day Delivery",
+    icon: Zap,
+    bg: "bg-[#C5A869]/10",
+    text: "text-[#A88B4D]",
+    border: "border-[#C5A869]/20",
+    desc: "Courier on the way for same-day delivery in Doha",
+  },
+  next_day: {
+    label: "Next-Day Qatar Delivery",
+    icon: Clock,
+    bg: "bg-blue-50",
+    text: "text-blue-700",
+    border: "border-blue-200",
+    desc: "Dispatched for next-day delivery across Qatar",
+  },
+  standard: {
+    label: "Standard Delivery (1-2 Days)",
+    icon: Truck,
+    bg: "bg-neutral-100",
+    text: "text-neutral-700",
+    border: "border-neutral-200",
+    desc: "Courier delivering within 1-2 business days",
+  },
+  express: {
+    label: "Express 2-Hour VIP Delivery",
+    icon: Sparkles,
+    bg: "bg-purple-50",
+    text: "text-purple-700",
+    border: "border-purple-200",
+    desc: "Priority VIP courier dispatched (within 2 hours)",
+  },
+  scheduled: {
+    label: "Scheduled Delivery",
+    icon: Calendar,
+    bg: "bg-emerald-50",
+    text: "text-emerald-700",
+    border: "border-emerald-200",
+    desc: "Courier scheduled for delivery on your requested date/time",
+  },
+};
 
 function TrackPageContent() {
   const searchParams = useSearchParams();
@@ -87,13 +136,6 @@ function TrackPageContent() {
     executeSearch(query, "auto");
   };
 
-  const statusSteps = [
-    { key: "pending", label: "Order Received", desc: "Order details logged in Atelier" },
-    { key: "confirmed", label: "Confirmed", desc: "Cases verified & packaged" },
-    { key: "dispatched", label: "Out for Delivery", desc: "Courier on the way in Doha" },
-    { key: "delivered", label: "Delivered", desc: "Handed over to customer" },
-  ];
-
   return (
     <div className="min-h-screen bg-neutral-50 text-neutral-950 py-12 lg:py-16">
       <div className="mx-auto max-w-2xl px-4 sm:px-6 lg:px-8">
@@ -107,7 +149,7 @@ function TrackPageContent() {
             Live Order Tracking
           </h1>
           <p className="text-xs sm:text-sm text-neutral-600 max-w-md mx-auto">
-            Track same-day delivery progress across Doha, The Pearl, Lusail, and Qatar
+            Track real-time delivery progress across Doha, The Pearl, Lusail, and Qatar
           </p>
         </div>
 
@@ -162,6 +204,16 @@ function TrackPageContent() {
         {orders.length > 0 && (
           <div className="mt-8 space-y-6">
             {orders.map((order) => {
+              const speedConfig = DELIVERY_SPEED_CONFIG[order.deliverySpeed || "same_day"] || DELIVERY_SPEED_CONFIG.same_day;
+              const SpeedIcon = speedConfig.icon;
+
+              const statusSteps = [
+                { key: "pending", label: "Order Received", desc: "Order logged in Atelier" },
+                { key: "confirmed", label: "Confirmed", desc: "Cases verified & packaged" },
+                { key: "dispatched", label: "Out for Delivery", desc: speedConfig.desc },
+                { key: "delivered", label: "Delivered", desc: "Handed over to customer" },
+              ];
+
               const currentStepIdx = statusSteps.findIndex((s) => s.key === order.status);
               const activeIdx = currentStepIdx === -1 ? 0 : currentStepIdx;
 
@@ -191,11 +243,11 @@ function TrackPageContent() {
                       </p>
                     </div>
 
-                    {/* Delivery Method Badge */}
+                    {/* Dynamic Delivery Speed / Method Badge */}
                     <div className="flex items-center gap-2">
-                      <div className="inline-flex items-center gap-1.5 rounded-full bg-[#C5A869]/10 px-3 py-1 text-xs font-semibold text-[#A88B4D] border border-[#C5A869]/20">
-                        <Truck className="h-3.5 w-3.5" />
-                        <span>Doha Same-Day Delivery</span>
+                      <div className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold border ${speedConfig.bg} ${speedConfig.text} ${speedConfig.border}`}>
+                        <SpeedIcon className="h-3.5 w-3.5" />
+                        <span>{speedConfig.label}</span>
                       </div>
                     </div>
                   </div>

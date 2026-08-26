@@ -35,6 +35,7 @@ interface AdminOrder {
   address: string;
   createdAt: string;
   itemsDetail?: { productId?: string; name: string; model: string; qty: number; price: number }[];
+  deliverySpeed?: string;
   notes?: string;
 }
 
@@ -68,6 +69,7 @@ export default function AdminOrdersPage() {
   const [customerPhone, setCustomerPhone] = useState("+974 ");
   const [deliveryAddress, setDeliveryAddress] = useState("");
   const [orderStatus, setOrderStatus] = useState("confirmed");
+  const [deliverySpeed, setDeliverySpeed] = useState("same_day");
   const [orderNotes, setOrderNotes] = useState("");
   const [orderDiscount, setOrderDiscount] = useState("0");
   const [pastedWhatsAppText, setPastedWhatsAppText] = useState("");
@@ -235,6 +237,19 @@ export default function AdminOrdersPage() {
       ]);
     }
 
+    // Extract Delivery Speed if mentioned in message
+    if (/next\s*day|tomorrow/i.test(text)) {
+      setDeliverySpeed("next_day");
+    } else if (/express|urgent|2\s*hour/i.test(text)) {
+      setDeliverySpeed("express");
+    } else if (/standard/i.test(text)) {
+      setDeliverySpeed("standard");
+    } else if (/schedule|friday|saturday|sunday|monday|tuesday|wednesday|thursday/i.test(text)) {
+      setDeliverySpeed("scheduled");
+    } else {
+      setDeliverySpeed("same_day");
+    }
+
     toast("Form auto-filled from WhatsApp message!", "success");
     setShowAutoFillBox(false);
   };
@@ -309,6 +324,7 @@ export default function AdminOrdersPage() {
           discount: Number(orderDiscount || 0),
           total: calculatedTotal,
           status: orderStatus,
+          deliverySpeed,
           notes: orderNotes.trim(),
         }),
       });
@@ -328,6 +344,7 @@ export default function AdminOrdersPage() {
         setCustomerName("");
         setCustomerPhone("+974 ");
         setDeliveryAddress("");
+        setDeliverySpeed("same_day");
         setOrderNotes("");
         setOrderDiscount("0");
         setPastedWhatsAppText("");
@@ -498,7 +515,20 @@ export default function AdminOrdersPage() {
                           <p className="text-[11px] text-neutral-500 font-mono">{order.phone}</p>
                         </td>
                         <td className="px-4 py-3.5 text-neutral-700 font-medium">
-                          {order.address}
+                          <div>{order.address}</div>
+                          <div className="mt-1">
+                            <span className="inline-flex items-center gap-1 rounded-md bg-neutral-100 px-1.5 py-0.5 text-[10px] font-semibold text-neutral-600 font-mono">
+                              {order.deliverySpeed === "next_day"
+                                ? "📦 Next-Day"
+                                : order.deliverySpeed === "standard"
+                                ? "🚚 Standard (1-2d)"
+                                : order.deliverySpeed === "express"
+                                ? "🚀 Express 2hr"
+                                : order.deliverySpeed === "scheduled"
+                                ? "📅 Scheduled"
+                                : "⚡ Same-Day"}
+                            </span>
+                          </div>
                         </td>
                         <td className="px-4 py-3.5 font-mono text-neutral-500 font-medium">
                           {order.items} cases
@@ -754,8 +784,8 @@ export default function AdminOrdersPage() {
                 </div>
               </div>
 
-              {/* Order Status & Discount */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t border-neutral-100">
+              {/* Order Status, Delivery Speed & Discount */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 border-t border-neutral-100">
                 <div className="space-y-1">
                   <label className="text-[11px] font-bold uppercase tracking-wider text-neutral-700">Order Status</label>
                   <select
@@ -767,6 +797,21 @@ export default function AdminOrdersPage() {
                     <option value="pending">PENDING</option>
                     <option value="dispatched">DISPATCHED</option>
                     <option value="delivered">DELIVERED</option>
+                  </select>
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-[11px] font-bold uppercase tracking-wider text-neutral-700">Delivery Speed</label>
+                  <select
+                    value={deliverySpeed}
+                    onChange={(e) => setDeliverySpeed(e.target.value)}
+                    className="w-full h-10 px-3 rounded-xl border border-neutral-200 bg-white text-neutral-950 text-xs font-semibold focus:outline-none focus:border-neutral-950 shadow-2xs"
+                  >
+                    <option value="same_day">⚡ Same-Day Doha</option>
+                    <option value="next_day">📦 Next-Day Qatar</option>
+                    <option value="standard">🚚 Standard (1-2 Days)</option>
+                    <option value="express">🚀 Express 2-Hour VIP</option>
+                    <option value="scheduled">📅 Scheduled Date</option>
                   </select>
                 </div>
 
