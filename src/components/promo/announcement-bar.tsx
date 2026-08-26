@@ -52,7 +52,7 @@ export function AnnouncementBar() {
       .then((res) => res.json())
       .then((data) => {
         if (data.settings?.announcement_text) {
-          setCustomAnnouncement(data.settings.announcement_text);
+          setCustomAnnouncement(data.settings.announcement_text.trim());
         }
       })
       .catch(() => {});
@@ -71,17 +71,23 @@ export function AnnouncementBar() {
   }, []);
 
   const announcementsList = [
+    // Free delivery banner — ONLY when enabled in database
     ...(freeDeliveryEnabled && deliveryThreshold > 0
       ? [
           {
             text:
-              customAnnouncement ||
-              `Complimentary Doha Express Delivery on Orders Over QR ${deliveryThreshold}`,
+              customAnnouncement && customAnnouncement.toLowerCase().includes("delivery")
+                ? customAnnouncement
+                : `Complimentary Doha Express Delivery on Orders Over QR ${deliveryThreshold}`,
             badge: "FREE DELIVERY",
             link: "/shop",
           },
         ]
-      : customAnnouncement
+      : []),
+
+    // Custom announcement banner — Only if NOT empty and NOT a delivery message when delivery is disabled
+    ...(customAnnouncement &&
+    (!customAnnouncement.toLowerCase().includes("delivery") || freeDeliveryEnabled)
       ? [
           {
             text: customAnnouncement,
@@ -90,6 +96,8 @@ export function AnnouncementBar() {
           },
         ]
       : []),
+
+    // Active promo code banner — ONLY when active in database
     ...(activePromo
       ? [
           {
@@ -99,6 +107,8 @@ export function AnnouncementBar() {
           },
         ]
       : []),
+
+    // Brand Guarantee
     {
       text: "Bespoke Aerospace Composites • 100% Precision Fit Guarantee",
       badge: "PRECISION FIT",
