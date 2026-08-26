@@ -6,17 +6,11 @@ interface TierResult {
   tierLabel: string | null;
 }
 
-const DEFAULT_TIERS = [
-  { min: 50, percent: 5 },
-  { min: 100, percent: 10 },
-  { min: 200, percent: 15 },
-];
-
 export async function calculateTierDiscount(
   subtotal: number
 ): Promise<TierResult> {
   try {
-    // Check if tier discounts are enabled in settings
+    // 1. Check if tier discounts are enabled globally in settings
     const tierSetting = await prisma.setting.findUnique({
       where: { key: "tier_discounts_enabled" },
     });
@@ -24,6 +18,7 @@ export async function calculateTierDiscount(
       return { applicablePercent: 0, discountAmount: 0, tierLabel: null };
     }
 
+    // 2. Fetch active tiers from PostgreSQL
     const tiers = await prisma.tierDiscount.findMany({
       where: { isActive: true },
       orderBy: { minAmount: "asc" },
@@ -51,26 +46,11 @@ export async function calculateTierDiscount(
             : null,
       };
     }
-  } catch (error) {
-    console.warn("DB tier discount calculation failed, using fallback:", error);
-  }
 
-  // Fallback default tiers
-  let applicablePercent = 0;
-  let tierMin = 0;
-  for (const tier of DEFAULT_TIERS) {
-    if (subtotal >= tier.min) {
-      applicablePercent = tier.percent;
-      tierMin = tier.min;
-    }
+    // If database returned tiers array and none are active / configured, return 0
+    return { applicablePercent: 0, discountAmount: 0, tierLabel: null };
+  } catch (error) {
+    console.warn("DB tier discount calculation failed:", error);
+    return { applicablePercent: 0, discountAmount: 0, tierLabel: null };
   }
-  const discountAmount = Math.round((subtotal * applicablePercent) / 100);
-  return {
-    applicablePercent,
-    discountAmount,
-    tierLabel:
-      applicablePercent > 0
-        ? `Spend QR ${tierMin}+ and save ${applicablePercent}%`
-        : null,
-  };
 }

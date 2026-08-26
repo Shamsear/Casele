@@ -32,13 +32,15 @@ export function CartDrawer() {
 
   const [deliveryThreshold, setDeliveryThreshold] = useState(100);
   const [freeDeliveryEnabled, setFreeDeliveryEnabled] = useState(true);
+  const [tierDiscountsEnabled, setTierDiscountsEnabled] = useState(true);
+  const [activeTiers, setActiveTiers] = useState<{ minAmount: number; discountPercent: number }[]>([]);
 
   // Automatically close cart drawer when navigating to another page
   useEffect(() => {
     setOpen(false);
   }, [pathname, setOpen]);
 
-  // Fetch WhatsApp number, delivery threshold, and saved customer credentials on mount
+  // Fetch WhatsApp number, delivery threshold, tier settings, and saved customer credentials on mount
   useEffect(() => {
     getWhatsAppNumber().then(setWhatsappNumber);
 
@@ -55,40 +57,45 @@ export function CartDrawer() {
         if (data.settings?.free_delivery_enabled !== undefined) {
           setFreeDeliveryEnabled(data.settings.free_delivery_enabled !== "false");
         }
+        if (data.settings?.tier_discounts_enabled !== undefined) {
+          setTierDiscountsEnabled(data.settings.tier_discounts_enabled !== "false");
+        }
         if (data.settings?.free_delivery_threshold) {
           const val = Number(data.settings.free_delivery_threshold);
           if (val > 0) setDeliveryThreshold(val);
         }
       })
       .catch(() => {});
-  }, []);
 
-  // Close on escape
-  useEffect(() => {
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setOpen(false);
-    };
-    document.addEventListener("keydown", handleEscape);
-    return () => document.removeEventListener("keydown", handleEscape);
-  }, [setOpen]);
-
-  // Prevent body scroll when open (preserves scroll position)
-  useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = "hidden";
-      document.body.style.position = "fixed";
-      document.body.style.width = "100%";
-    } else {
-      document.body.style.overflow = "";
-      document.body.style.position = "";
-      document.body.style.width = "";
-    }
-    return () => {
-      document.body.style.overflow = "";
-      document.body.style.position = "";
-      document.body.style.width = "";
-    };
+    fetch("/api/admin/discounts/tiered")
+      .then((res) => res.json())
+      .then((data) => {
+        if (Array.isArray(data.tiers)) {
+          setActiveTiers(
+            data.tiers
+              .filter((t: any) => t.isActive)
+              .map((t: any) => ({ minAmount: Number(t.minAmount), discountPercent: Number(t.discountPercent) }))
+          );
+        }
+      })
+      .catch(() => {});
   }, [isOpen]);
+
+  const currentSubtotal = subtotal();
+
+  const calculateDynamicTierDiscount = () => {
+    if (!tierDiscountsEnabled || activeTiers.length === 0) return 0;
+    let applicablePercent = 0;
+    for (const tier of activeTiers) {
+      if (currentSubtotal >= tier.minAmount && tier.discountPercent > applicablePercent) {
+        applicablePercent = tier.discountPercent;
+      }
+    }
+    return Math.round((currentSubtotal * applicablePercent) / 100);
+  };
+
+  const dynamicTierDiscount = calculateDynamicTierDiscount();
+  const calculatedTotal = Math.max(0, currentSubtotal - dynamicTierDiscount - promoDiscount);
 
   const handleWhatsAppOrder = () => {
     if (typeof window !== "undefined") {
@@ -107,18 +114,17 @@ export function CartDrawer() {
         qty: item.quantity,
         price: item.price,
       })),
-      subtotal: subtotal(),
-      tierDiscount: tierDiscount(),
+      subtotal: currentSubtotal,
+      tierDiscount: dynamicTierDiscount,
       flashDiscount: 0,
       bundleDiscount: 0,
       promoDiscount: promoDiscount,
-      total: total(),
+      total: calculatedTotal,
     });
 
     openWhatsApp(whatsappNumber, message);
   };
 
-  const currentSubtotal = subtotal();
   const progressPercent = Math.min(100, (currentSubtotal / deliveryThreshold) * 100);
   const qualifiesForFreeDelivery = currentSubtotal >= deliveryThreshold;
 
@@ -288,10 +294,10 @@ export function CartDrawer() {
                 <span>Subtotal</span>
                 <span className="text-neutral-950 font-medium">{formatPrice(currentSubtotal)}</span>
               </div>
-              {tierDiscount() > 0 && (
+              {dynamicTierDiscount > 0 && (
                 <div className="flex justify-between text-emerald-700">
                   <span>Tier Bundle Savings</span>
-                  <span>-{formatPrice(tierDiscount())}</span>
+                  <span>-{formatPrice(dynamicTierDiscount)}</span>
                 </div>
               )}
               {promoDiscount > 0 && (
@@ -302,7 +308,7 @@ export function CartDrawer() {
               )}
               <div className="flex justify-between border-t border-neutral-200/80 pt-2 text-sm font-bold text-neutral-950">
                 <span>Estimated Total</span>
-                <span className="font-display text-base tracking-tight">{formatPrice(total())}</span>
+                <span className="font-display text-base tracking-tight">{formatPrice(calculatedTotal)}</span>
               </div>
             </div>
 
