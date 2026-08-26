@@ -6,7 +6,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useCartStore } from "@/lib/store/cart";
 import { useI18n } from "@/lib/i18n/context";
-import { getWhatsAppNumber } from "@/lib/settings";
 import { buildWhatsAppMessage, openWhatsApp } from "@/lib/whatsapp";
 import { Price } from "@/components/ui/price";
 import {
@@ -42,8 +41,6 @@ export function CartDrawer() {
 
   // Fetch WhatsApp number, delivery threshold, tier settings, and saved customer credentials on mount
   useEffect(() => {
-    getWhatsAppNumber().then(setWhatsappNumber);
-
     if (typeof window !== "undefined") {
       const savedName = localStorage.getItem("casele_customer_name");
       const savedPhone = localStorage.getItem("casele_customer_phone");
@@ -54,6 +51,9 @@ export function CartDrawer() {
     fetch("/api/settings")
       .then((res) => res.json())
       .then((data) => {
+        if (data.settings?.whatsapp_number) {
+          setWhatsappNumber(data.settings.whatsapp_number);
+        }
         if (data.settings?.free_delivery_enabled !== undefined) {
           setFreeDeliveryEnabled(data.settings.free_delivery_enabled !== "false");
         }
@@ -63,6 +63,18 @@ export function CartDrawer() {
         if (data.settings?.free_delivery_threshold) {
           const val = Number(data.settings.free_delivery_threshold);
           if (val > 0) setDeliveryThreshold(val);
+        }
+      })
+      .catch(() => {});
+
+    fetch("/api/admin/discounts/delivery-rule")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.config) {
+          setFreeDeliveryEnabled(Boolean(data.config.isFreeDeliveryActive));
+          if (Number(data.config.freeThreshold) > 0) {
+            setDeliveryThreshold(Number(data.config.freeThreshold));
+          }
         }
       })
       .catch(() => {});

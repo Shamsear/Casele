@@ -16,7 +16,6 @@ import { Price } from "@/components/ui/price";
 import { addRecentlyViewed } from "@/lib/recently-viewed";
 import { StickyAddToCart } from "@/components/products/sticky-add-to-cart";
 import { QuickBuyModal } from "@/components/products/quick-buy-modal";
-import { getWhatsAppNumber } from "@/lib/settings";
 import { flyToCart } from "@/lib/fly-to-cart";
 import type { ProductWithRelations } from "@/lib/db/products";
 import {
@@ -70,12 +69,14 @@ export function ProductDetailClient({
 
   useEffect(() => {
     addRecentlyViewed(product.id);
-    getWhatsAppNumber().then(setWhatsappNumber);
 
     fetch("/api/settings")
       .then((res) => res.json())
       .then((data) => {
         if (data.settings) {
+          if (data.settings.whatsapp_number) {
+            setWhatsappNumber(data.settings.whatsapp_number);
+          }
           if (data.settings.free_delivery_enabled !== undefined) {
             setFreeDeliveryEnabled(data.settings.free_delivery_enabled !== "false");
           }

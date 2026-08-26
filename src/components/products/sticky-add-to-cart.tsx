@@ -6,7 +6,6 @@ import { useCartStore } from "@/lib/store/cart";
 import { useHaptic } from "@/hooks/use-haptic";
 import { Price } from "@/components/ui/price";
 import { QuickBuyModal } from "@/components/products/quick-buy-modal";
-import { getWhatsAppNumber } from "@/lib/settings";
 import { flyToCart } from "@/lib/fly-to-cart";
 import { MessageSquare, ShoppingBag, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -49,7 +48,14 @@ export function StickyAddToCart({
   const isOutOfStock = stock !== undefined && stock <= 0;
 
   useEffect(() => {
-    getWhatsAppNumber().then(setWhatsappNumber);
+    fetch("/api/settings")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.settings?.whatsapp_number) {
+          setWhatsappNumber(data.settings.whatsapp_number);
+        }
+      })
+      .catch(() => {});
 
     const target = document.getElementById("main-add-to-cart-btn");
     if (!target) {

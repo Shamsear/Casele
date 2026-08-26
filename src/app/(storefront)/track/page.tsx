@@ -3,7 +3,6 @@
 import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { useI18n } from "@/lib/i18n/context";
-import { getWhatsAppNumber } from "@/lib/settings";
 import {
   Search,
   Package,
@@ -98,7 +97,14 @@ function TrackPageContent() {
   const { formatPrice } = useI18n();
 
   useEffect(() => {
-    getWhatsAppNumber().then(setWhatsappNumber);
+    fetch("/api/settings")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.settings?.whatsapp_number) {
+          setWhatsappNumber(data.settings.whatsapp_number);
+        }
+      })
+      .catch(() => {});
   }, []);
 
   useEffect(() => {
