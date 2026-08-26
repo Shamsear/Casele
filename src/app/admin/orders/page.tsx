@@ -159,11 +159,11 @@ export default function AdminOrdersPage() {
     }
   };
 
-  // ─── 1-Click Copy WhatsApp Order Template ─────────────────────
+  // ─── 1-Click Copy Delivery Address Request Template ──────────
   const handleCopyTemplate = () => {
-    const template = `*CASELÉ ATELIER QATAR — ORDER FORM*\nPlease reply with your details to confirm:\n\n• Full Name: \n• Phone (+974): \n• Case Selected: \n• Phone Model (e.g. iPhone 15 Pro Max): \n• Delivery Address in Qatar: \n• Notes (e.g. Cash on delivery): `;
+    const template = `*CASELÉ ATELIER QATAR — DELIVERY DETAILS*\nThank you for choosing CASELÉ! Please share your delivery location to dispatch your order:\n\n• Area / District (e.g. The Pearl, Lusail, West Bay):\n• Street & Building / Villa #:\n• Preferred Delivery Time (e.g. After 4 PM):\n• Payment: Cash on Delivery / Card`;
     navigator.clipboard.writeText(template);
-    toast("WhatsApp Order Template copied to clipboard! Paste it to your client.", "success");
+    toast("Delivery Request copied to clipboard! Paste it to your client.", "success");
   };
 
   // ─── Parse & Auto-Fill from Pasted WhatsApp Text ──────────────
@@ -175,14 +175,17 @@ export default function AdminOrdersPage() {
 
     const text = pastedWhatsAppText;
 
-    // Extract Name
-    const nameMatch = text.match(/(?:name|full name|client)[:\s•\-\*]+([^\n\r,•]+)/i);
+    // 1. Extract Client Name (from website cart message or custom chat)
+    const nameMatch =
+      text.match(/(?:client|name|full name)[:\s•\-\*]+([^\n\r,•]+)/i);
     if (nameMatch && nameMatch[1]) {
       setCustomerName(nameMatch[1].replace(/[\*\_]/g, "").trim());
     }
 
-    // Extract Phone
-    const phoneMatch = text.match(/(?:phone|mobile|tel|contact|wa)[:\s•\-\*]+([0-9\+\s\-]+)/i) || text.match(/(\+?974\s?[0-9]{8}|[3567][0-9]{7})/);
+    // 2. Extract Phone Number
+    const phoneMatch =
+      text.match(/(?:contact|phone|mobile|tel|wa)[:\s•\-\*]+([0-9\+\s\-]+)/i) ||
+      text.match(/(\+?974\s?[0-9]{8}|[3567][0-9]{7})/);
     if (phoneMatch && phoneMatch[1]) {
       let cleanP = phoneMatch[1].replace(/[\*\_]/g, "").trim();
       if (!cleanP.startsWith("+974") && cleanP.length === 8) {
@@ -191,53 +194,90 @@ export default function AdminOrdersPage() {
       setCustomerPhone(cleanP);
     }
 
-    // Extract Address
-    const addressMatch = text.match(/(?:address|location|delivery address|area)[:\s•\-\*]+([^\n\r•]+)/i);
+    // 3. Extract Delivery Address
+    const addressMatch = text.match(
+      /(?:delivery location|delivery address|location|area|address)[:\s•\-\*]+([^\n\r•]+)/i
+    );
     if (addressMatch && addressMatch[1]) {
-      setDeliveryAddress(addressMatch[1].replace(/[\*\_]/g, "").trim());
+      const parsedAddr = addressMatch[1].replace(/[\*\_]/g, "").trim();
+      if (!parsedAddr.includes("Please confirm area")) {
+        setDeliveryAddress(parsedAddr);
+      }
     }
 
-    // Extract Notes
-    const notesMatch = text.match(/(?:notes|note|instruction|special)[:\s•\-\*]+([^\n\r•]+)/i);
+    // 4. Extract Notes / Preferred Time
+    const notesMatch = text.match(
+      /(?:notes|note|time|preferred time|special|payment)[:\s•\-\*]+([^\n\r•]+)/i
+    );
     if (notesMatch && notesMatch[1]) {
       setOrderNotes(notesMatch[1].replace(/[\*\_]/g, "").trim());
     }
 
-    // Extract Model
-    const modelMatch = text.match(/(?:model|phone model|device)[:\s•\-\*]+([^\n\r,•]+)/i);
-    const extractedModel = modelMatch ? modelMatch[1].replace(/[\*\_]/g, "").trim() : "iPhone 15 Pro Max";
+    // 5. Parse Item Rows from WhatsApp Message
+    const parsedRows: { productId: string; name: string; model: string; qty: number; price: number }[] = [];
+    const itemLines = text.split("\n").filter((l) => l.includes("•") && (l.includes("×") || l.includes("QR") || l.includes("[")));
 
-    // Match Product in Catalog
-    const caseMatch = text.match(/(?:case|product|item|selected)[:\s•\-\*]+([^\n\r,•]+)/i);
-    let matchedProduct = productsCatalog[0];
+    for (const line of itemLines) {
+      // e.g. • *Titanium Edge Case* [iPhone 15 Pro Max • Black] × 2 — QR 170
+      let matchedProd = productsCatalog[0];
+      for (const p of productsCatalog) {
+        if (line.toLowerCase().includes(p.name.toLowerCase())) {
+          matchedProd = p;
+          break;
+        }
+      }
 
-    if (caseMatch && caseMatch[1]) {
-      const query = caseMatch[1].toLowerCase();
-      const found = productsCatalog.find(
-        (p) => p.name.toLowerCase().includes(query) || query.includes(p.name.toLowerCase())
-      );
-      if (found) matchedProduct = found;
+      // Extract model inside brackets [iPhone 15 Pro Max ...]
+      let model = matchedProd?.models?.[0]?.name || "iPhone 15 Pro Max";
+      const bracketMatch = line.match(/\[([^\]]+)\]/);
+      if (bracketMatch && bracketMatch[1]) {
+        const specParts = bracketMatch[1].split("•");
+        if (specParts[0]) model = specParts[0].trim();
+      }
+
+      // Extract quantity
+      let qty = 1;
+      const qtyMatch = line.match(/[×x]\s*(\d+)/i);
+      if (qtyMatch && qtyMatch[1]) {
+        qty = parseInt(qtyMatch[1], 10) || 1;
+      }
+
+      if (matchedProd) {
+        parsedRows.push({
+          productId: matchedProd.id,
+          name: matchedProd.name,
+          model,
+          qty,
+          price: Number(matchedProd.price) || 85,
+        });
+      }
+    }
+
+    if (parsedRows.length > 0) {
+      setOrderItems(parsedRows);
     } else {
-      // search entire text for any product name
-      const foundInText = productsCatalog.find((p) =>
-        text.toLowerCase().includes(p.name.toLowerCase())
-      );
-      if (foundInText) matchedProduct = foundInText;
+      // Fallback single product matching
+      let matchedProduct = productsCatalog[0];
+      for (const p of productsCatalog) {
+        if (text.toLowerCase().includes(p.name.toLowerCase())) {
+          matchedProduct = p;
+          break;
+        }
+      }
+      if (matchedProduct) {
+        setOrderItems([
+          {
+            productId: matchedProduct.id,
+            name: matchedProduct.name,
+            model: "iPhone 15 Pro Max",
+            qty: 1,
+            price: Number(matchedProduct.price) || 85,
+          },
+        ]);
+      }
     }
 
-    if (matchedProduct) {
-      setOrderItems([
-        {
-          productId: matchedProduct.id,
-          name: matchedProduct.name,
-          model: extractedModel,
-          qty: 1,
-          price: Number(matchedProduct.price) || 85,
-        },
-      ]);
-    }
-
-    // Extract Delivery Speed if mentioned in message
+    // 6. Extract Delivery Speed if mentioned
     if (/next\s*day|tomorrow/i.test(text)) {
       setDeliverySpeed("next_day");
     } else if (/express|urgent|2\s*hour/i.test(text)) {
@@ -250,7 +290,7 @@ export default function AdminOrdersPage() {
       setDeliverySpeed("same_day");
     }
 
-    toast("Form auto-filled from WhatsApp message!", "success");
+    toast("Order auto-filled from WhatsApp message!", "success");
     setShowAutoFillBox(false);
   };
 
@@ -401,7 +441,7 @@ export default function AdminOrdersPage() {
             title="Copy WhatsApp order form template to send to customer"
           >
             <Copy className="h-3.5 w-3.5 text-[#A88B4D]" />
-            <span>Copy WhatsApp Form</span>
+            <span>Copy Address Request</span>
           </button>
 
           {/* Primary Action: Log Manual WhatsApp Order */}
