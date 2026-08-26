@@ -34,6 +34,7 @@ export async function GET(request: NextRequest) {
         time: formatOrderTime(order.createdAt),
         createdAt: order.createdAt.toISOString(),
         itemsDetail: itemsList,
+        notes: order.notes || "",
       };
     });
 
@@ -41,6 +42,92 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error("Admin fetch orders error:", error);
     return NextResponse.json({ error: "Failed to fetch orders" }, { status: 500 });
+  }
+}
+
+// ─── POST: Admin Manual Order Creation (From WhatsApp / Direct Call) ───
+export async function POST(request: NextRequest) {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session || (session.user as any)?.role !== "admin") {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const body = await request.json();
+    const {
+      customerName,
+      customerPhone,
+      address,
+      items,
+      subtotal,
+      discount = 0,
+      total,
+      status = "confirmed",
+      notes,
+    } = body;
+
+    if (!customerName || !customerPhone || !items || !Array.isArray(items) || items.length === 0) {
+      return NextResponse.json(
+        { error: "Customer name, phone number, and at least 1 product item are required" },
+        { status: 400 }
+      );
+    }
+
+    const calculatedSubtotal = subtotal || items.reduce((acc: number, it: any) => acc + (Number(it.price) * (Number(it.qty) || 1)), 0);
+    const calculatedTotal = total !== undefined ? Number(total) : Math.max(0, calculatedSubtotal - Number(discount));
+
+    const order = await prisma.order.create({
+      data: {
+        customerName: customerName.trim(),
+        customerPhone: customerPhone.trim(),
+        address: address?.trim() || "Doha, Qatar",
+        items: items,
+        subtotal: calculatedSubtotal,
+        promoDiscount: Number(discount),
+        total: calculatedTotal,
+        status: status || "confirmed",
+        notes: notes?.trim() || null,
+        whatsappSent: true,
+      },
+    });
+
+    // Update product sold counters
+    for (const it of items) {
+      if (it.productId) {
+        try {
+          await prisma.product.update({
+            where: { id: it.productId },
+            data: {
+              orderCount: { increment: Number(it.qty) || 1 },
+              lastSoldAt: new Date(),
+            },
+          });
+        } catch {
+          // Continue if custom item or id not matched
+        }
+      }
+    }
+
+    // Log admin activity
+    try {
+      const adminUserId = (session.user as any)?.id;
+      if (adminUserId) {
+        await prisma.adminActivityLog.create({
+          data: {
+            adminId: adminUserId,
+            action: "create_order",
+            details: `Manual WhatsApp order created for ${customerName} (QR ${calculatedTotal})`,
+          },
+        });
+      }
+    } catch {
+      // ignore
+    }
+
+    return NextResponse.json({ success: true, order });
+  } catch (error) {
+    console.error("Admin create order error:", error);
+    return NextResponse.json({ error: "Failed to create order" }, { status: 500 });
   }
 }
 
@@ -53,15 +140,19 @@ export async function PUT(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { id, status } = body;
+    const { id, status, notes, address } = body;
 
-    if (!id || !status) {
-      return NextResponse.json({ error: "Order ID and status required" }, { status: 400 });
+    if (!id) {
+      return NextResponse.json({ error: "Order ID is required" }, { status: 400 });
     }
 
     const updated = await prisma.order.update({
       where: { id },
-      data: { status },
+      data: {
+        ...(status && { status }),
+        ...(notes !== undefined && { notes }),
+        ...(address && { address }),
+      },
     });
 
     return NextResponse.json({ success: true, order: updated });
