@@ -67,13 +67,20 @@ export default function AdminDiscountsPage() {
   const fetchTiers = async () => {
     try {
       setLoadingTiers(true);
-      const res = await fetch(`/api/admin/discounts/tiered?_t=${Date.now()}`);
+      const res = await fetch(`/api/admin/discounts/tiered?_t=${Date.now()}`, {
+        cache: "no-store",
+      });
       if (res.ok) {
         const data = await res.json();
         setTiers(data.tiers || []);
+      } else {
+        const err = await res.json().catch(() => ({}));
+        console.error("Fetch tiers error:", res.status, err);
+        toast(err.error ? `Failed to load tiers: ${err.error}` : `HTTP ${res.status}: Failed to load tiers`, "error");
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error("Failed to load tiers:", err);
+      toast(`Failed to load tiers: ${err.message || "Network Error"}`, "error");
     } finally {
       setLoadingTiers(false);
     }
@@ -82,7 +89,9 @@ export default function AdminDiscountsPage() {
   const fetchFlashSales = async () => {
     try {
       setLoadingFlash(true);
-      const res = await fetch(`/api/admin/flash-sales?_t=${Date.now()}`);
+      const res = await fetch(`/api/admin/flash-sales?_t=${Date.now()}`, {
+        cache: "no-store",
+      });
       if (res.ok) {
         const data = await res.json();
         setFlashSales(data.sales || []);
@@ -97,7 +106,9 @@ export default function AdminDiscountsPage() {
   const fetchRules = async () => {
     try {
       // 1. Fetch Bundle Rule from dedicated table
-      const resBundle = await fetch(`/api/admin/discounts/bundle-rule?_t=${Date.now()}`);
+      const resBundle = await fetch(`/api/admin/discounts/bundle-rule?_t=${Date.now()}`, {
+        cache: "no-store",
+      });
       if (resBundle.ok) {
         const data = await resBundle.json();
         if (data.config) {
@@ -108,7 +119,9 @@ export default function AdminDiscountsPage() {
       }
 
       // 2. Fetch Delivery Rule from dedicated table
-      const resDelivery = await fetch(`/api/admin/discounts/delivery-rule?_t=${Date.now()}`);
+      const resDelivery = await fetch(`/api/admin/discounts/delivery-rule?_t=${Date.now()}`, {
+        cache: "no-store",
+      });
       if (resDelivery.ok) {
         const data = await resDelivery.json();
         if (data.config) {
