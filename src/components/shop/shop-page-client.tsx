@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { ProductCard } from "@/components/products/product-card";
 import { cn } from "@/lib/utils";
 import { useI18n } from "@/lib/i18n/context";
@@ -8,6 +8,8 @@ import type { ProductWithRelations, ModelWithCount } from "@/lib/db/products";
 import {
   ChevronDown,
   ChevronUp,
+  ChevronLeft,
+  ChevronRight,
   LayoutGrid,
   Grid3X3,
   SlidersHorizontal,
@@ -29,6 +31,8 @@ const SORT_OPTIONS = [
   { value: "price-high", label: "Price: High to Low" },
 ];
 
+const ITEMS_PER_PAGE = 12;
+
 export function ShopPageClient({ products, models, brands }: ShopPageClientProps) {
   const { locale } = useI18n();
   const currencySymbol = locale === "ar" ? "ر.ق" : "QR";
@@ -43,11 +47,17 @@ export function ShopPageClient({ products, models, brands }: ShopPageClientProps
   const [sort, setSort] = useState<string>("featured");
   const [gridCols, setGridCols] = useState<3 | 4>(3);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
 
   // Accordion Open States
   const [availabilityOpen, setAvailabilityOpen] = useState(true);
   const [priceOpen, setPriceOpen] = useState(true);
   const [modelOpen, setModelOpen] = useState(true);
+
+  // Reset page when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [inStockOnly, outOfStockOnly, minPrice, maxPrice, selectedBrand, selectedModel, sort]);
 
   // Highest price in catalog
   const highestPrice = useMemo(() => {
@@ -113,6 +123,13 @@ export function ShopPageClient({ products, models, brands }: ShopPageClientProps
     return list;
   }, [products, inStockOnly, outOfStockOnly, minPrice, maxPrice, selectedBrand, selectedModel, sort]);
 
+  // Pagination Calculation
+  const totalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE);
+  const paginatedProducts = useMemo(() => {
+    const start = (currentPage - 1) * ITEMS_PER_PAGE;
+    return filteredProducts.slice(start, start + ITEMS_PER_PAGE);
+  }, [filteredProducts, currentPage]);
+
   const hasActiveFilters =
     inStockOnly ||
     outOfStockOnly ||
@@ -129,6 +146,14 @@ export function ShopPageClient({ products, models, brands }: ShopPageClientProps
     setSelectedBrand("All");
     setSelectedModel("All");
     setSort("featured");
+    setCurrentPage(1);
+  };
+
+  const handlePageChange = (newPage: number) => {
+    setCurrentPage(newPage);
+    if (typeof window !== "undefined") {
+      window.scrollTo({ top: 100, behavior: "smooth" });
+    }
   };
 
   const formatPriceQar = (num: number) => {
@@ -417,18 +442,64 @@ export function ShopPageClient({ products, models, brands }: ShopPageClientProps
                 </button>
               </div>
             ) : (
-              <div
-                className={cn(
-                  "grid gap-5 sm:gap-6",
-                  gridCols === 3
-                    ? "grid-cols-2 sm:grid-cols-3"
-                    : "grid-cols-2 sm:grid-cols-3 lg:grid-cols-4"
+              <>
+                <div
+                  className={cn(
+                    "grid gap-5 sm:gap-6",
+                    gridCols === 3
+                      ? "grid-cols-2 sm:grid-cols-3"
+                      : "grid-cols-2 sm:grid-cols-3 lg:grid-cols-4"
+                  )}
+                >
+                  {paginatedProducts.map((product, i) => (
+                    <ProductCard key={product.id} product={product} index={i} />
+                  ))}
+                </div>
+
+                {/* ═══ Pagination Controls ═══ */}
+                {totalPages > 1 && (
+                  <div className="pt-10 pb-4 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-neutral-100">
+                    <span className="text-xs text-neutral-400 font-normal">
+                      Showing {(currentPage - 1) * ITEMS_PER_PAGE + 1}–{Math.min(currentPage * ITEMS_PER_PAGE, filteredProducts.length)} of {filteredProducts.length} cases
+                    </span>
+
+                    <div className="flex items-center gap-1.5">
+                      <button
+                        onClick={() => handlePageChange(currentPage - 1)}
+                        disabled={currentPage === 1}
+                        aria-label="Previous page"
+                        className="flex h-9 w-9 items-center justify-center rounded-xl border border-neutral-200 bg-white text-neutral-700 disabled:opacity-30 disabled:pointer-events-none hover:bg-neutral-100 hover:text-neutral-950 transition-colors cursor-pointer shadow-2xs"
+                      >
+                        <ChevronLeft className="h-4 w-4" />
+                      </button>
+
+                      {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
+                        <button
+                          key={pageNum}
+                          onClick={() => handlePageChange(pageNum)}
+                          className={cn(
+                            "flex h-9 min-w-[36px] px-2.5 items-center justify-center rounded-xl text-xs font-semibold transition-all cursor-pointer",
+                            pageNum === currentPage
+                              ? "bg-neutral-950 text-white shadow-xs"
+                              : "border border-neutral-200 bg-white text-neutral-700 hover:bg-neutral-100 hover:text-neutral-950 shadow-2xs"
+                          )}
+                        >
+                          {pageNum}
+                        </button>
+                      ))}
+
+                      <button
+                        onClick={() => handlePageChange(currentPage + 1)}
+                        disabled={currentPage === totalPages}
+                        aria-label="Next page"
+                        className="flex h-9 w-9 items-center justify-center rounded-xl border border-neutral-200 bg-white text-neutral-700 disabled:opacity-30 disabled:pointer-events-none hover:bg-neutral-100 hover:text-neutral-950 transition-colors cursor-pointer shadow-2xs"
+                      >
+                        <ChevronRight className="h-4 w-4" />
+                      </button>
+                    </div>
+                  </div>
                 )}
-              >
-                {filteredProducts.map((product, i) => (
-                  <ProductCard key={product.id} product={product} index={i} />
-                ))}
-              </div>
+              </>
             )}
           </main>
         </div>
