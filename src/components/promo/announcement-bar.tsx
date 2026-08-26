@@ -107,10 +107,10 @@ export function AnnouncementBar() {
     <div className="relative z-50 border-b border-neutral-200/80 bg-neutral-900 text-white select-none transition-all duration-300">
       <div className="mx-auto flex h-9 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         {/* Left spacer for perfect centering on desktop */}
-        <div className="hidden sm:flex items-center gap-2 w-24">
+        <div className="hidden sm:flex items-center gap-2 w-28">
           <span className="inline-flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-widest text-[#C5A869]">
             <span className="h-1.5 w-1.5 rounded-full bg-[#C5A869] animate-pulse" />
-            Live Atelier
+            Doha, Qatar
           </span>
         </div>
 

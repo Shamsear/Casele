@@ -22,7 +22,7 @@ export function Header() {
     { href: "/shop", label: t("nav_shop") || "Collection" },
     { href: "/category/premium", label: "Luxe Series" },
     { href: "/track", label: t("nav_track") || "Track Order" },
-    { href: "/about", label: "Atelier" },
+    { href: "/about", label: t("nav_about") || "About" },
   ];
 
   return (

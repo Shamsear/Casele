@@ -48,7 +48,7 @@ export function HomePageClient({
   categories,
 }: HomePageClientProps) {
   const [activeTab, setActiveTab] = useState("all");
-  const [heroBadge, setHeroBadge] = useState("Doha Atelier • Bespoke Protection");
+  const [heroBadge, setHeroBadge] = useState("Doha, Qatar • Luxury Protection");
   const [heroTitle, setHeroTitle] = useState("Sculpted for Flagships.");
   const [heroSubtitle, setHeroSubtitle] = useState("Artistry in Armor.");
   const [heroDescription, setHeroDescription] = useState("Every silhouette is machined with aerospace-grade composites and tactile metallic accents. Hand-finished in Qatar for discerning device owners.");
@@ -128,7 +128,7 @@ export function HomePageClient({
                     </Link>
 
                     <a
-                      href="https://wa.me/97455364455?text=Hello%20CASEL%C3%89%20Atelier%2C%20I%20would%20like%20to%20inquire%20about%20your%20protective%20cases."
+                      href="https://wa.me/97455364455?text=Hello%20CASEL%C3%89%2C%20I%20would%20like%20to%20inquire%20about%20your%20protective%20cases."
                       target="_blank"
                       rel="noopener noreferrer"
                       className="inline-flex items-center justify-center gap-2 rounded-xl border border-neutral-300 bg-white px-6 py-2.5 sm:py-3 text-xs font-semibold uppercase tracking-widest text-neutral-900 transition-all hover:bg-neutral-50 active:scale-[0.98] shadow-2xs"

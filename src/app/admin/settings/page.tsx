@@ -42,7 +42,7 @@ const DEFAULT_SETTINGS: Settings = {
   express_delivery_fee: "20",
   bundle_buy_2_discount: "5",
   bundle_buy_3_discount: "10",
-  hero_badge: "Doha Atelier • Bespoke Protection",
+  hero_badge: "Doha, Qatar • Luxury Protection",
   hero_title: "Sculpted for Flagships.",
   hero_subtitle: "Artistry in Armor.",
   hero_description: "Every silhouette is machined with aerospace-grade composites and tactile metallic accents. Hand-finished in Qatar for discerning device owners.",
