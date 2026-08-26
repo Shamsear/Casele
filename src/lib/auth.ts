@@ -16,16 +16,38 @@ export const authOptions: NextAuthOptions = {
           return null;
         }
 
-        // Find admin user
-        const admin = await prisma.adminUser.findUnique({
-          where: { email: credentials.email },
-        });
+        const normalizedEmail = credentials.email.toLowerCase().trim();
+
+        // 1. Find admin user in PostgreSQL database (table admin_users)
+        let admin = null;
+        try {
+          admin = await prisma.adminUser.findUnique({
+            where: { email: normalizedEmail },
+          });
+
+          // 2. If database has no admin users yet, automatically bootstrap the admin user in the database
+          if (!admin) {
+            const totalAdmins = await prisma.adminUser.count();
+            if (totalAdmins === 0) {
+              const passwordHash = await bcrypt.hash(credentials.password, 12);
+              admin = await prisma.adminUser.create({
+                data: {
+                  email: normalizedEmail,
+                  name: "Store Administrator",
+                  passwordHash,
+                },
+              });
+            }
+          }
+        } catch (dbError) {
+          console.error("Database admin lookup error:", dbError);
+        }
 
         if (!admin) {
           return null;
         }
 
-        // Verify password
+        // 3. Verify bcrypt password hash stored in database
         const isValid = await bcrypt.compare(
           credentials.password,
           admin.passwordHash

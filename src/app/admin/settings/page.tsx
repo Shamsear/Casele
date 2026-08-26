@@ -64,10 +64,29 @@ export default function AdminSettingsPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
-  // Fetch settings on mount
+  // Database Admin Users State
+  const [adminUsers, setAdminUsers] = useState<{ id: string; name: string; email: string; createdAt: string }[]>([]);
+  const [newAdminName, setNewAdminName] = useState("");
+  const [newAdminEmail, setNewAdminEmail] = useState("");
+  const [newAdminPassword, setNewAdminPassword] = useState("");
+  const [addingAdmin, setAddingAdmin] = useState(false);
+  const [showAddAdminModal, setShowAddAdminModal] = useState(false);
+
+  // Fetch settings and database admins on mount
   useEffect(() => {
     fetchSettings();
+    fetchAdmins();
   }, []);
+
+  const fetchAdmins = async () => {
+    try {
+      const res = await fetch("/api/admin/users");
+      if (res.ok) {
+        const data = await res.json();
+        setAdminUsers(data.admins || []);
+      }
+    } catch {}
+  };
 
   const fetchSettings = async () => {
     try {
@@ -83,6 +102,62 @@ export default function AdminSettingsPage() {
       console.error("Failed to fetch settings:", error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleCreateAdminUser = async () => {
+    if (!newAdminName.trim() || !newAdminEmail.trim() || !newAdminPassword.trim()) {
+      toast("Please enter name, email, and password", "error");
+      return;
+    }
+
+    try {
+      setAddingAdmin(true);
+      const res = await fetch("/api/admin/users", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: newAdminName.trim(),
+          email: newAdminEmail.trim(),
+          password: newAdminPassword.trim(),
+        }),
+      });
+
+      if (res.ok) {
+        toast("New database admin user created", "success");
+        setNewAdminName("");
+        setNewAdminEmail("");
+        setNewAdminPassword("");
+        setShowAddAdminModal(false);
+        fetchAdmins();
+      } else {
+        const data = await res.json();
+        toast(data.error || "Failed to create admin user", "error");
+      }
+    } catch {
+      toast("Failed to create admin user", "error");
+    } finally {
+      setAddingAdmin(false);
+    }
+  };
+
+  const handleDeleteAdminUser = async (id: string) => {
+    if (!confirm("Are you sure you want to remove this admin account from the database?")) return;
+
+    try {
+      const res = await fetch(`/api/admin/users?id=${id}`, {
+        method: "DELETE",
+      });
+
+      if (res.ok) {
+        toast("Admin user deleted", "success");
+        setAdminUsers((prev) => prev.filter((a) => a.id !== id));
+      } else {
+        const data = await res.json();
+        toast(data.error || "Failed to delete admin user", "error");
+      }
+    } catch {
+      toast("Failed to delete admin user", "error");
     }
   };
 
@@ -385,6 +460,119 @@ export default function AdminSettingsPage() {
             }
             label="Show bundle suggestions after add-to-cart"
           />
+        </div>
+      </section>
+
+      {/* Database Admin Accounts Management */}
+      <section className="rounded-xl border border-dark-border bg-dark-surface p-6 space-y-4">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h2 className="text-lg font-semibold text-white">Database Admin Users</h2>
+            <p className="mt-1 text-sm text-warm-gray">
+              Manage authorized administrator accounts stored directly in your PostgreSQL database
+            </p>
+          </div>
+          {!showAddAdminModal && (
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => setShowAddAdminModal(true)}
+            >
+              + Add Admin User
+            </Button>
+          )}
+        </div>
+
+        {/* Add Admin User Form */}
+        {showAddAdminModal && (
+          <div className="rounded-xl border border-gold/30 bg-neutral-950 p-4 space-y-3 animate-scale-in">
+            <h3 className="text-sm font-semibold text-white">Create New Database Admin</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <Input
+                label="Admin Name"
+                placeholder="e.g. Operations Manager"
+                value={newAdminName}
+                onChange={(e) => setNewAdminName(e.target.value)}
+              />
+              <Input
+                label="Admin Email"
+                type="email"
+                placeholder="ops@casele.co"
+                value={newAdminEmail}
+                onChange={(e) => setNewAdminEmail(e.target.value)}
+              />
+              <Input
+                label="Password"
+                type="password"
+                placeholder="••••••••"
+                value={newAdminPassword}
+                onChange={(e) => setNewAdminPassword(e.target.value)}
+              />
+            </div>
+            <div className="flex justify-end gap-2 pt-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowAddAdminModal(false)}
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="cta"
+                size="sm"
+                onClick={handleCreateAdminUser}
+                loading={addingAdmin}
+              >
+                Save Admin Account
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {/* Admins Table */}
+        <div className="rounded-xl border border-dark-border/60 overflow-hidden bg-neutral-950/60">
+          <table className="w-full text-left text-xs">
+            <thead>
+              <tr className="border-b border-dark-border bg-dark-surface text-warm-gray">
+                <th className="px-4 py-2.5">Name</th>
+                <th className="px-4 py-2.5">Email</th>
+                <th className="px-4 py-2.5">Storage</th>
+                <th className="px-4 py-2.5 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-dark-border/40">
+              {adminUsers.length === 0 ? (
+                <tr>
+                  <td colSpan={4} className="py-4 text-center text-warm-gray">
+                    Primary Database Admin active (admin@casele.co)
+                  </td>
+                </tr>
+              ) : (
+                adminUsers.map((admin) => (
+                  <tr key={admin.id} className="hover:bg-dark-surface/40 transition-colors">
+                    <td className="px-4 py-2.5 font-semibold text-white">
+                      {admin.name}
+                    </td>
+                    <td className="px-4 py-2.5 font-mono text-gold">
+                      {admin.email}
+                    </td>
+                    <td className="px-4 py-2.5 text-emerald-400 font-medium">
+                      PostgreSQL Database
+                    </td>
+                    <td className="px-4 py-2.5 text-right">
+                      <button
+                        onClick={() => handleDeleteAdminUser(admin.id)}
+                        className="text-xs text-rose-400 hover:text-rose-300 transition-colors cursor-pointer"
+                        title="Remove Admin Account"
+                      >
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
         </div>
       </section>
 
