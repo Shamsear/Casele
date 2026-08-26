@@ -8,13 +8,13 @@ import {
   Percent,
   Plus,
   Trash2,
-  Tag,
   Clock,
   Sparkles,
-  Zap,
   Power,
   PowerOff,
-  Inbox
+  Inbox,
+  CheckCircle2,
+  Loader2
 } from "lucide-react";
 
 interface TierDiscount {
@@ -102,8 +102,8 @@ export default function AdminDiscountsPage() {
           if (data.settings.bundle_buy_3_discount) setBundleBuy3(data.settings.bundle_buy_3_discount);
           if (data.settings.free_delivery_threshold) setFreeDeliveryThreshold(data.settings.free_delivery_threshold);
           if (data.settings.free_delivery_enabled !== undefined) setFreeDeliveryEnabled(data.settings.free_delivery_enabled);
-          if (data.settings.bundle_discounts_enabled) setBundleEnabled(data.settings.bundle_discounts_enabled);
-          if (data.settings.tier_discounts_enabled) setTierEnabled(data.settings.tier_discounts_enabled);
+          if (data.settings.bundle_discounts_enabled !== undefined) setBundleEnabled(data.settings.bundle_discounts_enabled);
+          if (data.settings.tier_discounts_enabled !== undefined) setTierEnabled(data.settings.tier_discounts_enabled);
         }
       }
     } catch (err) {
@@ -130,6 +130,9 @@ export default function AdminDiscountsPage() {
           `Tiered spend discounts are now ${nextVal === "true" ? "ACTIVE" : "DEACTIVATED"}`,
           nextVal === "true" ? "success" : "info"
         );
+      } else {
+        const err = await res.json().catch(() => ({}));
+        toast(err.error || "Failed to update tier discount setting", "error");
       }
     } catch {
       toast("Failed to update tier discount setting", "error");
@@ -198,6 +201,8 @@ export default function AdminDiscountsPage() {
         setFlashSales((prev) =>
           prev.map((s) => (s.id === sale.id ? { ...s, isActive: nextActive } : s))
         );
+      } else {
+        toast("Failed to update flash sale status", "error");
       }
     } catch {
       toast("Failed to update flash sale status", "error");
@@ -300,10 +305,11 @@ export default function AdminDiscountsPage() {
         toast("Bundle savings and delivery rules saved successfully!", "success");
       } else {
         const err = await res.json().catch(() => ({}));
-        toast(err.error || "Failed to save settings", "error");
+        toast(err.error || "Failed to save settings. Please ensure you are logged in.", "error");
       }
-    } catch {
-      toast("Failed to save settings", "error");
+    } catch (error) {
+      console.error("Save bundle settings error:", error);
+      toast("Failed to save settings due to network error", "error");
     } finally {
       setSavingSettings(false);
     }
@@ -601,30 +607,33 @@ export default function AdminDiscountsPage() {
       {/* ═══ TAB 3: MULTI-CASE BUNDLES & DELIVERY ═══ */}
       {activeTab === "bundle" && (
         <div className="space-y-6">
+          {/* Card 1: Multi-Case Bundle Discounts */}
           <div className="rounded-2xl border border-neutral-200/80 bg-white p-6 shadow-2xs space-y-4">
-            <div className="flex items-center justify-between border-b border-neutral-100 pb-3">
+            <div className="flex items-center justify-between border-b border-neutral-100 pb-4">
               <div>
                 <h3 className="text-base font-bold text-neutral-950">Multi-Case Bundle Volume Discounts</h3>
                 <p className="text-xs text-neutral-500">
                   Automatic percentage savings calculated when shoppers buy 2 or 3+ cases in a single order
                 </p>
               </div>
-              {/* Deactivate switch */}
+
+              {/* Toggle switch button */}
               <button
                 type="button"
                 onClick={handleToggleBundleMaster}
-                className={`inline-flex items-center gap-1.5 rounded-xl px-3 py-1 text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer ${
+                className={`inline-flex items-center gap-1.5 rounded-xl px-3.5 py-1.5 text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer shadow-2xs ${
                   bundleEnabled === "true"
-                    ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
-                    : "bg-neutral-100 text-neutral-500 border border-neutral-200"
+                    ? "bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100"
+                    : "bg-neutral-100 text-neutral-600 border border-neutral-200 hover:bg-neutral-200"
                 }`}
               >
-                {bundleEnabled === "true" ? <Power className="h-3 w-3" /> : <PowerOff className="h-3 w-3" />}
+                {bundleEnabled === "true" ? <Power className="h-3.5 w-3.5" /> : <PowerOff className="h-3.5 w-3.5" />}
                 <span>{bundleEnabled === "true" ? "Bundles Active" : "Bundles Deactivated"}</span>
               </button>
             </div>
+
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-lg pt-1">
-              <div className="space-y-1">
+              <div className="space-y-1.5">
                 <label className="text-[11px] font-bold uppercase tracking-wider text-neutral-700">Buy 2 Cases Discount (%)</label>
                 <input
                   type="number"
@@ -634,7 +643,7 @@ export default function AdminDiscountsPage() {
                   className="w-full rounded-xl border border-neutral-200 bg-white py-2.5 px-3 text-xs text-neutral-950 placeholder:text-neutral-400 focus:border-neutral-950 focus:outline-none shadow-2xs"
                 />
               </div>
-              <div className="space-y-1">
+              <div className="space-y-1.5">
                 <label className="text-[11px] font-bold uppercase tracking-wider text-neutral-700">Buy 3+ Cases Discount (%)</label>
                 <input
                   type="number"
@@ -647,48 +656,61 @@ export default function AdminDiscountsPage() {
             </div>
           </div>
 
+          {/* Card 2: Free Delivery Threshold */}
           <div className="rounded-2xl border border-neutral-200/80 bg-white p-6 shadow-2xs space-y-4">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-neutral-100 pb-3">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-neutral-100 pb-4">
               <div>
                 <h3 className="text-base font-bold text-neutral-950">Free Express Delivery Threshold</h3>
                 <p className="text-xs text-neutral-500">
                   Orders at or above this amount automatically receive complimentary same-day Doha delivery.
                 </p>
               </div>
+
               <button
                 type="button"
                 onClick={handleToggleFreeDelivery}
-                className={`inline-flex items-center gap-1.5 rounded-xl px-3 py-1 text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer ${
+                className={`inline-flex items-center gap-1.5 rounded-xl px-3.5 py-1.5 text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer shadow-2xs ${
                   freeDeliveryEnabled !== "false"
-                    ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
-                    : "bg-neutral-100 text-neutral-500 border border-neutral-200"
+                    ? "bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100"
+                    : "bg-neutral-100 text-neutral-600 border border-neutral-200 hover:bg-neutral-200"
                 }`}
               >
-                {freeDeliveryEnabled !== "false" ? <Power className="h-3 w-3" /> : <PowerOff className="h-3 w-3" />}
+                {freeDeliveryEnabled !== "false" ? <Power className="h-3.5 w-3.5" /> : <PowerOff className="h-3.5 w-3.5" />}
                 <span>{freeDeliveryEnabled !== "false" ? "Free Delivery Active" : "Free Delivery Deactivated"}</span>
               </button>
             </div>
-            <div className="max-w-xs pt-1 space-y-1">
+
+            <div className="max-w-xs pt-1 space-y-1.5">
               <label className="text-[11px] font-bold uppercase tracking-wider text-neutral-700">Free Delivery Minimum (QR)</label>
               <input
                 type="number"
                 value={freeDeliveryThreshold}
                 onChange={(e) => setFreeDeliveryThreshold(e.target.value)}
                 placeholder="100"
-                disabled={freeDeliveryEnabled === "false"}
-                className="w-full rounded-xl border border-neutral-200 bg-white py-2.5 px-3 text-xs text-neutral-950 placeholder:text-neutral-400 focus:border-neutral-950 focus:outline-none shadow-2xs disabled:opacity-50"
+                className="w-full rounded-xl border border-neutral-200 bg-white py-2.5 px-3 text-xs text-neutral-950 placeholder:text-neutral-400 focus:border-neutral-950 focus:outline-none shadow-2xs"
               />
             </div>
           </div>
 
-          <div className="flex justify-end">
+          {/* Action Bar */}
+          <div className="flex items-center justify-end gap-3 pt-2">
             <button
               type="button"
               onClick={handleSaveBundleSettings}
               disabled={savingSettings}
-              className="rounded-xl bg-neutral-950 px-5 py-2.5 text-xs font-bold uppercase tracking-wider text-white hover:bg-neutral-800 transition-all cursor-pointer shadow-xs disabled:opacity-50"
+              className="inline-flex items-center gap-2 rounded-xl bg-neutral-950 px-6 py-3 text-xs font-bold uppercase tracking-wider text-white hover:bg-neutral-800 transition-all cursor-pointer shadow-xs disabled:opacity-50"
             >
-              {savingSettings ? "Saving..." : "Save Bundle & Delivery Settings"}
+              {savingSettings ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <span>Saving Settings...</span>
+                </>
+              ) : (
+                <>
+                  <CheckCircle2 className="h-4 w-4" />
+                  <span>Save Bundle & Delivery Settings</span>
+                </>
+              )}
             </button>
           </div>
         </div>
