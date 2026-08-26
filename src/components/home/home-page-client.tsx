@@ -32,22 +32,12 @@ interface HomePageClientProps {
   categories: CategoryWithCount[];
 }
 
-const FILTER_TABS = [
-  { id: "all", label: "All Enclosures" },
-  { id: "bestsellers", label: "Best Sellers" },
-  { id: "new", label: "New Releases" },
-  { id: "premium", label: "Luxe Leather" },
-  { id: "minimal", label: "Matte Minimal" },
-  { id: "sport", label: "Carbon Armor" },
-];
-
 export function HomePageClient({
   allProducts,
   featuredProducts,
   models,
   categories,
 }: HomePageClientProps) {
-  const [activeTab, setActiveTab] = useState("all");
   const [heroBadge, setHeroBadge] = useState("Doha, Qatar • Luxury Protection");
   const [heroTitle, setHeroTitle] = useState("Sculpted for Flagships.");
   const [heroSubtitle, setHeroSubtitle] = useState("Artistry in Armor.");
@@ -75,16 +65,6 @@ export function HomePageClient({
       })
       .catch(() => {});
   }, []);
-
-  const filteredProducts = allProducts.filter((product) => {
-    if (activeTab === "all") return true;
-    if (activeTab === "bestsellers") return product.badge?.toLowerCase() === "bestseller" || product.isFeatured;
-    if (activeTab === "new") return product.badge?.toLowerCase() === "new";
-    if (activeTab === "premium") return product.categoryName.toLowerCase().includes("premium") || product.name.toLowerCase().includes("leather");
-    if (activeTab === "minimal") return product.categoryName.toLowerCase().includes("classic") || product.name.toLowerCase().includes("crystal") || product.name.toLowerCase().includes("silicone");
-    if (activeTab === "sport") return product.categoryName.toLowerCase().includes("sport") || product.name.toLowerCase().includes("carbon");
-    return true;
-  });
 
   return (
     <div className="min-h-screen bg-neutral-50 text-neutral-950 overflow-hidden">
@@ -161,22 +141,16 @@ export function HomePageClient({
                         </span>
                       </div>
 
-                      {/* Product Image */}
+                      {/* Spotlight Product Image */}
                       <div className="relative h-full w-full">
                         <Image
-                          src={featuredProducts[0]?.images[0] || "/products/leather-case-black.png"}
-                          alt="Featured Case"
+                          src={featuredProducts[0]?.images[0] || "/images/products/gold-edge.svg"}
+                          alt="CASELÉ Bespoke Protection"
                           fill
                           priority
-                          className="object-contain p-1.5 transition-transform duration-700 group-hover:scale-105 drop-shadow-xl"
+                          className="object-contain transition-transform duration-700 ease-out group-hover:scale-105"
                           sizes="285px"
                         />
-                      </div>
-
-                      {/* Floating Price Pill */}
-                      <div className="absolute bottom-2.5 right-2.5 z-10 rounded-2xl bg-white/95 backdrop-blur-md border border-neutral-200/80 px-2.5 py-0.5 shadow-sm text-right">
-                        <p className="text-[7.5px] font-bold text-neutral-400 uppercase tracking-wider">Titanium Frame</p>
-                        <p className="text-[11px] font-bold text-neutral-950">QR 85</p>
                       </div>
                     </div>
                   </TiltCard>
@@ -192,12 +166,12 @@ export function HomePageClient({
         </div>
       </div>
 
-      {/* 3. CURATED COLLECTION SECTION WITH PILL FILTERS (Unified Section Reveal) */}
+      {/* 3. CURATED COLLECTION SECTION (Clean without filter buttons) */}
       <Reveal animation="fade-up">
         <section className="py-16 sm:py-24">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            {/* Header & Filter Bar */}
-            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 mb-10 pb-6 border-b border-neutral-200/70">
+            {/* Header */}
+            <div className="flex items-end justify-between mb-10 pb-6 border-b border-neutral-200/70">
               <div>
                 <span className="text-[10px] font-bold text-[#A88B4D] tracking-widest uppercase mb-1.5 block">
                   Catalog Archive
@@ -207,28 +181,18 @@ export function HomePageClient({
                 </h2>
               </div>
 
-              {/* Filter Pills */}
-              <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-2 sm:pb-0">
-                {FILTER_TABS.map((tab) => (
-                  <button
-                    key={tab.id}
-                    onClick={() => setActiveTab(tab.id)}
-                    className={cn(
-                      "px-4 py-2 rounded-xl text-xs font-semibold uppercase tracking-wider transition-all duration-200 whitespace-nowrap cursor-pointer select-none",
-                      activeTab === tab.id
-                        ? "bg-neutral-950 text-white shadow-sm scale-102"
-                        : "border border-neutral-200/80 bg-white text-neutral-600 hover:border-neutral-400 hover:text-neutral-950"
-                    )}
-                  >
-                    {tab.label}
-                  </button>
-                ))}
-              </div>
+              <Link
+                href="/shop"
+                className="hidden sm:inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-neutral-700 hover:text-neutral-950 transition-colors"
+              >
+                <span>View All Cases</span>
+                <ArrowRight className="h-3.5 w-3.5" />
+              </Link>
             </div>
 
-            {/* 4:5 Aspect Ratio Containerless Product Grid */}
+            {/* Product Grid */}
             <div className="grid grid-cols-2 gap-4 sm:gap-6 lg:grid-cols-4">
-              {filteredProducts.map((product, index) => (
+              {allProducts.slice(0, 8).map((product, index) => (
                 <ProductCard key={product.id} product={product} index={index} />
               ))}
             </div>
@@ -299,67 +263,51 @@ export function HomePageClient({
 
       {/* 8. WHITE-GLOVE SERVICE & CRAFTSMANSHIP PILLARS (Unified Section Reveal) */}
       <Reveal animation="fade-up">
-        <section className="py-16 sm:py-24 border-t border-neutral-200/70 bg-neutral-900 text-white relative overflow-hidden">
-          <div className="pointer-events-none absolute -bottom-20 -right-20 h-80 w-80 rounded-full bg-[#A88B4D]/10 blur-3xl" />
-
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-              <div className="lg:col-span-6 space-y-6">
-                <div>
-                  <span className="text-[10px] font-bold text-[#DFCA9B] uppercase tracking-[0.2em]">
-                    Atelier Standards
-                  </span>
-                  <h2 className="font-display text-3xl sm:text-5xl font-normal text-white leading-tight mt-2">
-                    Crafted for Discerning Device Owners.
-                  </h2>
-                  <p className="text-xs sm:text-sm leading-relaxed text-neutral-400 max-w-lg mt-3">
-                    Every CASELÉ piece is inspected for millimeter-perfect button travel, non-yellowing composite stability, and MagSafe magnetic force.
-                  </p>
+        <section className="py-16 sm:py-20 border-t border-neutral-200/70 bg-neutral-50">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
+              {/* Feature 1 */}
+              <div className="flex items-start gap-4 p-6 rounded-2xl border border-neutral-200/80 bg-white shadow-2xs">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-neutral-100 text-neutral-900">
+                  <Truck className="h-5 w-5" />
                 </div>
-
-                <div className="space-y-4 pt-2">
-                  {[
-                    { title: "Same-Day Dispatch Across Qatar", desc: "Express routing within Doha, Lusail, Al Wakrah, and Al Khor." },
-                    { title: "Direct WhatsApp Ordering", desc: "No complex checkouts. Communicate directly with our Doha team." },
-                    { title: "7-Day Satisfaction Fit Guarantee", desc: "Hassle-free replacement if the enclosure does not meet your expectations." },
-                  ].map((item, idx) => (
-                    <div key={idx} className="flex items-start gap-3">
-                      <CheckCircle className="h-4 w-4 text-[#DFCA9B] shrink-0 mt-0.5" />
-                      <div>
-                        <h4 className="text-xs font-bold text-white uppercase tracking-wider">{item.title}</h4>
-                        <p className="text-[11px] text-neutral-400 mt-0.5">{item.desc}</p>
-                      </div>
-                    </div>
-                  ))}
+                <div>
+                  <h3 className="font-bold text-xs sm:text-sm uppercase tracking-wider text-neutral-950">
+                    Doha Express Delivery
+                  </h3>
+                  <p className="mt-1 text-xs text-neutral-500 leading-relaxed">
+                    Same-day and 24-hour priority dispatch across all Qatar zones. Complimentary on orders over QR {deliveryThreshold}.
+                  </p>
                 </div>
               </div>
 
-              <div className="lg:col-span-6 flex justify-center">
-                <div className="w-full max-w-md">
-                  <TiltCard maxTilt={6} scale={1.02}>
-                    <div className="relative w-full aspect-square rounded-3xl border border-white/10 bg-white/5 p-8 flex flex-col items-center justify-center text-center space-y-4 shadow-xl">
-                      <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-white/10 text-white border border-white/20">
-                        <ShieldCheck className="h-8 w-8 text-[#DFCA9B]" />
-                      </div>
-                      <h3 className="font-display text-2xl text-white font-normal">
-                        {freeDeliveryEnabled && deliveryThreshold > 0
-                          ? "Complimentary Doha Delivery"
-                          : "Express Doha Dispatch"}
-                      </h3>
-                      <p className="text-xs text-neutral-400 max-w-xs leading-relaxed">
-                        {freeDeliveryEnabled && deliveryThreshold > 0
-                          ? `Enjoy complimentary express courier delivery on all orders over QR ${deliveryThreshold} in the State of Qatar.`
-                          : "Enjoy swift express courier dispatch across Doha, Lusail, and all Qatar municipalities."}
-                      </p>
-                      <Link
-                        href="/shop"
-                        className="btn-shimmer mt-2 inline-flex items-center gap-2 rounded-xl bg-white px-6 py-3 text-xs font-bold uppercase tracking-widest text-neutral-950 hover:bg-[#C5A869] transition-colors shadow-sm"
-                      >
-                        <span>Order Now</span>
-                        <ArrowRight className="h-3.5 w-3.5" />
-                      </Link>
-                    </div>
-                  </TiltCard>
+              {/* Feature 2 */}
+              <div className="flex items-start gap-4 p-6 rounded-2xl border border-neutral-200/80 bg-white shadow-2xs">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-neutral-100 text-neutral-900">
+                  <ShieldCheck className="h-5 w-5" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-xs sm:text-sm uppercase tracking-wider text-neutral-950">
+                    Definitive Protection
+                  </h3>
+                  <p className="mt-1 text-xs text-neutral-500 leading-relaxed">
+                    Military-grade perimeter drop dispersal with elevated 1.2mm camera bezels protecting your lenses.
+                  </p>
+                </div>
+              </div>
+
+              {/* Feature 3 */}
+              <div className="flex items-start gap-4 p-6 rounded-2xl border border-neutral-200/80 bg-white shadow-2xs">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-neutral-100 text-neutral-900">
+                  <Sparkles className="h-5 w-5" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-xs sm:text-sm uppercase tracking-wider text-neutral-950">
+                    Hand-Inspected in Qatar
+                  </h3>
+                  <p className="mt-1 text-xs text-neutral-500 leading-relaxed">
+                    Every piece undergoes tactile and microscopic inspection in our Doha atelier before luxury delivery.
+                  </p>
                 </div>
               </div>
             </div>
