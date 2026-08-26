@@ -231,6 +231,8 @@ export default function AdminDiscountsPage() {
         body: JSON.stringify({
           settings: {
             bundle_discounts_enabled: nextVal,
+            bundle_buy_2_discount: String(bundleBuy2),
+            bundle_buy_3_discount: String(bundleBuy3),
           },
         }),
       });
@@ -239,6 +241,9 @@ export default function AdminDiscountsPage() {
           `Multi-case bundle discounts are now ${nextVal === "true" ? "ACTIVE" : "DEACTIVATED"}`,
           nextVal === "true" ? "success" : "info"
         );
+      } else {
+        const err = await res.json().catch(() => ({}));
+        toast(err.error || "Failed to update bundle discount setting", "error");
       }
     } catch {
       toast("Failed to update bundle discount setting", "error");
@@ -255,7 +260,7 @@ export default function AdminDiscountsPage() {
         body: JSON.stringify({
           settings: {
             free_delivery_enabled: nextVal,
-            free_delivery_threshold: freeDeliveryThreshold,
+            free_delivery_threshold: String(freeDeliveryThreshold),
           },
         }),
       });
@@ -264,6 +269,9 @@ export default function AdminDiscountsPage() {
           `Free delivery threshold is now ${nextVal === "true" ? "ACTIVE" : "DEACTIVATED"} across all store pages`,
           nextVal === "true" ? "success" : "info"
         );
+      } else {
+        const err = await res.json().catch(() => ({}));
+        toast(err.error || "Failed to update free delivery setting", "error");
       }
     } catch {
       toast("Failed to update free delivery setting", "error");
@@ -278,20 +286,21 @@ export default function AdminDiscountsPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           settings: {
-            bundle_buy_2_discount: bundleBuy2,
-            bundle_buy_3_discount: bundleBuy3,
-            free_delivery_threshold: freeDeliveryThreshold,
-            free_delivery_enabled: freeDeliveryEnabled,
-            bundle_discounts_enabled: bundleEnabled,
-            tier_discounts_enabled: tierEnabled,
+            bundle_buy_2_discount: String(bundleBuy2),
+            bundle_buy_3_discount: String(bundleBuy3),
+            free_delivery_threshold: String(freeDeliveryThreshold),
+            free_delivery_enabled: String(freeDeliveryEnabled),
+            bundle_discounts_enabled: String(bundleEnabled),
+            tier_discounts_enabled: String(tierEnabled),
           },
         }),
       });
 
       if (res.ok) {
-        toast("Bundle savings and delivery rules saved!", "success");
+        toast("Bundle savings and delivery rules saved successfully!", "success");
       } else {
-        toast("Failed to save settings", "error");
+        const err = await res.json().catch(() => ({}));
+        toast(err.error || "Failed to save settings", "error");
       }
     } catch {
       toast("Failed to save settings", "error");
