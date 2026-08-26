@@ -87,23 +87,6 @@ export async function PUT(request: NextRequest) {
       });
     }
 
-    // Keep settings table synchronized for backward compatibility
-    await prisma.setting.upsert({
-      where: { key: "bundle_discounts_enabled" },
-      update: { value: String(config.isActive) },
-      create: { key: "bundle_discounts_enabled", value: String(config.isActive) },
-    });
-    await prisma.setting.upsert({
-      where: { key: "bundle_buy_2_discount" },
-      update: { value: String(config.buy2Percent) },
-      create: { key: "bundle_buy_2_discount", value: String(config.buy2Percent) },
-    });
-    await prisma.setting.upsert({
-      where: { key: "bundle_buy_3_discount" },
-      update: { value: String(config.buy3Percent) },
-      create: { key: "bundle_buy_3_discount", value: String(config.buy3Percent) },
-    });
-
     clearSettingsCache();
 
     return NextResponse.json(

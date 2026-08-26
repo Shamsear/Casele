@@ -1,23 +1,19 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/components/ui/toast";
-import { Settings as SettingsIcon, MessageSquare, Store, Globe, Tag, Truck, Percent, ShieldCheck, Plus, Trash2, Sliders, Power, PowerOff } from "lucide-react";
+import { Plus, Trash2, Power, PowerOff } from "lucide-react";
 
 interface Settings {
   whatsapp_number: string;
   store_name: string;
   store_email: string;
   currency: string;
+  currency_symbol: string;
   tax_rate: string;
   free_delivery_threshold: string;
   free_delivery_enabled: string;
   express_delivery_fee: string;
-  bundle_buy_2_discount: string;
-  bundle_buy_3_discount: string;
   hero_badge: string;
   hero_title: string;
   hero_subtitle: string;
@@ -30,8 +26,6 @@ interface Settings {
   social_proof_enabled: string;
   flash_sale_banner_enabled: string;
   bundle_suggestions_enabled: string;
-  tier_discounts_enabled: string;
-  bundle_discounts_enabled: string;
 }
 
 const DEFAULT_SETTINGS: Settings = {
@@ -39,12 +33,11 @@ const DEFAULT_SETTINGS: Settings = {
   store_name: "CASELÉ",
   store_email: "info@casele.qa",
   currency: "QAR",
+  currency_symbol: "QR",
   tax_rate: "0",
   free_delivery_threshold: "100",
   free_delivery_enabled: "true",
   express_delivery_fee: "20",
-  bundle_buy_2_discount: "5",
-  bundle_buy_3_discount: "10",
   hero_badge: "Doha, Qatar • Luxury Protection",
   hero_title: "Sculpted for Flagships.",
   hero_subtitle: "Artistry in Armor.",
@@ -57,8 +50,6 @@ const DEFAULT_SETTINGS: Settings = {
   social_proof_enabled: "true",
   flash_sale_banner_enabled: "true",
   bundle_suggestions_enabled: "true",
-  tier_discounts_enabled: "true",
-  bundle_discounts_enabled: "true",
 };
 
 export default function AdminSettingsPage() {
@@ -92,14 +83,31 @@ export default function AdminSettingsPage() {
 
   const fetchSettings = async () => {
     try {
-      const response = await fetch("/api/settings");
-      if (response.ok) {
-        const data = await response.json();
-        setSettings({
-          ...DEFAULT_SETTINGS,
+      const [resSettings, resDelivery] = await Promise.all([
+        fetch(`/api/settings?_t=${Date.now()}`),
+        fetch(`/api/admin/discounts/delivery-rule?_t=${Date.now()}`),
+      ]);
+
+      let loadedSettings = { ...DEFAULT_SETTINGS };
+
+      if (resSettings.ok) {
+        const data = await resSettings.json();
+        loadedSettings = {
+          ...loadedSettings,
           ...data.settings,
-        });
+        };
       }
+
+      if (resDelivery.ok) {
+        const deliveryData = await resDelivery.json();
+        if (deliveryData.config) {
+          loadedSettings.free_delivery_threshold = String(deliveryData.config.freeThreshold ?? 100);
+          loadedSettings.express_delivery_fee = String(deliveryData.config.expressFee ?? 20);
+          loadedSettings.free_delivery_enabled = String(deliveryData.config.isFreeDeliveryActive ?? true);
+        }
+      }
+
+      setSettings(loadedSettings);
     } catch (error) {
       console.error("Failed to fetch settings:", error);
     } finally {
@@ -166,17 +174,35 @@ export default function AdminSettingsPage() {
   const handleSave = async () => {
     setSaving(true);
     try {
-      const response = await fetch("/api/settings", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ settings }),
-      });
+      // 1. Separate delivery config from general settings
+      const {
+        free_delivery_threshold,
+        free_delivery_enabled,
+        express_delivery_fee,
+        ...generalSettings
+      } = settings;
 
-      if (response.ok) {
-        toast("Settings saved successfully", "success");
+      const [resSettings, resDelivery] = await Promise.all([
+        fetch("/api/settings", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ settings: generalSettings }),
+        }),
+        fetch("/api/admin/discounts/delivery-rule", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            freeThreshold: Number(free_delivery_threshold),
+            expressFee: Number(express_delivery_fee),
+            isFreeDeliveryActive: free_delivery_enabled !== "false",
+          }),
+        }),
+      ]);
+
+      if (resSettings.ok && resDelivery.ok) {
+        toast("Settings and delivery rules saved successfully", "success");
       } else {
-        const error = await response.json();
-        toast(error.error || "Failed to save settings", "error");
+        toast("Failed to save settings", "error");
       }
     } catch (error) {
       toast("Failed to save settings", "error");
@@ -259,7 +285,7 @@ export default function AdminSettingsPage() {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-1">
-              <label className="text-[11px] font-bold uppercase tracking-wider text-neutral-700">Headline Line 1</label>
+              <label className="text-[11px] font-bold uppercase tracking-wider text-neutral-700">Primary Headline</label>
               <input
                 type="text"
                 value={settings.hero_title}
@@ -269,7 +295,7 @@ export default function AdminSettingsPage() {
               />
             </div>
             <div className="space-y-1">
-              <label className="text-[11px] font-bold uppercase tracking-wider text-neutral-700">Headline Line 2 (Italic Accent)</label>
+              <label className="text-[11px] font-bold uppercase tracking-wider text-neutral-700">Secondary Subtitle</label>
               <input
                 type="text"
                 value={settings.hero_subtitle}
@@ -280,46 +306,78 @@ export default function AdminSettingsPage() {
             </div>
           </div>
           <div className="space-y-1">
-            <label className="text-[11px] font-bold uppercase tracking-wider text-neutral-700">Editorial Description Paragraph</label>
+            <label className="text-[11px] font-bold uppercase tracking-wider text-neutral-700">Hero Editorial Description</label>
             <textarea
-              rows={2}
+              rows={3}
               value={settings.hero_description}
               onChange={(e) => setSettings({ ...settings, hero_description: e.target.value })}
-              placeholder="Every silhouette is machined with aerospace-grade composites..."
-              className="w-full rounded-xl border border-neutral-200 bg-white py-2 px-3 text-xs text-neutral-950 placeholder:text-neutral-400 focus:border-neutral-950 focus:outline-none shadow-2xs"
+              placeholder="Machined with aerospace-grade composites..."
+              className="w-full rounded-xl border border-neutral-200 bg-white py-2.5 px-3 text-xs text-neutral-950 placeholder:text-neutral-400 focus:border-neutral-950 focus:outline-none shadow-2xs resize-none"
             />
           </div>
         </div>
       </section>
 
-      {/* 2. WhatsApp Checkout Integration */}
+      {/* 2. Store Info & WhatsApp Configuration */}
       <section className="rounded-2xl border border-neutral-200/80 bg-white p-6 shadow-2xs space-y-4">
         <div className="border-b border-neutral-100 pb-3">
-          <h2 className="text-base font-bold text-neutral-950">WhatsApp Order Destination</h2>
+          <h2 className="text-base font-bold text-neutral-950">Store Details & WhatsApp Ordering</h2>
           <p className="text-xs text-neutral-500">
-            Customers will automatically forward their cart items and delivery addresses to this WhatsApp number
+            Set your brand identity, primary Qatar WhatsApp sales line, and contact email
           </p>
         </div>
-        <div className="max-w-md space-y-1 pt-1">
-          <label className="text-[11px] font-bold uppercase tracking-wider text-neutral-700">WhatsApp Phone Number (with Country Code)</label>
-          <input
-            type="text"
-            value={settings.whatsapp_number}
-            onChange={(e) => setSettings({ ...settings, whatsapp_number: e.target.value })}
-            placeholder="+97455364455"
-            className="w-full rounded-xl border border-neutral-200 bg-white py-2.5 px-3 text-xs font-mono font-bold text-neutral-950 placeholder:text-neutral-400 focus:border-neutral-950 focus:outline-none shadow-2xs"
-          />
-          <p className="text-[10.5px] text-neutral-500">Example format: +97455364455</p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl pt-1">
+          <div className="space-y-1">
+            <label className="text-[11px] font-bold uppercase tracking-wider text-neutral-700">Store Name</label>
+            <input
+              type="text"
+              value={settings.store_name}
+              onChange={(e) => setSettings({ ...settings, store_name: e.target.value })}
+              placeholder="CASELÉ"
+              className="w-full rounded-xl border border-neutral-200 bg-white py-2.5 px-3 text-xs text-neutral-950 placeholder:text-neutral-400 focus:border-neutral-950 focus:outline-none shadow-2xs"
+            />
+          </div>
+          <div className="space-y-1">
+            <label className="text-[11px] font-bold uppercase tracking-wider text-neutral-700">Support Email</label>
+            <input
+              type="email"
+              value={settings.store_email}
+              onChange={(e) => setSettings({ ...settings, store_email: e.target.value })}
+              placeholder="info@casele.qa"
+              className="w-full rounded-xl border border-neutral-200 bg-white py-2.5 px-3 text-xs text-neutral-950 placeholder:text-neutral-400 focus:border-neutral-950 focus:outline-none shadow-2xs"
+            />
+          </div>
+          <div className="space-y-1">
+            <label className="text-[11px] font-bold uppercase tracking-wider text-neutral-700">Primary WhatsApp Number</label>
+            <input
+              type="text"
+              value={settings.whatsapp_number}
+              onChange={(e) => setSettings({ ...settings, whatsapp_number: e.target.value })}
+              placeholder="+97455364455"
+              className="w-full rounded-xl border border-neutral-200 bg-white py-2.5 px-3 text-xs text-neutral-950 placeholder:text-neutral-400 focus:border-neutral-950 focus:outline-none shadow-2xs font-mono"
+            />
+            <p className="text-[10px] text-neutral-400">Must include Qatar country code +974</p>
+          </div>
+          <div className="space-y-1">
+            <label className="text-[11px] font-bold uppercase tracking-wider text-neutral-700">Store Currency</label>
+            <input
+              type="text"
+              value={settings.currency}
+              onChange={(e) => setSettings({ ...settings, currency: e.target.value })}
+              placeholder="QAR"
+              className="w-full rounded-xl border border-neutral-200 bg-white py-2.5 px-3 text-xs text-neutral-950 placeholder:text-neutral-400 focus:border-neutral-950 focus:outline-none shadow-2xs uppercase"
+            />
+          </div>
         </div>
       </section>
 
-      {/* 3. Delivery Rates & Free Threshold */}
+      {/* 3. Doha Express Delivery */}
       <section className="rounded-2xl border border-neutral-200/80 bg-white p-6 shadow-2xs space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-neutral-100 pb-3">
           <div>
             <h2 className="text-base font-bold text-neutral-950">Doha Express Delivery</h2>
             <p className="text-xs text-neutral-500">
-              Delivery fees and minimum cart value for free same-day shipping
+              Delivery fees and minimum cart value for free same-day shipping (Managed in Dedicated Table)
             </p>
           </div>
           <button
@@ -448,36 +506,33 @@ export default function AdminSettingsPage() {
               <tr className="border-b border-neutral-100 bg-neutral-50/70 text-[11px] font-bold uppercase tracking-wider text-neutral-500">
                 <th className="px-4 py-2.5">Name</th>
                 <th className="px-4 py-2.5">Email</th>
-                <th className="px-4 py-2.5">Storage</th>
+                <th className="px-4 py-2.5">Created</th>
                 <th className="px-4 py-2.5 text-right">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-neutral-100">
               {adminUsers.length === 0 ? (
                 <tr>
-                  <td colSpan={4} className="py-4 text-center text-neutral-400">
-                    Primary Database Admin active (admin@casele.co)
+                  <td colSpan={4} className="px-4 py-6 text-center text-neutral-400">
+                    No additional admin accounts found.
                   </td>
                 </tr>
               ) : (
                 adminUsers.map((admin) => (
-                  <tr key={admin.id} className="hover:bg-neutral-50/60 transition-colors">
-                    <td className="px-4 py-2.5 font-semibold text-neutral-950">
-                      {admin.name}
+                  <tr key={admin.id} className="hover:bg-neutral-50/50 transition-colors">
+                    <td className="px-4 py-3 font-semibold text-neutral-950">{admin.name}</td>
+                    <td className="px-4 py-3 text-neutral-600 font-mono">{admin.email}</td>
+                    <td className="px-4 py-3 text-neutral-400">
+                      {new Date(admin.createdAt).toLocaleDateString()}
                     </td>
-                    <td className="px-4 py-2.5 font-mono font-bold text-neutral-950">
-                      {admin.email}
-                    </td>
-                    <td className="px-4 py-2.5 text-emerald-700 font-medium">
-                      PostgreSQL Database
-                    </td>
-                    <td className="px-4 py-2.5 text-right">
+                    <td className="px-4 py-3 text-right">
                       <button
                         onClick={() => handleDeleteAdminUser(admin.id)}
-                        className="text-xs text-rose-600 hover:text-rose-800 transition-colors cursor-pointer"
-                        title="Remove Admin Account"
+                        className="p-1 text-neutral-400 hover:text-rose-600 transition-colors cursor-pointer"
+                        title="Delete Admin"
+                        aria-label="Delete Admin"
                       >
-                        Delete
+                        <Trash2 className="w-3.5 h-3.5" />
                       </button>
                     </td>
                   </tr>
@@ -488,16 +543,59 @@ export default function AdminSettingsPage() {
         </div>
       </section>
 
-      {/* Save Button */}
-      <div className="flex justify-end pt-2">
-        <button
-          onClick={handleSave}
-          disabled={saving}
-          className="rounded-xl bg-neutral-950 px-6 py-3 text-xs font-bold uppercase tracking-wider text-white shadow-md hover:bg-neutral-800 active:scale-95 transition-all cursor-pointer disabled:opacity-50"
-        >
-          {saving ? "Saving..." : "Save All Settings"}
-        </button>
-      </div>
+      {/* 5. SEO & Social Links */}
+      <section className="rounded-2xl border border-neutral-200/80 bg-white p-6 shadow-2xs space-y-4">
+        <div className="border-b border-neutral-100 pb-3">
+          <h2 className="text-base font-bold text-neutral-950">SEO & Social Links</h2>
+          <p className="text-xs text-neutral-500">
+            Search engine title tags, meta descriptions, and Qatar social presence
+          </p>
+        </div>
+        <div className="grid gap-4 max-w-2xl pt-1">
+          <div className="space-y-1">
+            <label className="text-[11px] font-bold uppercase tracking-wider text-neutral-700">Meta Title</label>
+            <input
+              type="text"
+              value={settings.meta_title}
+              onChange={(e) => setSettings({ ...settings, meta_title: e.target.value })}
+              placeholder="CASELÉ — Premium Phone Cases in Qatar"
+              className="w-full rounded-xl border border-neutral-200 bg-white py-2.5 px-3 text-xs text-neutral-950 placeholder:text-neutral-400 focus:border-neutral-950 focus:outline-none shadow-2xs"
+            />
+          </div>
+          <div className="space-y-1">
+            <label className="text-[11px] font-bold uppercase tracking-wider text-neutral-700">Meta Description</label>
+            <textarea
+              rows={2}
+              value={settings.meta_description}
+              onChange={(e) => setSettings({ ...settings, meta_description: e.target.value })}
+              placeholder="Premium mobile phone cases designed for style and durability..."
+              className="w-full rounded-xl border border-neutral-200 bg-white py-2.5 px-3 text-xs text-neutral-950 placeholder:text-neutral-400 focus:border-neutral-950 focus:outline-none shadow-2xs resize-none"
+            />
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="space-y-1">
+              <label className="text-[11px] font-bold uppercase tracking-wider text-neutral-700">Instagram Profile URL</label>
+              <input
+                type="url"
+                value={settings.instagram}
+                onChange={(e) => setSettings({ ...settings, instagram: e.target.value })}
+                placeholder="https://instagram.com/casele_premium_mobile_case"
+                className="w-full rounded-xl border border-neutral-200 bg-white py-2.5 px-3 text-xs text-neutral-950 placeholder:text-neutral-400 focus:border-neutral-950 focus:outline-none shadow-2xs"
+              />
+            </div>
+            <div className="space-y-1">
+              <label className="text-[11px] font-bold uppercase tracking-wider text-neutral-700">Website URL</label>
+              <input
+                type="text"
+                value={settings.website}
+                onChange={(e) => setSettings({ ...settings, website: e.target.value })}
+                placeholder="www.casele.co"
+                className="w-full rounded-xl border border-neutral-200 bg-white py-2.5 px-3 text-xs text-neutral-950 placeholder:text-neutral-400 focus:border-neutral-950 focus:outline-none shadow-2xs"
+              />
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }

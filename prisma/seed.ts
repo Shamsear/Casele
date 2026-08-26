@@ -228,13 +228,6 @@ async function main() {
     { key: "tax_rate", value: "0" }, // Qatar has no sales tax
     { key: "country", value: "Qatar" },
     { key: "city", value: "Doha" },
-    { key: "free_delivery_threshold", value: "100" },
-    { key: "free_delivery_enabled", value: "true" },
-    { key: "express_delivery_fee", value: "20" },
-    { key: "bundle_buy_2_discount", value: "5" },
-    { key: "bundle_buy_3_discount", value: "10" },
-    { key: "bundle_discounts_enabled", value: "true" },
-    { key: "tier_discounts_enabled", value: "true" },
     { key: "social_proof_enabled", value: "true" },
     { key: "flash_sale_banner_enabled", value: "true" },
     { key: "bundle_suggestions_enabled", value: "true" },

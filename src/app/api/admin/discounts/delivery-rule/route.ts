@@ -97,23 +97,6 @@ export async function PUT(request: NextRequest) {
       });
     }
 
-    // Keep settings table synchronized for backward compatibility
-    await prisma.setting.upsert({
-      where: { key: "free_delivery_enabled" },
-      update: { value: String(config.isFreeDeliveryActive) },
-      create: { key: "free_delivery_enabled", value: String(config.isFreeDeliveryActive) },
-    });
-    await prisma.setting.upsert({
-      where: { key: "free_delivery_threshold" },
-      update: { value: String(config.freeThreshold) },
-      create: { key: "free_delivery_threshold", value: String(config.freeThreshold) },
-    });
-    await prisma.setting.upsert({
-      where: { key: "express_delivery_fee" },
-      update: { value: String(config.expressFee) },
-      create: { key: "express_delivery_fee", value: String(config.expressFee) },
-    });
-
     clearSettingsCache();
 
     return NextResponse.json(
