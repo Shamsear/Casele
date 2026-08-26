@@ -16,6 +16,11 @@ interface Settings {
   express_delivery_fee: string;
   bundle_buy_2_discount: string;
   bundle_buy_3_discount: string;
+  hero_badge: string;
+  hero_title: string;
+  hero_subtitle: string;
+  hero_description: string;
+  announcement_text: string;
   meta_title: string;
   meta_description: string;
   instagram: string;
@@ -37,6 +42,11 @@ const DEFAULT_SETTINGS: Settings = {
   express_delivery_fee: "20",
   bundle_buy_2_discount: "5",
   bundle_buy_3_discount: "10",
+  hero_badge: "Doha Atelier • Bespoke Protection",
+  hero_title: "Sculpted for Flagships.",
+  hero_subtitle: "Artistry in Armor.",
+  hero_description: "Every silhouette is machined with aerospace-grade composites and tactile metallic accents. Hand-finished in Qatar for discerning device owners.",
+  announcement_text: "Complimentary Doha Express Delivery on Orders Over QR 100",
   meta_title: "CASELÉ — Premium Phone Cases in Qatar",
   meta_description: "Premium mobile phone cases designed for style and durability. Shop now in Qatar.",
   instagram: "https://www.instagram.com/casele_premium_mobile_case?igsi=MW55cTM4MmN6dGF3ag%3D%3D&utm_source=qr",
@@ -226,6 +236,56 @@ export default function AdminSettingsPage() {
             onChange={(e) =>
               setSettings({ ...settings, website: e.target.value })
             }
+          />
+        </div>
+      </section>
+
+      {/* Hero Section & Storefront Copy */}
+      <section className="rounded-xl border border-dark-border bg-dark-surface p-6">
+        <h2 className="text-lg font-semibold text-white">Hero Landing & Storefront Copy</h2>
+        <p className="mt-1 text-sm text-warm-gray">
+          Customize the main headline, subtitle, badge, and announcement bar on your storefront
+        </p>
+        <div className="mt-4 grid gap-4 max-w-lg">
+          <Input
+            label="Hero Badge"
+            value={settings.hero_badge}
+            onChange={(e) =>
+              setSettings({ ...settings, hero_badge: e.target.value })
+            }
+            placeholder="Doha Atelier • Bespoke Protection"
+          />
+          <Input
+            label="Hero Headline Line 1"
+            value={settings.hero_title}
+            onChange={(e) =>
+              setSettings({ ...settings, hero_title: e.target.value })
+            }
+            placeholder="Sculpted for Flagships."
+          />
+          <Input
+            label="Hero Headline Line 2 (Italic Accent)"
+            value={settings.hero_subtitle}
+            onChange={(e) =>
+              setSettings({ ...settings, hero_subtitle: e.target.value })
+            }
+            placeholder="Artistry in Armor."
+          />
+          <Input
+            label="Hero Editorial Subtitle"
+            value={settings.hero_description}
+            onChange={(e) =>
+              setSettings({ ...settings, hero_description: e.target.value })
+            }
+            placeholder="Every silhouette is machined with aerospace-grade composites..."
+          />
+          <Input
+            label="Top Announcement Bar Offer Text"
+            value={settings.announcement_text}
+            onChange={(e) =>
+              setSettings({ ...settings, announcement_text: e.target.value })
+            }
+            placeholder="Complimentary Doha Express Delivery on Orders Over QR 100"
           />
         </div>
       </section>

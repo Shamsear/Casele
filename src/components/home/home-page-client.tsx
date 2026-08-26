@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ProductCard } from "@/components/products/product-card";
@@ -48,6 +48,24 @@ export function HomePageClient({
   categories,
 }: HomePageClientProps) {
   const [activeTab, setActiveTab] = useState("all");
+  const [heroBadge, setHeroBadge] = useState("Doha Atelier • Bespoke Protection");
+  const [heroTitle, setHeroTitle] = useState("Sculpted for Flagships.");
+  const [heroSubtitle, setHeroSubtitle] = useState("Artistry in Armor.");
+  const [heroDescription, setHeroDescription] = useState("Every silhouette is machined with aerospace-grade composites and tactile metallic accents. Hand-finished in Qatar for discerning device owners.");
+
+  useEffect(() => {
+    fetch("/api/settings")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.settings) {
+          if (data.settings.hero_badge) setHeroBadge(data.settings.hero_badge);
+          if (data.settings.hero_title) setHeroTitle(data.settings.hero_title);
+          if (data.settings.hero_subtitle) setHeroSubtitle(data.settings.hero_subtitle);
+          if (data.settings.hero_description) setHeroDescription(data.settings.hero_description);
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   const filteredProducts = allProducts.filter((product) => {
     if (activeTab === "all") return true;
@@ -78,7 +96,7 @@ export function HomePageClient({
                   <div className="inline-flex items-center gap-2 rounded-full border border-neutral-200 bg-white px-3 py-1 shadow-2xs">
                     <span className="flex h-1.5 w-1.5 rounded-full bg-[#C5A869] animate-ping" />
                     <span className="text-[9px] sm:text-[10px] font-bold tracking-[0.18em] uppercase text-neutral-900">
-                      Doha Atelier • Bespoke Protection
+                      {heroBadge}
                     </span>
                   </div>
                 </Reveal>
@@ -86,15 +104,15 @@ export function HomePageClient({
                 {/* Main Headline */}
                 <Reveal animation="fade-up" delay={120}>
                   <h1 className="font-display text-3xl sm:text-4xl lg:text-[2.65rem] xl:text-[3rem] font-normal leading-[1.08] tracking-tight text-neutral-950">
-                    Sculpted for Flagships. <br />
-                    <span className="italic font-light text-neutral-700">Artistry in Armor.</span>
+                    {heroTitle} <br />
+                    <span className="italic font-light text-neutral-700">{heroSubtitle}</span>
                   </h1>
                 </Reveal>
 
                 {/* Subtitle */}
                 <Reveal animation="fade-up" delay={190}>
                   <p className="max-w-md text-xs sm:text-sm leading-relaxed text-neutral-600">
-                    Every silhouette is machined with aerospace-grade composites and tactile metallic accents. Hand-finished in Qatar for discerning device owners.
+                    {heroDescription}
                   </p>
                 </Reveal>
 

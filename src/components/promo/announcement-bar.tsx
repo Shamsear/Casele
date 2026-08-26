@@ -28,6 +28,7 @@ export function AnnouncementBar() {
   const [isDismissed, setIsDismissed] = useState<boolean | null>(null);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [deliveryThreshold, setDeliveryThreshold] = useState(100);
+  const [customAnnouncement, setCustomAnnouncement] = useState("");
 
   // Sync dismissal state and fetch settings on mount
   useEffect(() => {
@@ -41,9 +42,14 @@ export function AnnouncementBar() {
     fetch("/api/settings")
       .then((res) => res.json())
       .then((data) => {
-        if (data.settings?.free_delivery_threshold) {
-          const val = Number(data.settings.free_delivery_threshold);
-          if (val > 0) setDeliveryThreshold(val);
+        if (data.settings) {
+          if (data.settings.free_delivery_threshold) {
+            const val = Number(data.settings.free_delivery_threshold);
+            if (val > 0) setDeliveryThreshold(val);
+          }
+          if (data.settings.announcement_text) {
+            setCustomAnnouncement(data.settings.announcement_text);
+          }
         }
       })
       .catch(() => {});
@@ -79,7 +85,7 @@ export function AnnouncementBar() {
 
   const announcementsList = [
     {
-      text: `Complimentary Doha Express Delivery on Orders Over QR ${deliveryThreshold}`,
+      text: customAnnouncement || `Complimentary Doha Express Delivery on Orders Over QR ${deliveryThreshold}`,
       badge: "FREE DELIVERY",
       link: "/shop",
     },
