@@ -64,7 +64,6 @@ export function FlashSale({
       modelId: product.modelSlug,
       modelName: product.modelSlug,
     });
-    toast(`${product.name} added to bag`);
   };
 
   const pad = (n: number) => n.toString().padStart(2, "0");

@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useState, useCallback, useEffect } from "react";
 import { cn } from "@/lib/utils";
+import { Check, AlertCircle, Info, Sparkles, X } from "lucide-react";
 
 interface Toast {
   id: string;
@@ -16,7 +17,7 @@ interface ToastContextType {
 
 const ToastContext = createContext<ToastContextType | null>(null);
 
-const TOAST_DURATION = 3000;
+const TOAST_DURATION = 3200;
 
 function ToastItem({ toast: t, onRemove }: { toast: Toast; onRemove: (id: string) => void }) {
   const [isExiting, setIsExiting] = useState(false);
@@ -41,43 +42,59 @@ function ToastItem({ toast: t, onRemove }: { toast: Toast; onRemove: (id: string
   return (
     <div
       className={cn(
-        "relative overflow-hidden rounded-xl shadow-2xl text-sm font-medium backdrop-blur-xl transition-all duration-300",
+        "relative overflow-hidden rounded-2xl sm:rounded-full border shadow-[0_16px_40px_rgba(0,0,0,0.35)] backdrop-blur-2xl transition-all duration-300 pointer-events-auto",
         isExiting
-          ? "opacity-0 translate-y-2 scale-95"
-          : "opacity-100 translate-y-0 scale-100",
-        "animate-slide-up",
-        t.type === "success" && "bg-emerald-500/90 text-white",
-        t.type === "error" && "bg-red-500/90 text-white",
-        t.type === "info" && "bg-dark-surface/95 text-white border border-dark-border"
+          ? "opacity-0 -translate-y-2 scale-95"
+          : "opacity-100 translate-y-0 scale-100 animate-slide-up",
+        t.type === "success" && "bg-neutral-950/95 text-white border-white/15",
+        t.type === "error" && "bg-neutral-950/95 text-white border-rose-500/40",
+        t.type === "info" && "bg-neutral-950/95 text-white border-white/15"
       )}
     >
-      <div className="flex items-center gap-3 px-4 py-3.5">
-        {/* Icon */}
+      <div className="flex items-center gap-3 px-4 py-2.5 sm:px-5 sm:py-3">
+        {/* Luxury Gold/Status Badge */}
         {t.type === "success" && (
-          <div className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-white/20">
-            <svg viewBox="0 0 20 20" fill="currentColor" className="w-3.5 h-3.5">
-              <path fillRule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clipRule="evenodd" />
-            </svg>
+          <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#C5A869]/20 border border-[#C5A869]/40 text-[#DFCA9B]">
+            <Check className="w-3.5 h-3.5" />
           </div>
         )}
         {t.type === "error" && (
-          <div className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-white/20">
-            <svg viewBox="0 0 20 20" fill="currentColor" className="w-3.5 h-3.5">
-              <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-5a.75.75 0 01.75.75v4.5a.75.75 0 01-1.5 0v-4.5A.75.75 0 0110 5zm0 10a1 1 0 100-2 1 1 0 000 2z" clipRule="evenodd" />
-            </svg>
+          <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-rose-500/20 border border-rose-500/40 text-rose-300">
+            <AlertCircle className="w-3.5 h-3.5" />
           </div>
         )}
-        <span>{t.message}</span>
+        {t.type === "info" && (
+          <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#C5A869]/20 border border-[#C5A869]/40 text-[#DFCA9B]">
+            <Sparkles className="w-3.5 h-3.5" />
+          </div>
+        )}
+
+        <div className="flex-1 min-w-0 pr-2">
+          <p className="text-xs sm:text-sm font-medium tracking-wide text-neutral-100 leading-snug">
+            {t.message}
+          </p>
+        </div>
+
+        <button
+          onClick={() => {
+            setIsExiting(true);
+            setTimeout(() => onRemove(t.id), 200);
+          }}
+          className="text-neutral-400 hover:text-white p-1 transition-colors"
+          aria-label="Close notification"
+        >
+          <X className="w-3.5 h-3.5" />
+        </button>
       </div>
 
-      {/* Progress bar */}
-      <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-white/10">
+      {/* Luxury Champagne Gold Progress Bar */}
+      <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-white/10">
         <div
           className={cn(
             "h-full transition-all duration-100 ease-linear",
-            t.type === "success" && "bg-white/40",
-            t.type === "error" && "bg-white/40",
-            t.type === "info" && "bg-gold/60"
+            t.type === "success" && "bg-gradient-to-r from-[#A88B4D] to-[#DFCA9B]",
+            t.type === "error" && "bg-rose-500",
+            t.type === "info" && "bg-gradient-to-r from-[#A88B4D] to-[#DFCA9B]"
           )}
           style={{ width: `${progress}%` }}
         />
@@ -105,8 +122,8 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
     <ToastContext.Provider value={{ toast: addToast }}>
       {children}
 
-      {/* Toast container */}
-      <div className="fixed bottom-20 left-1/2 -translate-x-1/2 z-[100] flex flex-col gap-2 md:bottom-6 w-[90vw] max-w-sm">
+      {/* Floating Luxury Toast Container */}
+      <div className="fixed top-5 left-1/2 -translate-x-1/2 z-[120] pointer-events-none flex flex-col items-center gap-2 w-[92vw] max-w-md">
         {toasts.map((t) => (
           <ToastItem key={t.id} toast={t} onRemove={removeToast} />
         ))}

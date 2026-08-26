@@ -68,7 +68,6 @@ export function StickyAddToCart({
       quantity
     );
     vibrate(10);
-    toast(`${name} (${finish} • ${modelName}) added to bag`);
   };
 
   const handleBuyNow = () => {

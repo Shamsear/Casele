@@ -110,7 +110,6 @@ export function ProductDetailClient({
       quantity
     );
     vibrate(10);
-    toast(`${product.name} (${selectedFinish} • ${selectedModel.name}) added to bag`);
   };
 
   const handleBuyNow = () => {

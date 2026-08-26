@@ -65,8 +65,6 @@ export function ProductCard({ product, className }: ProductCardProps) {
 
     vibrate(10);
     setIsAdded(true);
-    toast(`${product.name} added to bag`);
-
     setTimeout(() => setIsAdded(false), 1600);
   };
 
