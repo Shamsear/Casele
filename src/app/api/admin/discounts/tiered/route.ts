@@ -141,7 +141,7 @@ export async function PUT(request: NextRequest) {
 
     const body = await request.json();
 
-    // Support Master Toggle All Tiers
+    // 1. Support Master Toggle All Tiers
     if (body.toggleAll && body.isActive !== undefined) {
       await prisma.tierDiscount.updateMany({
         data: { isActive: Boolean(body.isActive) },
@@ -163,63 +163,80 @@ export async function PUT(request: NextRequest) {
 
     const { id, minAmount, discountPercent, isActive } = body;
 
-    if (!id && minAmount === undefined) {
-      return NextResponse.json({ error: "Missing tier ID or minAmount" }, { status: 400 });
+    // 2. Direct ID update (if real database ID)
+    if (id && !id.startsWith("default-tier")) {
+      try {
+        const updated = await prisma.tierDiscount.update({
+          where: { id },
+          data: {
+            ...(minAmount !== undefined && { minAmount: Number(minAmount) }),
+            ...(discountPercent !== undefined && { discountPercent: Number(discountPercent) }),
+            ...(isActive !== undefined && { isActive: Boolean(isActive) }),
+          },
+        });
+        return NextResponse.json({
+          success: true,
+          tier: {
+            id: updated.id,
+            minAmount: Number(updated.minAmount),
+            discountPercent: updated.discountPercent,
+            isActive: updated.isActive,
+          },
+        });
+      } catch (err) {
+        console.warn("Direct ID update failed, attempting minAmount match:", err);
+      }
     }
 
-    // Locate the tier in DB
-    const existing = await prisma.tierDiscount.findFirst({
-      where: {
-        OR: [
-          ...(id ? [{ id }] : []),
-          ...(minAmount !== undefined ? [{ minAmount: Number(minAmount) }] : []),
-        ],
-      },
-    });
-
-    if (existing) {
-      const updated = await prisma.tierDiscount.update({
-        where: { id: existing.id },
-        data: {
-          ...(minAmount !== undefined && { minAmount: Number(minAmount) }),
-          ...(discountPercent !== undefined && { discountPercent: Number(discountPercent) }),
-          ...(isActive !== undefined && { isActive: Boolean(isActive) }),
-        },
+    // 3. Match or Upsert by minAmount
+    if (minAmount !== undefined) {
+      const numMinAmount = Number(minAmount);
+      const existing = await prisma.tierDiscount.findFirst({
+        where: { minAmount: numMinAmount },
       });
 
-      return NextResponse.json({
-        success: true,
-        tier: {
-          id: updated.id,
-          minAmount: Number(updated.minAmount),
-          discountPercent: updated.discountPercent,
-          isActive: updated.isActive,
-        },
-      });
+      if (existing) {
+        const updated = await prisma.tierDiscount.update({
+          where: { id: existing.id },
+          data: {
+            ...(discountPercent !== undefined && { discountPercent: Number(discountPercent) }),
+            ...(isActive !== undefined && { isActive: Boolean(isActive) }),
+          },
+        });
+        return NextResponse.json({
+          success: true,
+          tier: {
+            id: updated.id,
+            minAmount: Number(updated.minAmount),
+            discountPercent: updated.discountPercent,
+            isActive: updated.isActive,
+          },
+        });
+      } else {
+        const created = await prisma.tierDiscount.create({
+          data: {
+            minAmount: numMinAmount,
+            discountPercent: discountPercent !== undefined ? Number(discountPercent) : 5,
+            isActive: isActive !== undefined ? Boolean(isActive) : true,
+            sortOrder: 0,
+          },
+        });
+        return NextResponse.json({
+          success: true,
+          tier: {
+            id: created.id,
+            minAmount: Number(created.minAmount),
+            discountPercent: created.discountPercent,
+            isActive: created.isActive,
+          },
+        });
+      }
     }
 
-    // If not found in DB yet, create it
-    const created = await prisma.tierDiscount.create({
-      data: {
-        minAmount: minAmount !== undefined ? Number(minAmount) : 50,
-        discountPercent: discountPercent !== undefined ? Number(discountPercent) : 5,
-        isActive: isActive !== undefined ? Boolean(isActive) : true,
-        sortOrder: 0,
-      },
-    });
-
-    return NextResponse.json({
-      success: true,
-      tier: {
-        id: created.id,
-        minAmount: Number(created.minAmount),
-        discountPercent: created.discountPercent,
-        isActive: created.isActive,
-      },
-    });
+    return NextResponse.json({ error: "Missing tier ID or minAmount" }, { status: 400 });
   } catch (error) {
     console.error("Update tier error:", error);
-    return NextResponse.json({ error: "Failed to update tiered discount" }, { status: 500 });
+    return NextResponse.json({ error: "Failed to update tiered discount in database" }, { status: 500 });
   }
 }
 

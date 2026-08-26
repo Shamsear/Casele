@@ -26,11 +26,6 @@ export default withAuth(
           return true;
         }
 
-        // Allow API routes to handle their own JSON error responses
-        if (pathname.startsWith("/api/admin")) {
-          return true;
-        }
-
         // All other /admin UI pages require valid authentication
         return !!token;
       },
@@ -42,5 +37,5 @@ export default withAuth(
 );
 
 export const config = {
-  matcher: ["/admin/:path*", "/api/admin/:path*"],
+  matcher: ["/admin/:path*"],
 };
