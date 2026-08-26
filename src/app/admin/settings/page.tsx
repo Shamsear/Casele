@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/components/ui/toast";
+import { Settings as SettingsIcon, MessageSquare, Store, Globe, Tag, Truck, Percent, ShieldCheck, Plus, Trash2, Sliders } from "lucide-react";
 
 interface Settings {
   whatsapp_number: string;
@@ -72,7 +73,6 @@ export default function AdminSettingsPage() {
   const [addingAdmin, setAddingAdmin] = useState(false);
   const [showAddAdminModal, setShowAddAdminModal] = useState(false);
 
-  // Fetch settings and database admins on mount
   useEffect(() => {
     fetchSettings();
     fetchAdmins();
@@ -185,384 +185,267 @@ export default function AdminSettingsPage() {
 
   if (loading) {
     return (
-      <div className="space-y-8">
+      <div className="space-y-6">
         <div>
-          <h1 className="font-display text-h1 font-bold text-white">Settings</h1>
-          <p className="mt-1 text-warm-gray">Loading...</p>
+          <h1 className="font-display text-2xl font-bold text-neutral-950">Store Settings</h1>
+          <p className="mt-1 text-xs text-neutral-500">Loading store preferences...</p>
         </div>
         <div className="animate-pulse space-y-4">
-          <div className="h-32 rounded-xl bg-dark-surface" />
-          <div className="h-32 rounded-xl bg-dark-surface" />
-          <div className="h-32 rounded-xl bg-dark-surface" />
+          <div className="h-32 rounded-2xl bg-neutral-200/50" />
+          <div className="h-32 rounded-2xl bg-neutral-200/50" />
         </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-8">
-      <div>
-        <h1 className="font-display text-h1 font-bold text-white">Settings</h1>
-        <p className="mt-1 text-warm-gray">Configure your store settings</p>
-      </div>
-
-      {/* WhatsApp */}
-      <section className="rounded-xl border border-dark-border bg-dark-surface p-6">
-        <h2 className="text-lg font-semibold text-white">WhatsApp</h2>
-        <p className="mt-1 text-sm text-warm-gray">
-          Customers will send orders to this number
-        </p>
-        <div className="mt-4 max-w-md">
-          <Input
-            label="WhatsApp Number (with country code)"
-            value={settings.whatsapp_number}
-            onChange={(e) =>
-              setSettings({ ...settings, whatsapp_number: e.target.value })
-            }
-            placeholder="+97455364455"
-          />
-          <p className="mt-1 text-xs text-warm-gray">
-            Include country code without spaces. Example: +97455364455
+    <div className="space-y-8 animate-fade-in pb-12">
+      {/* Page Title & Save Action */}
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h1 className="font-display text-2xl sm:text-3xl font-bold tracking-tight text-neutral-950">
+            Store Settings & Copy
+          </h1>
+          <p className="mt-1 text-xs sm:text-sm text-neutral-500 font-medium">
+            Configure WhatsApp ordering, landing hero texts, announcement offers, and database administrator accounts
           </p>
         </div>
-      </section>
+        <button
+          onClick={handleSave}
+          disabled={saving}
+          className="inline-flex items-center gap-1.5 rounded-xl bg-neutral-950 px-5 py-2.5 text-xs font-bold uppercase tracking-wider text-white shadow-xs hover:bg-neutral-800 active:scale-95 transition-all self-start sm:self-auto cursor-pointer disabled:opacity-50"
+        >
+          {saving ? "Saving Changes..." : "Save All Settings"}
+        </button>
+      </div>
 
-      {/* Shop Info */}
-      <section className="rounded-xl border border-dark-border bg-dark-surface p-6">
-        <h2 className="text-lg font-semibold text-white">Shop Info</h2>
-        <div className="mt-4 grid gap-4 max-w-md">
-          <Input
-            label="Shop Name"
-            value={settings.store_name}
-            onChange={(e) =>
-              setSettings({ ...settings, store_name: e.target.value })
-            }
-          />
-          <Input
-            label="Store Email"
-            type="email"
-            value={settings.store_email}
-            onChange={(e) =>
-              setSettings({ ...settings, store_email: e.target.value })
-            }
-          />
+      {/* 1. Hero Section & Announcement Bar */}
+      <section className="rounded-2xl border border-neutral-200/80 bg-white p-6 shadow-2xs space-y-4">
+        <div className="border-b border-neutral-100 pb-3">
+          <h2 className="text-base font-bold text-neutral-950">Hero Landing & Editorial Copy</h2>
+          <p className="text-xs text-neutral-500">
+            Control the main headline, subtitle, location badge, and announcement bar on the storefront
+          </p>
+        </div>
+        <div className="grid gap-4 max-w-2xl pt-1">
+          <div className="space-y-1">
+            <label className="text-[11px] font-bold uppercase tracking-wider text-neutral-700">Top Announcement Bar Offer Text</label>
+            <input
+              type="text"
+              value={settings.announcement_text}
+              onChange={(e) => setSettings({ ...settings, announcement_text: e.target.value })}
+              placeholder="Complimentary Doha Express Delivery on Orders Over QR 100"
+              className="w-full rounded-xl border border-neutral-200 bg-white py-2.5 px-3 text-xs text-neutral-950 placeholder:text-neutral-400 focus:border-neutral-950 focus:outline-none shadow-2xs"
+            />
+          </div>
+          <div className="space-y-1">
+            <label className="text-[11px] font-bold uppercase tracking-wider text-neutral-700">Hero Badge Pill</label>
+            <input
+              type="text"
+              value={settings.hero_badge}
+              onChange={(e) => setSettings({ ...settings, hero_badge: e.target.value })}
+              placeholder="Doha, Qatar • Luxury Protection"
+              className="w-full rounded-xl border border-neutral-200 bg-white py-2.5 px-3 text-xs text-neutral-950 placeholder:text-neutral-400 focus:border-neutral-950 focus:outline-none shadow-2xs"
+            />
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="space-y-1">
+              <label className="text-[11px] font-bold uppercase tracking-wider text-neutral-700">Headline Line 1</label>
+              <input
+                type="text"
+                value={settings.hero_title}
+                onChange={(e) => setSettings({ ...settings, hero_title: e.target.value })}
+                placeholder="Sculpted for Flagships."
+                className="w-full rounded-xl border border-neutral-200 bg-white py-2.5 px-3 text-xs text-neutral-950 placeholder:text-neutral-400 focus:border-neutral-950 focus:outline-none shadow-2xs"
+              />
+            </div>
+            <div className="space-y-1">
+              <label className="text-[11px] font-bold uppercase tracking-wider text-neutral-700">Headline Line 2 (Italic Accent)</label>
+              <input
+                type="text"
+                value={settings.hero_subtitle}
+                onChange={(e) => setSettings({ ...settings, hero_subtitle: e.target.value })}
+                placeholder="Artistry in Armor."
+                className="w-full rounded-xl border border-neutral-200 bg-white py-2.5 px-3 text-xs text-neutral-950 placeholder:text-neutral-400 focus:border-neutral-950 focus:outline-none shadow-2xs"
+              />
+            </div>
+          </div>
+          <div className="space-y-1">
+            <label className="text-[11px] font-bold uppercase tracking-wider text-neutral-700">Editorial Description Paragraph</label>
+            <textarea
+              rows={2}
+              value={settings.hero_description}
+              onChange={(e) => setSettings({ ...settings, hero_description: e.target.value })}
+              placeholder="Every silhouette is machined with aerospace-grade composites..."
+              className="w-full rounded-xl border border-neutral-200 bg-white py-2 px-3 text-xs text-neutral-950 placeholder:text-neutral-400 focus:border-neutral-950 focus:outline-none shadow-2xs"
+            />
+          </div>
         </div>
       </section>
 
-      {/* Currency & Tax */}
-      <section className="rounded-xl border border-dark-border bg-dark-surface p-6">
-        <h2 className="text-lg font-semibold text-white">Currency & Tax</h2>
-        <div className="mt-4 grid gap-4 max-w-md">
-          <Input
-            label="Currency Code"
-            value={settings.currency}
-            onChange={(e) =>
-              setSettings({ ...settings, currency: e.target.value })
-            }
-            placeholder="QAR"
+      {/* 2. WhatsApp Checkout Integration */}
+      <section className="rounded-2xl border border-neutral-200/80 bg-white p-6 shadow-2xs space-y-4">
+        <div className="border-b border-neutral-100 pb-3">
+          <h2 className="text-base font-bold text-neutral-950">WhatsApp Order Destination</h2>
+          <p className="text-xs text-neutral-500">
+            Customers will automatically forward their cart items and delivery addresses to this WhatsApp number
+          </p>
+        </div>
+        <div className="max-w-md space-y-1 pt-1">
+          <label className="text-[11px] font-bold uppercase tracking-wider text-neutral-700">WhatsApp Phone Number (with Country Code)</label>
+          <input
+            type="text"
+            value={settings.whatsapp_number}
+            onChange={(e) => setSettings({ ...settings, whatsapp_number: e.target.value })}
+            placeholder="+97455364455"
+            className="w-full rounded-xl border border-neutral-200 bg-white py-2.5 px-3 text-xs font-mono font-bold text-neutral-950 placeholder:text-neutral-400 focus:border-neutral-950 focus:outline-none shadow-2xs"
           />
-          <Input
-            label="Tax Rate (%)"
-            type="number"
-            value={settings.tax_rate}
-            onChange={(e) =>
-              setSettings({ ...settings, tax_rate: e.target.value })
-            }
-            placeholder="0"
-          />
+          <p className="text-[10.5px] text-neutral-500">Example format: +97455364455</p>
         </div>
       </section>
 
-      {/* SEO */}
-      <section className="rounded-xl border border-dark-border bg-dark-surface p-6">
-        <h2 className="text-lg font-semibold text-white">SEO</h2>
-        <div className="mt-4 grid gap-4 max-w-md">
-          <Input
-            label="Meta Title"
-            value={settings.meta_title}
-            onChange={(e) =>
-              setSettings({ ...settings, meta_title: e.target.value })
-            }
-          />
-          <Input
-            label="Meta Description"
-            value={settings.meta_description}
-            onChange={(e) =>
-              setSettings({ ...settings, meta_description: e.target.value })
-            }
-          />
+      {/* 3. Delivery Rates & Free Threshold */}
+      <section className="rounded-2xl border border-neutral-200/80 bg-white p-6 shadow-2xs space-y-4">
+        <div className="border-b border-neutral-100 pb-3">
+          <h2 className="text-base font-bold text-neutral-950">Doha Express Delivery</h2>
+          <p className="text-xs text-neutral-500">
+            Delivery fees and minimum cart value for free same-day shipping
+          </p>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-md pt-1">
+          <div className="space-y-1">
+            <label className="text-[11px] font-bold uppercase tracking-wider text-neutral-700">Free Express Delivery Minimum (QR)</label>
+            <input
+              type="number"
+              value={settings.free_delivery_threshold}
+              onChange={(e) => setSettings({ ...settings, free_delivery_threshold: e.target.value })}
+              placeholder="100"
+              className="w-full rounded-xl border border-neutral-200 bg-white py-2.5 px-3 text-xs text-neutral-950 placeholder:text-neutral-400 focus:border-neutral-950 focus:outline-none shadow-2xs"
+            />
+          </div>
+          <div className="space-y-1">
+            <label className="text-[11px] font-bold uppercase tracking-wider text-neutral-700">Standard Delivery Fee (QR)</label>
+            <input
+              type="number"
+              value={settings.express_delivery_fee}
+              onChange={(e) => setSettings({ ...settings, express_delivery_fee: e.target.value })}
+              placeholder="20"
+              className="w-full rounded-xl border border-neutral-200 bg-white py-2.5 px-3 text-xs text-neutral-950 placeholder:text-neutral-400 focus:border-neutral-950 focus:outline-none shadow-2xs"
+            />
+          </div>
         </div>
       </section>
 
-      {/* Social Links */}
-      <section className="rounded-xl border border-dark-border bg-dark-surface p-6">
-        <h2 className="text-lg font-semibold text-white">Social Links</h2>
-        <div className="mt-4 grid gap-4 max-w-md">
-          <Input
-            label="Instagram"
-            value={settings.instagram}
-            onChange={(e) =>
-              setSettings({ ...settings, instagram: e.target.value })
-            }
-          />
-          <Input
-            label="Website"
-            value={settings.website}
-            onChange={(e) =>
-              setSettings({ ...settings, website: e.target.value })
-            }
-          />
-        </div>
-      </section>
-
-      {/* Hero Section & Storefront Copy */}
-      <section className="rounded-xl border border-dark-border bg-dark-surface p-6">
-        <h2 className="text-lg font-semibold text-white">Hero Landing & Storefront Copy</h2>
-        <p className="mt-1 text-sm text-warm-gray">
-          Customize the main headline, subtitle, badge, and announcement bar on your storefront
-        </p>
-        <div className="mt-4 grid gap-4 max-w-lg">
-          <Input
-            label="Hero Badge"
-            value={settings.hero_badge}
-            onChange={(e) =>
-              setSettings({ ...settings, hero_badge: e.target.value })
-            }
-            placeholder="Doha Atelier • Bespoke Protection"
-          />
-          <Input
-            label="Hero Headline Line 1"
-            value={settings.hero_title}
-            onChange={(e) =>
-              setSettings({ ...settings, hero_title: e.target.value })
-            }
-            placeholder="Sculpted for Flagships."
-          />
-          <Input
-            label="Hero Headline Line 2 (Italic Accent)"
-            value={settings.hero_subtitle}
-            onChange={(e) =>
-              setSettings({ ...settings, hero_subtitle: e.target.value })
-            }
-            placeholder="Artistry in Armor."
-          />
-          <Input
-            label="Hero Editorial Subtitle"
-            value={settings.hero_description}
-            onChange={(e) =>
-              setSettings({ ...settings, hero_description: e.target.value })
-            }
-            placeholder="Every silhouette is machined with aerospace-grade composites..."
-          />
-          <Input
-            label="Top Announcement Bar Offer Text"
-            value={settings.announcement_text}
-            onChange={(e) =>
-              setSettings({ ...settings, announcement_text: e.target.value })
-            }
-            placeholder="Complimentary Doha Express Delivery on Orders Over QR 100"
-          />
-        </div>
-      </section>
-
-      {/* Delivery & Shipping */}
-      <section className="rounded-xl border border-dark-border bg-dark-surface p-6">
-        <h2 className="text-lg font-semibold text-white">Delivery & Shipping</h2>
-        <p className="mt-1 text-sm text-warm-gray">
-          Configure express delivery rates and free shipping threshold for Doha storefront
-        </p>
-        <div className="mt-4 grid gap-4 max-w-md">
-          <Input
-            label="Free Express Delivery Minimum (QR)"
-            type="number"
-            value={settings.free_delivery_threshold}
-            onChange={(e) =>
-              setSettings({ ...settings, free_delivery_threshold: e.target.value })
-            }
-            placeholder="100"
-          />
-          <Input
-            label="Standard Express Delivery Fee (QR)"
-            type="number"
-            value={settings.express_delivery_fee}
-            onChange={(e) =>
-              setSettings({ ...settings, express_delivery_fee: e.target.value })
-            }
-            placeholder="20"
-          />
-        </div>
-      </section>
-
-      {/* Bundle & Tier Discount Rules */}
-      <section className="rounded-xl border border-dark-border bg-dark-surface p-6">
-        <h2 className="text-lg font-semibold text-white">Bundle & Multi-Item Savings</h2>
-        <p className="mt-1 text-sm text-warm-gray">
-          Set automatic percentage savings when customers purchase multiple cases
-        </p>
-        <div className="mt-4 grid gap-4 max-w-md">
-          <Input
-            label="Buy 2 Cases Discount (%)"
-            type="number"
-            value={settings.bundle_buy_2_discount}
-            onChange={(e) =>
-              setSettings({ ...settings, bundle_buy_2_discount: e.target.value })
-            }
-            placeholder="5"
-          />
-          <Input
-            label="Buy 3+ Cases Discount (%)"
-            type="number"
-            value={settings.bundle_buy_3_discount}
-            onChange={(e) =>
-              setSettings({ ...settings, bundle_buy_3_discount: e.target.value })
-            }
-            placeholder="10"
-          />
-        </div>
-      </section>
-
-      {/* Features */}
-      <section className="rounded-xl border border-dark-border bg-dark-surface p-6">
-        <h2 className="text-lg font-semibold text-white">Features & Automations</h2>
-        <div className="mt-4 space-y-4">
-          <Switch
-            checked={settings.bundle_discounts_enabled === "true"}
-            onCheckedChange={(v) =>
-              setSettings({ ...settings, bundle_discounts_enabled: String(v) })
-            }
-            label="Enable multi-case bundle savings (Buy 2 / Buy 3+ discounts)"
-          />
-          <Switch
-            checked={settings.tier_discounts_enabled === "true"}
-            onCheckedChange={(v) =>
-              setSettings({ ...settings, tier_discounts_enabled: String(v) })
-            }
-            label="Enable spend tier discounts (e.g. Spend QR 100+ save 10%)"
-          />
-          <Switch
-            checked={settings.social_proof_enabled === "true"}
-            onCheckedChange={(v) =>
-              setSettings({ ...settings, social_proof_enabled: String(v) })
-            }
-            label='Show "X people ordered today" on products'
-          />
-          <Switch
-            checked={settings.flash_sale_banner_enabled === "true"}
-            onCheckedChange={(v) =>
-              setSettings({ ...settings, flash_sale_banner_enabled: String(v) })
-            }
-            label="Show flash sale countdown banner"
-          />
-          <Switch
-            checked={settings.bundle_suggestions_enabled === "true"}
-            onCheckedChange={(v) =>
-              setSettings({ ...settings, bundle_suggestions_enabled: String(v) })
-            }
-            label="Show bundle suggestions after add-to-cart"
-          />
-        </div>
-      </section>
-
-      {/* Database Admin Accounts Management */}
-      <section className="rounded-xl border border-dark-border bg-dark-surface p-6 space-y-4">
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+      {/* 4. Database Admin Accounts Management */}
+      <section className="rounded-2xl border border-neutral-200/80 bg-white p-6 shadow-2xs space-y-4">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between border-b border-neutral-100 pb-3">
           <div>
-            <h2 className="text-lg font-semibold text-white">Database Admin Users</h2>
-            <p className="mt-1 text-sm text-warm-gray">
-              Manage authorized administrator accounts stored directly in your PostgreSQL database
+            <h2 className="text-base font-bold text-neutral-950">Database Administrator Accounts</h2>
+            <p className="text-xs text-neutral-500">
+              Manage authorized administrator users stored and authenticated in your PostgreSQL database
             </p>
           </div>
           {!showAddAdminModal && (
-            <Button
-              variant="secondary"
-              size="sm"
+            <button
               onClick={() => setShowAddAdminModal(true)}
+              className="inline-flex items-center gap-1.5 rounded-xl border border-neutral-200 bg-white px-3.5 py-1.5 text-xs font-semibold text-neutral-800 hover:bg-neutral-50 shadow-2xs transition-colors cursor-pointer self-start sm:self-auto"
             >
-              + Add Admin User
-            </Button>
+              <Plus className="w-3.5 h-3.5" />
+              <span>Add Admin User</span>
+            </button>
           )}
         </div>
 
         {/* Add Admin User Form */}
         {showAddAdminModal && (
-          <div className="rounded-xl border border-gold/30 bg-neutral-950 p-4 space-y-3 animate-scale-in">
-            <h3 className="text-sm font-semibold text-white">Create New Database Admin</h3>
+          <div className="rounded-xl border border-neutral-200 bg-neutral-50/70 p-5 space-y-3 animate-scale-in shadow-2xs">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-neutral-950">Create Database Admin</h3>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <Input
-                label="Admin Name"
-                placeholder="e.g. Operations Manager"
-                value={newAdminName}
-                onChange={(e) => setNewAdminName(e.target.value)}
-              />
-              <Input
-                label="Admin Email"
-                type="email"
-                placeholder="ops@casele.co"
-                value={newAdminEmail}
-                onChange={(e) => setNewAdminEmail(e.target.value)}
-              />
-              <Input
-                label="Password"
-                type="password"
-                placeholder="••••••••"
-                value={newAdminPassword}
-                onChange={(e) => setNewAdminPassword(e.target.value)}
-              />
+              <div className="space-y-1">
+                <label className="text-[11px] font-bold uppercase tracking-wider text-neutral-700">Admin Name</label>
+                <input
+                  type="text"
+                  placeholder="e.g. Operations Manager"
+                  value={newAdminName}
+                  onChange={(e) => setNewAdminName(e.target.value)}
+                  className="w-full rounded-xl border border-neutral-200 bg-white py-2 px-3 text-xs text-neutral-950 placeholder:text-neutral-400 focus:border-neutral-950 focus:outline-none shadow-2xs"
+                />
+              </div>
+              <div className="space-y-1">
+                <label className="text-[11px] font-bold uppercase tracking-wider text-neutral-700">Email Address</label>
+                <input
+                  type="email"
+                  placeholder="ops@casele.co"
+                  value={newAdminEmail}
+                  onChange={(e) => setNewAdminEmail(e.target.value)}
+                  className="w-full rounded-xl border border-neutral-200 bg-white py-2 px-3 text-xs text-neutral-950 placeholder:text-neutral-400 focus:border-neutral-950 focus:outline-none shadow-2xs"
+                />
+              </div>
+              <div className="space-y-1">
+                <label className="text-[11px] font-bold uppercase tracking-wider text-neutral-700">Password</label>
+                <input
+                  type="password"
+                  placeholder="••••••••"
+                  value={newAdminPassword}
+                  onChange={(e) => setNewAdminPassword(e.target.value)}
+                  className="w-full rounded-xl border border-neutral-200 bg-white py-2 px-3 text-xs text-neutral-950 placeholder:text-neutral-400 focus:border-neutral-950 focus:outline-none shadow-2xs"
+                />
+              </div>
             </div>
             <div className="flex justify-end gap-2 pt-2">
-              <Button
-                variant="ghost"
-                size="sm"
+              <button
+                type="button"
                 onClick={() => setShowAddAdminModal(false)}
+                className="rounded-xl border border-neutral-200 bg-white px-3 py-1 text-xs font-semibold text-neutral-700 hover:bg-neutral-50 transition-colors cursor-pointer"
               >
                 Cancel
-              </Button>
-              <Button
-                variant="cta"
-                size="sm"
+              </button>
+              <button
+                type="button"
                 onClick={handleCreateAdminUser}
-                loading={addingAdmin}
+                disabled={addingAdmin}
+                className="rounded-xl bg-neutral-950 px-4 py-1 text-xs font-bold uppercase tracking-wider text-white hover:bg-neutral-800 transition-all cursor-pointer shadow-xs disabled:opacity-50"
               >
-                Save Admin Account
-              </Button>
+                {addingAdmin ? "Saving..." : "Save Admin Account"}
+              </button>
             </div>
           </div>
         )}
 
         {/* Admins Table */}
-        <div className="rounded-xl border border-dark-border/60 overflow-hidden bg-neutral-950/60">
+        <div className="rounded-xl border border-neutral-200 overflow-hidden bg-white shadow-2xs">
           <table className="w-full text-left text-xs">
             <thead>
-              <tr className="border-b border-dark-border bg-dark-surface text-warm-gray">
+              <tr className="border-b border-neutral-100 bg-neutral-50/70 text-[11px] font-bold uppercase tracking-wider text-neutral-500">
                 <th className="px-4 py-2.5">Name</th>
                 <th className="px-4 py-2.5">Email</th>
                 <th className="px-4 py-2.5">Storage</th>
                 <th className="px-4 py-2.5 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-dark-border/40">
+            <tbody className="divide-y divide-neutral-100">
               {adminUsers.length === 0 ? (
                 <tr>
-                  <td colSpan={4} className="py-4 text-center text-warm-gray">
+                  <td colSpan={4} className="py-4 text-center text-neutral-400">
                     Primary Database Admin active (admin@casele.co)
                   </td>
                 </tr>
               ) : (
                 adminUsers.map((admin) => (
-                  <tr key={admin.id} className="hover:bg-dark-surface/40 transition-colors">
-                    <td className="px-4 py-2.5 font-semibold text-white">
+                  <tr key={admin.id} className="hover:bg-neutral-50/60 transition-colors">
+                    <td className="px-4 py-2.5 font-semibold text-neutral-950">
                       {admin.name}
                     </td>
-                    <td className="px-4 py-2.5 font-mono text-gold">
+                    <td className="px-4 py-2.5 font-mono font-bold text-neutral-950">
                       {admin.email}
                     </td>
-                    <td className="px-4 py-2.5 text-emerald-400 font-medium">
+                    <td className="px-4 py-2.5 text-emerald-700 font-medium">
                       PostgreSQL Database
                     </td>
                     <td className="px-4 py-2.5 text-right">
                       <button
                         onClick={() => handleDeleteAdminUser(admin.id)}
-                        className="text-xs text-rose-400 hover:text-rose-300 transition-colors cursor-pointer"
+                        className="text-xs text-rose-600 hover:text-rose-800 transition-colors cursor-pointer"
                         title="Remove Admin Account"
                       >
                         Delete
@@ -576,10 +459,15 @@ export default function AdminSettingsPage() {
         </div>
       </section>
 
-      <div className="flex justify-end">
-        <Button variant="cta" onClick={handleSave} loading={saving}>
-          {saving ? "Saving..." : "Save Settings"}
-        </Button>
+      {/* Save Button */}
+      <div className="flex justify-end pt-2">
+        <button
+          onClick={handleSave}
+          disabled={saving}
+          className="rounded-xl bg-neutral-950 px-6 py-3 text-xs font-bold uppercase tracking-wider text-white shadow-md hover:bg-neutral-800 active:scale-95 transition-all cursor-pointer disabled:opacity-50"
+        >
+          {saving ? "Saving..." : "Save All Settings"}
+        </button>
       </div>
     </div>
   );

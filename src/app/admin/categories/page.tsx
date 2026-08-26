@@ -1,8 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/toast";
 import { Plus, Trash2, Edit2, Layers, Tag, Percent } from "lucide-react";
 
@@ -123,6 +121,8 @@ export default function AdminCategoriesPage() {
       if (res.ok) {
         toast("Category deleted", "success");
         setCategories((prev) => prev.filter((c) => c.id !== id));
+      } else {
+        toast("Failed to delete category", "error");
       }
     } catch {
       toast("Failed to delete category", "error");
@@ -130,101 +130,140 @@ export default function AdminCategoriesPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-fade-in">
+      {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="font-display text-h1 font-bold text-white">Categories & Collections</h1>
-          <p className="mt-1 text-warm-gray">Manage case collections, descriptions, and category sales</p>
+          <h1 className="font-display text-2xl sm:text-3xl font-bold tracking-tight text-neutral-950">
+            Collections & Categories
+          </h1>
+          <p className="mt-1 text-xs sm:text-sm text-neutral-500 font-medium">
+            Manage case collections, category-wide sales, and descriptions
+          </p>
         </div>
         {!isAdding && (
-          <Button variant="cta" onClick={() => setIsAdding(true)}>
-            <Plus className="w-4 h-4 mr-1" /> Add Category
-          </Button>
+          <button
+            onClick={() => setIsAdding(true)}
+            className="inline-flex items-center gap-1.5 rounded-xl bg-neutral-950 px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-white shadow-xs hover:bg-neutral-800 active:scale-95 transition-all self-start sm:self-auto cursor-pointer"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Add Collection</span>
+          </button>
         )}
       </div>
 
       {/* Add / Edit Category Form */}
       {isAdding && (
-        <div className="rounded-xl border border-gold/30 bg-dark-surface p-6 space-y-4 animate-scale-in">
-          <div className="flex items-center gap-2">
-            <Layers className="w-5 h-5 text-gold" />
-            <h3 className="text-lg font-semibold text-white">
-              {editingId ? "Edit Category" : "Create New Category"}
+        <div className="rounded-2xl border border-neutral-200 bg-white p-6 space-y-4 shadow-2xs animate-scale-in">
+          <div className="flex items-center gap-2 border-b border-neutral-100 pb-3">
+            <Layers className="w-4 h-4 text-[#A88B4D]" />
+            <h3 className="text-sm font-bold text-neutral-950 uppercase tracking-wider">
+              {editingId ? "Edit Collection" : "Create New Collection"}
             </h3>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
-            <Input
-              label="Category Name"
-              placeholder="e.g. Luxe Series"
-              value={name}
-              onChange={(e) => handleNameChange(e.target.value)}
-            />
-            <Input
-              label="URL Slug"
-              placeholder="e.g. luxe-series"
-              value={slug}
-              onChange={(e) => setSlug(e.target.value)}
-            />
-            <Input
-              label="Category Description"
-              placeholder="Brief description for category banner..."
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-            />
-            <Input
-              label="Category-Wide Sale (%)"
-              type="number"
-              placeholder="e.g. 15 for 15% off all cases in category"
-              value={salePercent}
-              onChange={(e) => setSalePercent(e.target.value)}
-            />
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
+            <div className="space-y-1">
+              <label className="text-[11px] font-bold uppercase tracking-wider text-neutral-700">Collection Name</label>
+              <input
+                type="text"
+                placeholder="e.g. Titanium Atelier"
+                value={name}
+                onChange={(e) => handleNameChange(e.target.value)}
+                className="w-full rounded-xl border border-neutral-200 bg-white py-2.5 px-3 text-xs text-neutral-950 placeholder:text-neutral-400 focus:border-neutral-950 focus:outline-none shadow-2xs"
+              />
+            </div>
+            <div className="space-y-1">
+              <label className="text-[11px] font-bold uppercase tracking-wider text-neutral-700">URL Slug</label>
+              <input
+                type="text"
+                placeholder="e.g. titanium-atelier"
+                value={slug}
+                onChange={(e) => setSlug(e.target.value)}
+                className="w-full rounded-xl border border-neutral-200 bg-white py-2.5 px-3 text-xs font-mono text-neutral-950 placeholder:text-neutral-400 focus:border-neutral-950 focus:outline-none shadow-2xs"
+              />
+            </div>
+            <div className="space-y-1">
+              <label className="text-[11px] font-bold uppercase tracking-wider text-neutral-700">Description</label>
+              <input
+                type="text"
+                placeholder="Brief editorial headline..."
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                className="w-full rounded-xl border border-neutral-200 bg-white py-2.5 px-3 text-xs text-neutral-950 placeholder:text-neutral-400 focus:border-neutral-950 focus:outline-none shadow-2xs"
+              />
+            </div>
+            <div className="space-y-1">
+              <label className="text-[11px] font-bold uppercase tracking-wider text-neutral-700">Collection-Wide Sale (%)</label>
+              <input
+                type="number"
+                placeholder="e.g. 15 for 15% off all cases in this collection"
+                value={salePercent}
+                onChange={(e) => setSalePercent(e.target.value)}
+                className="w-full rounded-xl border border-neutral-200 bg-white py-2.5 px-3 text-xs text-neutral-950 placeholder:text-neutral-400 focus:border-neutral-950 focus:outline-none shadow-2xs"
+              />
+            </div>
           </div>
           <div className="flex gap-2 justify-end pt-3">
-            <Button variant="ghost" size="sm" onClick={resetForm}>
+            <button
+              type="button"
+              onClick={resetForm}
+              className="rounded-xl border border-neutral-200 bg-white px-3.5 py-1.5 text-xs font-semibold text-neutral-700 hover:bg-neutral-50 transition-colors cursor-pointer"
+            >
               Cancel
-            </Button>
-            <Button variant="cta" size="sm" onClick={handleSaveCategory} loading={submitting}>
-              {editingId ? "Update Category" : "Save Category"}
-            </Button>
+            </button>
+            <button
+              type="button"
+              onClick={handleSaveCategory}
+              disabled={submitting}
+              className="rounded-xl bg-neutral-950 px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-white hover:bg-neutral-800 transition-all cursor-pointer shadow-xs disabled:opacity-50"
+            >
+              {editingId ? "Update Collection" : "Save Collection"}
+            </button>
           </div>
         </div>
       )}
 
       {/* Categories Cards Grid */}
       {loading ? (
-        <div className="py-12 text-center text-warm-gray text-sm">Loading categories...</div>
+        <div className="py-12 text-center text-neutral-400 text-xs">Loading collections...</div>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {categories.map((cat) => (
             <div
               key={cat.id}
-              className="rounded-xl border border-dark-border bg-dark-surface p-5 flex flex-col justify-between hover:border-dark-border-hover transition-colors"
+              className="rounded-2xl border border-neutral-200/80 bg-white p-5 flex flex-col justify-between hover:border-neutral-400 transition-all shadow-2xs"
             >
               <div>
                 <div className="flex items-start justify-between">
-                  <h3 className="font-semibold text-white text-base">{cat.name}</h3>
-                  <span className="text-xs font-mono text-warm-gray">/{cat.slug}</span>
+                  <h3 className="font-bold text-neutral-950 text-base">{cat.name}</h3>
+                  <span className="text-xs font-mono text-neutral-400">/{cat.slug}</span>
                 </div>
                 {cat.description && (
-                  <p className="mt-1 text-xs text-warm-gray line-clamp-2">{cat.description}</p>
+                  <p className="mt-1.5 text-xs text-neutral-500 line-clamp-2">{cat.description}</p>
                 )}
-                <div className="mt-3 flex items-center gap-3">
-                  <span className="text-xs text-neutral-300 font-medium">{cat.productsCount} products</span>
+                <div className="mt-3 flex items-center gap-2">
+                  <span className="text-xs text-neutral-600 font-medium bg-neutral-100 px-2 py-0.5 rounded-md">
+                    {cat.productsCount} cases
+                  </span>
                   {cat.salePercent ? (
-                    <span className="inline-flex items-center gap-1 rounded-full bg-gold/10 px-2 py-0.5 text-[10px] font-bold text-gold border border-gold/20">
-                      <Percent className="w-3 h-3" /> {cat.salePercent}% Category Sale
+                    <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2.5 py-0.5 text-[10px] font-bold text-amber-800 border border-amber-200">
+                      <Percent className="w-3 h-3" /> {cat.salePercent}% Sale
                     </span>
                   ) : null}
                 </div>
               </div>
 
-              <div className="mt-5 pt-3 border-t border-dark-border/60 flex items-center justify-between">
-                <Button variant="secondary" size="sm" onClick={() => startEdit(cat)}>
-                  <Edit2 className="w-3.5 h-3.5 mr-1" /> Edit
-                </Button>
+              <div className="mt-5 pt-3 border-t border-neutral-100 flex items-center justify-between">
+                <button
+                  onClick={() => startEdit(cat)}
+                  className="inline-flex items-center gap-1 text-xs font-bold text-neutral-800 hover:text-neutral-950 transition-colors cursor-pointer"
+                >
+                  <Edit2 className="w-3.5 h-3.5" />
+                  <span>Edit Collection</span>
+                </button>
                 <button
                   onClick={() => handleDeleteCategory(cat.id)}
-                  className="p-1.5 text-warm-gray hover:text-rose-400 transition-colors cursor-pointer"
+                  className="p-1.5 text-neutral-400 hover:text-rose-600 transition-colors cursor-pointer"
                   title="Delete Category"
                   aria-label="Delete Category"
                 >

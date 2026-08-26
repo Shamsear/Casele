@@ -1,10 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/toast";
-import { Plus, Trash2, Tag, Percent, DollarSign } from "lucide-react";
+import { Plus, Trash2, Tag, Percent, DollarSign, Search } from "lucide-react";
 
 interface PromoCode {
   id: string;
@@ -123,6 +121,8 @@ export default function AdminPromoCodesPage() {
       if (res.ok) {
         toast("Promo code deleted", "success");
         setPromos((prev) => prev.filter((p) => p.id !== id));
+      } else {
+        toast("Failed to delete promo code", "error");
       }
     } catch {
       toast("Failed to delete promo code", "error");
@@ -134,154 +134,197 @@ export default function AdminPromoCodesPage() {
   );
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-fade-in">
+      {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="font-display text-h1 font-bold text-white">Promo Codes</h1>
-          <p className="mt-1 text-warm-gray">Create, edit, and monitor customer discount codes</p>
+          <h1 className="font-display text-2xl sm:text-3xl font-bold tracking-tight text-neutral-950">
+            Promo Codes
+          </h1>
+          <p className="mt-1 text-xs sm:text-sm text-neutral-500 font-medium">
+            Create, edit, and track customer coupon codes and influencer vouchers
+          </p>
         </div>
         {!isAdding && (
-          <Button variant="cta" onClick={() => setIsAdding(true)}>
-            <Plus className="w-4 h-4 mr-1" /> Create Promo Code
-          </Button>
+          <button
+            onClick={() => setIsAdding(true)}
+            className="inline-flex items-center gap-1.5 rounded-xl bg-neutral-950 px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-white shadow-xs hover:bg-neutral-800 active:scale-95 transition-all self-start sm:self-auto cursor-pointer"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Create Promo Code</span>
+          </button>
         )}
       </div>
 
       {/* Add New Promo Code Form */}
       {isAdding && (
-        <div className="rounded-xl border border-gold/30 bg-dark-surface p-6 space-y-4 animate-scale-in">
-          <div className="flex items-center gap-2">
-            <Tag className="w-5 h-5 text-gold" />
-            <h3 className="text-lg font-semibold text-white">Create New Promo Code</h3>
+        <div className="rounded-2xl border border-neutral-200 bg-white p-6 space-y-4 shadow-2xs animate-scale-in">
+          <div className="flex items-center gap-2 border-b border-neutral-100 pb-3">
+            <Tag className="w-4 h-4 text-[#A88B4D]" />
+            <h3 className="text-sm font-bold text-neutral-950 uppercase tracking-wider">New Promo Voucher</h3>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pt-2">
-            <Input
-              label="Promo Code"
-              placeholder="e.g. DOHA25"
-              value={code}
-              onChange={(e) => setCode(e.target.value)}
-            />
-            <div className="space-y-1.5">
-              <label className="text-xs font-medium text-warm-gray">Discount Type</label>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pt-1">
+            <div className="space-y-1">
+              <label className="text-[11px] font-bold uppercase tracking-wider text-neutral-700">Promo Code</label>
+              <input
+                type="text"
+                placeholder="e.g. DOHA20"
+                value={code}
+                onChange={(e) => setCode(e.target.value)}
+                className="w-full rounded-xl border border-neutral-200 bg-white py-2.5 px-3 text-xs font-mono font-bold text-neutral-950 uppercase placeholder:text-neutral-400 focus:border-neutral-950 focus:outline-none shadow-2xs"
+              />
+            </div>
+            <div className="space-y-1">
+              <label className="text-[11px] font-bold uppercase tracking-wider text-neutral-700">Discount Type</label>
               <select
                 value={discountType}
                 onChange={(e) => setDiscountType(e.target.value)}
-                className="w-full h-10 px-3 rounded-lg border border-dark-border bg-dark-surface text-white text-sm focus:outline-none focus:border-gold"
+                className="w-full h-10 px-3 rounded-xl border border-neutral-200 bg-white text-neutral-950 text-xs font-semibold focus:outline-none focus:border-neutral-950 shadow-2xs"
               >
                 <option value="percentage">Percentage (%) Off</option>
                 <option value="flat">Fixed Flat Amount (QR) Off</option>
               </select>
             </div>
-            <Input
-              label={discountType === "percentage" ? "Discount Percentage (%)" : "Flat Amount (QR)"}
-              type="number"
-              placeholder={discountType === "percentage" ? "e.g. 20" : "e.g. 25"}
-              value={discountValue}
-              onChange={(e) => setDiscountValue(e.target.value)}
-            />
-            <Input
-              label="Minimum Order Spend (QR)"
-              type="number"
-              placeholder="0 for no minimum"
-              value={minOrder}
-              onChange={(e) => setMinOrder(e.target.value)}
-            />
-            <Input
-              label="Max Usages (Optional)"
-              type="number"
-              placeholder="Leave empty for unlimited"
-              value={maxUses}
-              onChange={(e) => setMaxUses(e.target.value)}
-            />
+            <div className="space-y-1">
+              <label className="text-[11px] font-bold uppercase tracking-wider text-neutral-700">
+                {discountType === "percentage" ? "Discount Percentage (%)" : "Flat Amount (QR)"}
+              </label>
+              <input
+                type="number"
+                placeholder={discountType === "percentage" ? "e.g. 20" : "e.g. 25"}
+                value={discountValue}
+                onChange={(e) => setDiscountValue(e.target.value)}
+                className="w-full rounded-xl border border-neutral-200 bg-white py-2.5 px-3 text-xs text-neutral-950 placeholder:text-neutral-400 focus:border-neutral-950 focus:outline-none shadow-2xs"
+              />
+            </div>
+            <div className="space-y-1">
+              <label className="text-[11px] font-bold uppercase tracking-wider text-neutral-700">Minimum Order Spend (QR)</label>
+              <input
+                type="number"
+                placeholder="0 for no minimum"
+                value={minOrder}
+                onChange={(e) => setMinOrder(e.target.value)}
+                className="w-full rounded-xl border border-neutral-200 bg-white py-2.5 px-3 text-xs text-neutral-950 placeholder:text-neutral-400 focus:border-neutral-950 focus:outline-none shadow-2xs"
+              />
+            </div>
+            <div className="space-y-1">
+              <label className="text-[11px] font-bold uppercase tracking-wider text-neutral-700">Max Usages (Optional)</label>
+              <input
+                type="number"
+                placeholder="Leave empty for unlimited"
+                value={maxUses}
+                onChange={(e) => setMaxUses(e.target.value)}
+                className="w-full rounded-xl border border-neutral-200 bg-white py-2.5 px-3 text-xs text-neutral-950 placeholder:text-neutral-400 focus:border-neutral-950 focus:outline-none shadow-2xs"
+              />
+            </div>
           </div>
           <div className="flex gap-2 justify-end pt-3">
-            <Button variant="ghost" size="sm" onClick={() => setIsAdding(false)}>
+            <button
+              type="button"
+              onClick={() => setIsAdding(false)}
+              className="rounded-xl border border-neutral-200 bg-white px-3.5 py-1.5 text-xs font-semibold text-neutral-700 hover:bg-neutral-50 transition-colors cursor-pointer"
+            >
               Cancel
-            </Button>
-            <Button variant="cta" size="sm" onClick={handleCreatePromo} loading={submitting}>
-              Save Promo Code
-            </Button>
+            </button>
+            <button
+              type="button"
+              onClick={handleCreatePromo}
+              disabled={submitting}
+              className="rounded-xl bg-neutral-950 px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-white hover:bg-neutral-800 transition-all cursor-pointer shadow-xs disabled:opacity-50"
+            >
+              {submitting ? "Saving..." : "Save Promo Code"}
+            </button>
           </div>
         </div>
       )}
 
-      <div className="flex items-center justify-between gap-4">
-        <Input
-          placeholder="Search promo codes..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="max-w-sm"
-        />
-        <span className="text-xs text-warm-gray font-mono">{filtered.length} total codes</span>
+      {/* Search Toolbar */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div className="relative max-w-sm w-full">
+          <Search className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-400" />
+          <input
+            type="text"
+            placeholder="Search promo codes..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full rounded-xl border border-neutral-200 bg-white py-2.5 pl-9 pr-4 text-xs text-neutral-950 placeholder:text-neutral-400 focus:border-neutral-950 focus:outline-none focus:ring-1 focus:ring-neutral-950/20 transition-all shadow-2xs"
+          />
+        </div>
+        <span className="text-xs text-neutral-500 font-mono font-medium">{filtered.length} total codes</span>
       </div>
 
-      <div className="rounded-xl border border-dark-border overflow-hidden bg-dark-surface/50">
-        <table className="w-full">
-          <thead>
-            <tr className="border-b border-dark-border bg-dark-surface">
-              <th className="px-4 py-3 text-left text-xs font-medium text-warm-gray">Code</th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-warm-gray">Discount</th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-warm-gray">Min Order</th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-warm-gray">Uses</th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-warm-gray">Status</th>
-              <th className="px-4 py-3 text-right text-xs font-medium text-warm-gray">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {loading ? (
-              <tr>
-                <td colSpan={6} className="py-8 text-center text-warm-gray text-sm">
-                  Loading promo codes...
-                </td>
+      {/* Table */}
+      <div className="rounded-2xl border border-neutral-200/80 bg-white overflow-hidden shadow-2xs">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left">
+            <thead>
+              <tr className="border-b border-neutral-100 bg-neutral-50/70 text-[11px] font-bold uppercase tracking-wider text-neutral-500">
+                <th className="px-5 py-3.5">Code</th>
+                <th className="px-4 py-3.5">Discount</th>
+                <th className="px-4 py-3.5">Min Order</th>
+                <th className="px-4 py-3.5">Usage</th>
+                <th className="px-4 py-3.5">Status</th>
+                <th className="px-5 py-3.5 text-right">Actions</th>
               </tr>
-            ) : filtered.length === 0 ? (
-              <tr>
-                <td colSpan={6} className="py-8 text-center text-warm-gray text-sm">
-                  No promo codes found.
-                </td>
-              </tr>
-            ) : (
-              filtered.map((promo) => (
-                <tr key={promo.id} className="border-b border-dark-border/50 hover:bg-dark-surface/60 transition-colors">
-                  <td className="px-4 py-3">
-                    <span className="font-mono text-sm font-bold text-gold tracking-wider">{promo.code}</span>
-                  </td>
-                  <td className="px-4 py-3 text-sm text-white font-medium">
-                    {promo.discountType === "percentage" ? `${promo.discountValue}% OFF` : `QR ${promo.discountValue} OFF`}
-                  </td>
-                  <td className="px-4 py-3 text-sm text-warm-gray">
-                    {promo.minOrder > 0 ? `QR ${promo.minOrder}` : "None"}
-                  </td>
-                  <td className="px-4 py-3 text-sm text-warm-gray font-mono">
-                    {promo.usedCount}{promo.maxUses ? ` / ${promo.maxUses}` : " (Unlimited)"}
-                  </td>
-                  <td className="px-4 py-3">
-                    <button
-                      onClick={() => handleToggleStatus(promo)}
-                      className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold cursor-pointer transition-colors ${
-                        promo.isActive
-                          ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20"
-                          : "bg-neutral-800 text-neutral-400 border border-neutral-700 hover:bg-neutral-700"
-                      }`}
-                    >
-                      {promo.isActive ? "Active" : "Inactive"}
-                    </button>
-                  </td>
-                  <td className="px-4 py-3 text-right">
-                    <button
-                      onClick={() => handleDeletePromo(promo.id)}
-                      className="p-1 text-warm-gray hover:text-rose-400 transition-colors cursor-pointer"
-                      title="Delete Promo Code"
-                      aria-label="Delete Promo Code"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
+            </thead>
+            <tbody className="divide-y divide-neutral-100 text-xs">
+              {loading ? (
+                <tr>
+                  <td colSpan={6} className="py-8 text-center text-neutral-400">
+                    Loading promo codes...
                   </td>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+              ) : filtered.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="py-8 text-center text-neutral-400">
+                    No promo codes found.
+                  </td>
+                </tr>
+              ) : (
+                filtered.map((promo) => (
+                  <tr key={promo.id} className="hover:bg-neutral-50/60 transition-colors">
+                    <td className="px-5 py-3.5">
+                      <span className="font-mono text-xs font-bold text-neutral-950 tracking-wider bg-neutral-100 border border-neutral-200 px-2 py-0.5 rounded-lg shadow-2xs">
+                        {promo.code}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3.5 font-bold text-neutral-950">
+                      {promo.discountType === "percentage" ? `${promo.discountValue}% OFF` : `QR ${promo.discountValue} OFF`}
+                    </td>
+                    <td className="px-4 py-3.5 text-neutral-600 font-medium">
+                      {promo.minOrder > 0 ? `QR ${promo.minOrder}` : "None"}
+                    </td>
+                    <td className="px-4 py-3.5 text-neutral-500 font-mono">
+                      {promo.usedCount}{promo.maxUses ? ` / ${promo.maxUses}` : " (Unlimited)"}
+                    </td>
+                    <td className="px-4 py-3.5">
+                      <button
+                        onClick={() => handleToggleStatus(promo)}
+                        className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider cursor-pointer transition-colors ${
+                          promo.isActive
+                            ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                            : "bg-neutral-100 text-neutral-500 border border-neutral-200"
+                        }`}
+                      >
+                        {promo.isActive ? "Active" : "Inactive"}
+                      </button>
+                    </td>
+                    <td className="px-5 py-3.5 text-right">
+                      <button
+                        onClick={() => handleDeletePromo(promo.id)}
+                        className="p-1 text-neutral-400 hover:text-rose-600 transition-colors cursor-pointer"
+                        title="Delete Promo Code"
+                        aria-label="Delete Promo Code"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );
