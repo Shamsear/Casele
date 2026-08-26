@@ -20,7 +20,6 @@ export function Header() {
   const navLinks = [
     { href: "/", label: t("nav_home") || "Home" },
     { href: "/shop", label: t("nav_shop") || "Collection" },
-    { href: "/category/premium", label: "Luxe Series" },
     { href: "/track", label: t("nav_track") || "Track Order" },
     { href: "/about", label: t("nav_about") || "About" },
   ];
