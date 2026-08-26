@@ -1,108 +1,192 @@
 "use client";
 
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Tabs } from "@/components/ui/tabs";
+import { useState, useEffect } from "react";
+import Link from "next/link";
 import { formatPrice } from "@/lib/utils";
+import { Search, ShoppingBag, MessageSquare, ExternalLink, Filter } from "lucide-react";
 
-const SAMPLE_ORDERS = [
-  { id: "ORD-248", customer: "John D.", phone: "9876543210", items: 3, total: 1299, status: "pending", time: "2m ago", address: "Mumbai" },
-  { id: "ORD-247", customer: "Sarah M.", phone: "9876543211", items: 1, total: 499, status: "confirmed", time: "15m ago", address: "Delhi" },
-  { id: "ORD-246", customer: "Alex K.", phone: "9876543212", items: 2, total: 899, status: "dispatched", time: "1h ago", address: "Bangalore" },
-  { id: "ORD-245", customer: "Priya S.", phone: "9876543213", items: 1, total: 799, status: "delivered", time: "2h ago", address: "Chennai" },
-  { id: "ORD-244", customer: "Rahul V.", phone: "9876543214", items: 4, total: 2199, status: "confirmed", time: "3h ago", address: "Pune" },
-  { id: "ORD-243", customer: "Neha G.", phone: "9876543215", items: 2, total: 1098, status: "pending", time: "4h ago", address: "Hyderabad" },
+interface AdminOrder {
+  id: string;
+  customer: string;
+  phone: string;
+  items: number;
+  total: number;
+  status: string;
+  time: string;
+  address: string;
+}
+
+const SAMPLE_ORDERS: AdminOrder[] = [
+  { id: "ORD-9481", customer: "Rashid Al-Kuwari", phone: "+974 5512 3456", items: 2, total: 170, status: "delivered", time: "10m ago", address: "The Pearl, Doha" },
+  { id: "ORD-9482", customer: "Fatima Al-Thani", phone: "+974 6623 4567", items: 1, total: 95, status: "dispatched", time: "45m ago", address: "West Bay Lagoon, Doha" },
+  { id: "ORD-9483", customer: "Mohammed Hassan", phone: "+974 7734 5678", items: 1, total: 100, status: "confirmed", time: "2h ago", address: "Lusail Marina, Doha" },
+  { id: "ORD-9484", customer: "Sara Al-Attiyah", phone: "+974 5545 6789", items: 3, total: 245, status: "pending", time: "3h ago", address: "Al Waab, Doha" },
+  { id: "ORD-9485", customer: "Hamad Al-Marri", phone: "+974 3356 7890", items: 2, total: 160, status: "pending", time: "5h ago", address: "Al Wakrah" },
 ];
 
-const STATUS_COLORS: Record<string, string> = {
-  pending: "bg-amber-500/10 text-amber-400",
-  confirmed: "bg-blue-500/10 text-blue-400",
-  dispatched: "bg-purple-500/10 text-purple-400",
-  delivered: "bg-emerald-500/10 text-emerald-400",
-  cancelled: "bg-red-500/10 text-red-400",
+const STATUS_CONFIG: Record<string, { bg: string; text: string; border: string }> = {
+  pending: { bg: "bg-amber-500/10", text: "text-amber-400", border: "border-amber-500/20" },
+  confirmed: { bg: "bg-blue-500/10", text: "text-blue-400", border: "border-blue-500/20" },
+  dispatched: { bg: "bg-purple-500/10", text: "text-purple-400", border: "border-purple-500/20" },
+  delivered: { bg: "bg-emerald-500/10", text: "text-emerald-400", border: "border-emerald-500/20" },
+  cancelled: { bg: "bg-rose-500/10", text: "text-rose-400", border: "border-rose-500/20" },
 };
 
 export default function AdminOrdersPage() {
+  const [orders, setOrders] = useState<AdminOrder[]>(SAMPLE_ORDERS);
   const [activeTab, setActiveTab] = useState("all");
   const [search, setSearch] = useState("");
 
-  const tabs = [
-    { id: "all", label: "All", count: SAMPLE_ORDERS.length },
-    { id: "pending", label: "Pending", count: SAMPLE_ORDERS.filter((o) => o.status === "pending").length },
-    { id: "confirmed", label: "Confirmed", count: SAMPLE_ORDERS.filter((o) => o.status === "confirmed").length },
-    { id: "dispatched", label: "Dispatched", count: SAMPLE_ORDERS.filter((o) => o.status === "dispatched").length },
-    { id: "delivered", label: "Delivered", count: SAMPLE_ORDERS.filter((o) => o.status === "delivered").length },
-  ];
-
-  const filtered = SAMPLE_ORDERS.filter((o) => {
+  const filtered = orders.filter((o) => {
     const matchesTab = activeTab === "all" || o.status === activeTab;
     const matchesSearch =
       o.customer.toLowerCase().includes(search.toLowerCase()) ||
       o.id.toLowerCase().includes(search.toLowerCase()) ||
-      o.phone.includes(search);
+      o.phone.includes(search) ||
+      o.address.toLowerCase().includes(search.toLowerCase());
     return matchesTab && matchesSearch;
   });
 
+  const counts = {
+    all: orders.length,
+    pending: orders.filter((o) => o.status === "pending").length,
+    confirmed: orders.filter((o) => o.status === "confirmed").length,
+    dispatched: orders.filter((o) => o.status === "dispatched").length,
+    delivered: orders.filter((o) => o.status === "delivered").length,
+  };
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-fade-in">
+      {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="font-display text-h1 font-bold text-white">Orders</h1>
-          <p className="mt-1 text-warm-gray">Manage customer orders</p>
+          <h1 className="font-display text-2xl sm:text-3xl font-bold tracking-tight text-white">
+            Client Orders
+          </h1>
+          <p className="mt-1 text-xs sm:text-sm text-neutral-400">
+            Monitor WhatsApp and online orders, dispatch status, and client destinations
+          </p>
         </div>
-        <Button variant="secondary">Export CSV</Button>
       </div>
 
-      <Input
-        placeholder="Search by name, order ID, or phone..."
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-        className="max-w-md"
-      />
+      {/* Tabs & Search */}
+      <div className="flex flex-col gap-4">
+        {/* Filter Tabs */}
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-1">
+          {[
+            { id: "all", label: "All Orders", count: counts.all },
+            { id: "pending", label: "Pending", count: counts.pending },
+            { id: "confirmed", label: "Confirmed", count: counts.confirmed },
+            { id: "dispatched", label: "Dispatched", count: counts.dispatched },
+            { id: "delivered", label: "Delivered", count: counts.delivered },
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`flex items-center gap-2 rounded-xl px-3.5 py-2 text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
+                activeTab === tab.id
+                  ? "bg-[#C5A869]/20 text-[#DFCA9B] border border-[#C5A869]/30 shadow-xs"
+                  : "border border-neutral-800 bg-neutral-900/60 text-neutral-400 hover:text-white hover:border-neutral-700"
+              }`}
+            >
+              <span>{tab.label}</span>
+              <span className="rounded-full bg-neutral-800 px-1.5 py-0.2 text-[10px] font-mono text-neutral-400">
+                {tab.count}
+              </span>
+            </button>
+          ))}
+        </div>
 
-      <Tabs tabs={tabs} activeTab={activeTab} onChange={setActiveTab} />
+        {/* Search input */}
+        <div className="relative max-w-sm w-full">
+          <Search className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-500" />
+          <input
+            type="text"
+            placeholder="Search by client name, ID, phone, or location..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full rounded-xl border border-neutral-800 bg-neutral-900/80 py-2.5 pl-9 pr-4 text-xs text-white placeholder:text-neutral-500 focus:border-[#C5A869] focus:outline-none focus:ring-1 focus:ring-[#C5A869]/30 transition-all"
+          />
+        </div>
+      </div>
 
-      <div className="rounded-xl border border-dark-border overflow-hidden">
-        <table className="w-full">
+      {/* Orders Table */}
+      <div className="rounded-2xl border border-neutral-800/90 bg-neutral-900/60 overflow-hidden backdrop-blur-xl">
+        <table className="w-full text-left">
           <thead>
-            <tr className="border-b border-dark-border bg-dark-surface">
-              <th className="px-4 py-3 text-left text-xs font-medium text-warm-gray">Order</th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-warm-gray">Customer</th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-warm-gray">Items</th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-warm-gray">Total</th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-warm-gray">Status</th>
-              <th className="px-4 py-3 text-right text-xs font-medium text-warm-gray">Actions</th>
+            <tr className="border-b border-neutral-800 bg-neutral-950/80 text-[11px] font-bold uppercase tracking-wider text-neutral-400">
+              <th className="px-5 py-3.5">Order ID</th>
+              <th className="px-4 py-3.5">Client</th>
+              <th className="px-4 py-3.5">Delivery Destination</th>
+              <th className="px-4 py-3.5">Items</th>
+              <th className="px-4 py-3.5">Amount</th>
+              <th className="px-4 py-3.5">Fulfillment Status</th>
+              <th className="px-5 py-3.5 text-right">Actions</th>
             </tr>
           </thead>
-          <tbody>
-            {filtered.map((order) => (
-              <tr
-                key={order.id}
-                className="border-b border-dark-border/50 hover:bg-dark-surface/50"
-              >
-                <td className="px-4 py-3">
-                  <span className="text-sm font-medium text-white">{order.id}</span>
-                  <p className="text-xs text-warm-gray">{order.time}</p>
-                </td>
-                <td className="px-4 py-3">
-                  <span className="text-sm text-white">{order.customer}</span>
-                  <p className="text-xs text-warm-gray">{order.phone}</p>
-                </td>
-                <td className="px-4 py-3 text-sm text-warm-gray">{order.items}</td>
-                <td className="px-4 py-3 text-sm font-medium text-gold">{formatPrice(order.total)}</td>
-                <td className="px-4 py-3">
-                  <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${STATUS_COLORS[order.status]}`}>
-                    {order.status}
-                  </span>
-                </td>
-                <td className="px-4 py-3 text-right">
-                  <a href={`/admin/orders/${order.id}`} className="text-sm text-gold hover:text-gold-light">
-                    View
-                  </a>
+          <tbody className="divide-y divide-neutral-800/60 text-xs">
+            {filtered.length === 0 ? (
+              <tr>
+                <td colSpan={7} className="py-10 text-center text-neutral-500">
+                  No orders match the selected filters.
                 </td>
               </tr>
-            ))}
+            ) : (
+              filtered.map((order) => {
+                const badge = STATUS_CONFIG[order.status] || {
+                  bg: "bg-neutral-800",
+                  text: "text-neutral-400",
+                  border: "border-neutral-700",
+                };
+                return (
+                  <tr key={order.id} className="hover:bg-neutral-800/30 transition-colors">
+                    <td className="px-5 py-3.5">
+                      <span className="font-mono font-bold text-white">{order.id}</span>
+                      <p className="text-[10px] text-neutral-500 font-mono">{order.time}</p>
+                    </td>
+                    <td className="px-4 py-3.5">
+                      <span className="font-semibold text-white">{order.customer}</span>
+                      <p className="text-[11px] text-neutral-400 font-mono">{order.phone}</p>
+                    </td>
+                    <td className="px-4 py-3.5 text-neutral-300">
+                      {order.address}
+                    </td>
+                    <td className="px-4 py-3.5 font-mono text-neutral-400">
+                      {order.items} cases
+                    </td>
+                    <td className="px-4 py-3.5 font-bold text-[#DFCA9B]">
+                      QR {order.total}
+                    </td>
+                    <td className="px-4 py-3.5">
+                      <span
+                        className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider border ${badge.bg} ${badge.text} ${badge.border}`}
+                      >
+                        {order.status}
+                      </span>
+                    </td>
+                    <td className="px-5 py-3.5 text-right">
+                      <div className="inline-flex items-center gap-2">
+                        <a
+                          href={`https://wa.me/${order.phone.replace(/[^0-9]/g, "")}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="p-1.5 rounded-lg border border-neutral-800 bg-neutral-900 text-emerald-400 hover:border-emerald-500/40 hover:bg-emerald-500/10 transition-colors"
+                          title="Open WhatsApp Chat"
+                        >
+                          <MessageSquare className="h-3.5 w-3.5" />
+                        </a>
+                        <Link
+                          href={`/admin/orders/${order.id}`}
+                          className="inline-flex items-center gap-1 rounded-lg border border-neutral-800 bg-neutral-900 px-2.5 py-1 text-xs font-semibold text-neutral-300 hover:text-white hover:border-neutral-700 transition-colors"
+                        >
+                          <span>Review</span>
+                        </Link>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })
+            )}
           </tbody>
         </table>
       </div>
