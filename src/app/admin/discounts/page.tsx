@@ -146,12 +146,12 @@ export default function AdminDiscountsPage() {
         );
       } else {
         const err = await res.json().catch(() => ({}));
-        toast(err.error || "Failed to update tier status", "error");
+        toast(err.error ? `Error: ${err.error}` : `HTTP ${res.status}: Failed to update tier status`, "error");
         // Revert on failure
         setTiers((prev) => prev.map((t) => ({ ...t, isActive: !nextActive })));
       }
-    } catch {
-      toast("Failed to update tier status", "error");
+    } catch (err: any) {
+      toast(`Network error: ${err.message || "Failed to update tier status"}`, "error");
       setTiers((prev) => prev.map((t) => ({ ...t, isActive: !nextActive })));
     }
   };
@@ -181,14 +181,14 @@ export default function AdminDiscountsPage() {
         );
       } else {
         const err = await res.json().catch(() => ({}));
-        toast(err.error || "Failed to update tier status", "error");
+        toast(err.error ? `Error: ${err.error}` : `HTTP ${res.status}: Failed to update tier status`, "error");
         // Revert on failure
         setTiers((prev) =>
           prev.map((t) => (t.id === tier.id ? { ...t, isActive: !nextActive } : t))
         );
       }
-    } catch {
-      toast("Failed to update tier status", "error");
+    } catch (err: any) {
+      toast(`Network error: ${err.message || "Failed to update tier status"}`, "error");
       setTiers((prev) =>
         prev.map((t) => (t.id === tier.id ? { ...t, isActive: !nextActive } : t))
       );

@@ -1,9 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { getToken } from "next-auth/jwt";
-import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/db/prisma";
 import { clearSettingsCache } from "@/lib/settings";
+import { verifyAdminAuth } from "@/lib/admin-auth";
+
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+export const fetchCache = "force-no-store";
 
 // ─── GET: Fetch all settings ──────────────────────────────────
 export async function GET(request: NextRequest) {
@@ -21,6 +23,8 @@ export async function GET(request: NextRequest) {
       {
         headers: {
           "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+          Pragma: "no-cache",
+          Expires: "0",
         },
       }
     );
@@ -36,19 +40,7 @@ export async function GET(request: NextRequest) {
 // ─── Helper: Update Settings in Database ───────────────────────
 async function updateSettingsHandler(request: NextRequest) {
   try {
-    // Check authentication via session or JWT token
-    const session = await getServerSession(authOptions);
-    const token = await getToken({
-      req: request,
-      secret: process.env.NEXTAUTH_SECRET || "casele-luxury-secure-secret-key-2026-doha",
-    });
-
-    const isAuthorized =
-      Boolean(session?.user) ||
-      Boolean(token) ||
-      (session?.user as any)?.role === "admin" ||
-      token?.role === "admin";
-
+    const isAuthorized = await verifyAdminAuth(request);
     if (!isAuthorized) {
       console.warn("PUT/POST /api/settings unauthorized attempt");
       return NextResponse.json(
@@ -92,7 +84,9 @@ async function updateSettingsHandler(request: NextRequest) {
       { success: true, updatedKeys: Object.keys(settingsData) },
       {
         headers: {
-          "Cache-Control": "no-store, no-cache, must-revalidate",
+          "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+          Pragma: "no-cache",
+          Expires: "0",
         },
       }
     );

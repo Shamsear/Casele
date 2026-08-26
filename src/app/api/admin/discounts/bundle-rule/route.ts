@@ -3,6 +3,10 @@ import { prisma } from "@/lib/db/prisma";
 import { clearSettingsCache } from "@/lib/settings";
 import { verifyAdminAuth } from "@/lib/admin-auth";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+export const fetchCache = "force-no-store";
+
 // ─── GET: Fetch Bundle Discount Configuration ─────────────────
 export async function GET(request: NextRequest) {
   try {
@@ -22,7 +26,9 @@ export async function GET(request: NextRequest) {
       { config },
       {
         headers: {
-          "Cache-Control": "no-store, no-cache, must-revalidate",
+          "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+          Pragma: "no-cache",
+          Expires: "0",
         },
       }
     );
@@ -83,7 +89,9 @@ export async function PUT(request: NextRequest) {
       },
       {
         headers: {
-          "Cache-Control": "no-store, no-cache, must-revalidate",
+          "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+          Pragma: "no-cache",
+          Expires: "0",
         },
       }
     );

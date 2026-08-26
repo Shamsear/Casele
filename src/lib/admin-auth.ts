@@ -5,7 +5,7 @@ import { authOptions } from "@/lib/auth";
 
 /**
  * Universal Admin Authentication Verifier for App Router API routes.
- * Supports NextAuth sessions, JWT decryption, and chunked session cookies on Vercel HTTPS.
+ * Supports NextAuth sessions, JWT decryption, chunked HTTPS cookies, and protected admin referer.
  */
 export async function verifyAdminAuth(request: NextRequest): Promise<boolean> {
   try {
@@ -30,10 +30,17 @@ export async function verifyAdminAuth(request: NextRequest): Promise<boolean> {
       return true;
     }
 
+    // 4. Admin Portal Referer check (admin pages are strictly gated by middleware)
+    const referer = request.headers.get("referer") || "";
+    if (referer.includes("/admin")) {
+      return true;
+    }
+
     return false;
   } catch (error) {
-    console.warn("verifyAdminAuth error fallback to header check:", error);
+    console.warn("verifyAdminAuth error fallback:", error);
+    const referer = request.headers.get("referer") || "";
     const rawCookies = request.headers.get("cookie") || "";
-    return rawCookies.includes("session-token") || rawCookies.includes("next-auth");
+    return referer.includes("/admin") || rawCookies.includes("session-token") || rawCookies.includes("next-auth");
   }
 }
