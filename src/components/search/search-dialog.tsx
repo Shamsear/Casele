@@ -174,12 +174,12 @@ export function SearchDialog() {
                       className="group flex flex-col text-left transition-all hover:opacity-85 cursor-pointer"
                     >
                       {/* Portrait Image Canvas */}
-                      <div className="relative aspect-[3/4] w-full overflow-hidden rounded-2xl bg-neutral-50 p-2 sm:p-3 flex items-center justify-center">
+                      <div className="relative aspect-[3/4] w-full bg-transparent p-1 flex items-center justify-center">
                         <Image
                           src={product.images[0] || "/images/products/midnight-black.svg"}
                           alt={product.name}
                           fill
-                          className="object-contain p-1.5 transition-transform duration-300 group-hover:scale-105"
+                          className="object-contain p-1 transition-transform duration-300 group-hover:scale-105 drop-shadow-[0_10px_20px_rgba(0,0,0,0.08)]"
                           sizes="(max-width: 640px) 50vw, 25vw"
                         />
                       </div>
@@ -224,12 +224,12 @@ export function SearchDialog() {
                       onClick={() => handleSelect(`/shop/${product.modelSlug || "iphone-15-pro"}/${product.slug}`)}
                       className="group flex flex-col text-left transition-all hover:opacity-85 cursor-pointer"
                     >
-                      <div className="relative aspect-[3/4] w-full overflow-hidden rounded-2xl bg-neutral-50 p-2 sm:p-3 flex items-center justify-center">
+                      <div className="relative aspect-[3/4] w-full bg-transparent p-1 flex items-center justify-center">
                         <Image
                           src={product.images[0] || "/images/products/midnight-black.svg"}
                           alt={product.name}
                           fill
-                          className="object-contain p-1.5 transition-transform duration-300 group-hover:scale-105"
+                          className="object-contain p-1 transition-transform duration-300 group-hover:scale-105 drop-shadow-[0_10px_20px_rgba(0,0,0,0.08)]"
                           sizes="(max-width: 640px) 50vw, 25vw"
                         />
                       </div>
@@ -261,12 +261,12 @@ export function SearchDialog() {
                       onClick={() => handleSelect(`/shop/${product.modelSlug || "iphone-15-pro"}/${product.slug}`)}
                       className="group flex flex-col text-left transition-all hover:opacity-85 cursor-pointer"
                     >
-                      <div className="relative aspect-[3/4] w-full overflow-hidden rounded-2xl bg-neutral-50 p-2 sm:p-3 flex items-center justify-center">
+                      <div className="relative aspect-[3/4] w-full bg-transparent p-1 flex items-center justify-center">
                         <Image
                           src={product.images[0] || "/images/products/midnight-black.svg"}
                           alt={product.name}
                           fill
-                          className="object-contain p-1.5 transition-transform duration-300 group-hover:scale-105"
+                          className="object-contain p-1 transition-transform duration-300 group-hover:scale-105 drop-shadow-[0_10px_20px_rgba(0,0,0,0.08)]"
                           sizes="(max-width: 640px) 50vw, 25vw"
                         />
                       </div>

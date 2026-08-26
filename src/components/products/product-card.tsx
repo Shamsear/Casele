@@ -107,10 +107,10 @@ export function ProductCard({ product, className }: ProductCardProps) {
         className
       )}
     >
-      {/* ═══ Portrait Aspect Ratio Canvas with Soft Shadow ═══ */}
+      {/* ═══ 100% Transparent Aspect Ratio Canvas ═══ */}
       <Link
         href={`/shop/${modelSlug}/${product.slug}`}
-        className="relative aspect-[3/4] w-full overflow-hidden rounded-2xl sm:rounded-3xl bg-neutral-100/50 block transition-all duration-300 group-hover:bg-neutral-100/80"
+        className="relative aspect-[3/4] w-full block bg-transparent"
       >
         {/* Primary Phone Case Image */}
         <Image
@@ -118,7 +118,7 @@ export function ProductCard({ product, className }: ProductCardProps) {
           alt={product.name}
           fill
           className={cn(
-            "object-contain p-3 sm:p-5 transition-all duration-500 ease-out group-hover:scale-105 drop-shadow-[0_10px_20px_rgba(0,0,0,0.08)]",
+            "object-contain p-2 sm:p-3 transition-all duration-500 ease-out group-hover:scale-105 drop-shadow-[0_12px_24px_rgba(0,0,0,0.09)]",
             hasSecondImage && "group-hover:opacity-0",
             isOutOfStock && "opacity-60 grayscale-[30%]"
           )}
@@ -131,13 +131,13 @@ export function ProductCard({ product, className }: ProductCardProps) {
             src={secondImageUrl}
             alt={`${product.name} alternate view`}
             fill
-            className="object-contain p-3 sm:p-5 transition-all duration-500 ease-out opacity-0 group-hover:opacity-100 group-hover:scale-105 drop-shadow-[0_10px_20px_rgba(0,0,0,0.08)]"
+            className="object-contain p-2 sm:p-3 transition-all duration-500 ease-out opacity-0 group-hover:opacity-100 group-hover:scale-105 drop-shadow-[0_12px_24px_rgba(0,0,0,0.09)]"
             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
           />
         )}
 
         {/* Badges / Sold Out Indicator */}
-        <div className="absolute top-3 left-3 flex flex-col gap-1 z-10 pointer-events-none">
+        <div className="absolute top-2 left-2 flex flex-col gap-1 z-10 pointer-events-none">
           {isOutOfStock ? (
             <span className="inline-flex items-center gap-1 rounded-full bg-neutral-950/90 text-white backdrop-blur-md px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider border border-white/15 shadow-sm">
               Sold Out
@@ -152,7 +152,7 @@ export function ProductCard({ product, className }: ProductCardProps) {
           onClick={handleWishlist}
           aria-label={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
           className={cn(
-            "absolute top-3 right-3 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 backdrop-blur-sm border border-neutral-200/80 text-neutral-600 transition-all duration-200 hover:scale-110 active:scale-95 shadow-2xs cursor-pointer opacity-0 group-hover:opacity-100 sm:opacity-0",
+            "absolute top-2 right-2 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 backdrop-blur-sm border border-neutral-200/80 text-neutral-600 transition-all duration-200 hover:scale-110 active:scale-95 shadow-2xs cursor-pointer opacity-0 group-hover:opacity-100 sm:opacity-0",
             isWishlisted && "opacity-100 text-red-500 border-red-200 bg-red-50/90"
           )}
         >
@@ -162,7 +162,7 @@ export function ProductCard({ product, className }: ProductCardProps) {
         </button>
 
         {/* Quick Add Overlay on Hover */}
-        <div className="absolute bottom-3 inset-x-3 z-10 hidden sm:block pointer-events-none">
+        <div className="absolute bottom-2 inset-x-2 z-10 hidden sm:block pointer-events-none">
           {!isOutOfStock && (
             <button
               onClick={handleAddToCart}
@@ -191,7 +191,7 @@ export function ProductCard({ product, className }: ProductCardProps) {
       </Link>
 
       {/* ═══ Editorial Typography: Title & Price ═══ */}
-      <div className="flex flex-1 flex-col pt-3 space-y-0.5">
+      <div className="flex flex-1 flex-col pt-2.5 space-y-0.5">
         <Link
           href={`/shop/${modelSlug}/${product.slug}`}
           className="font-display text-sm sm:text-base text-neutral-800 font-normal leading-snug truncate hover:text-neutral-950 transition-colors"
