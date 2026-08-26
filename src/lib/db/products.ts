@@ -1,7 +1,6 @@
 /**
  * Server-side product data layer
- * Fetches products from Prisma database with caching.
- * Falls back to hardcoded data if DB is unavailable.
+ * Directly queries Prisma PostgreSQL database.
  */
 
 import { prisma } from "./prisma";
@@ -52,292 +51,10 @@ export interface CategoryWithCount {
   salePercent: number | null;
 }
 
-// ─── Fallback hardcoded data with Qatar stock quantities ─────────
-const FALLBACK_PRODUCTS: ProductWithRelations[] = [
-  {
-    id: "1",
-    name: "Midnight Black Premium Case",
-    slug: "midnight-black-premium-case",
-    description: "Crafted from aerospace composite with matte velvet hand-feel. High-impact perimeter bumper and MagSafe alignment.",
-    price: "79",
-    comparePrice: "99",
-    images: ["/images/products/midnight-black.svg"],
-    badge: "bestseller",
-    isFeatured: true,
-    isActive: true,
-    sortOrder: 1,
-    viewCount: 234,
-    orderCount: 89,
-    lastSoldAt: new Date(Date.now() - 2 * 60 * 60 * 1000),
-    metaTitle: null,
-    metaDescription: null,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    categoryId: "cat-2",
-    categoryName: "Premium",
-    modelSlug: "iphone-15-pro",
-    modelName: "iPhone 15 Pro",
-    stock: 24,
-    inStock: true,
-    models: [
-      { id: "m1", name: "iPhone 15 Pro", slug: "iphone-15-pro", brand: "iPhone", stock: 8 },
-      { id: "m2", name: "iPhone 15 Pro Max", slug: "iphone-15-pro-max", brand: "iPhone", stock: 10 },
-      { id: "m3", name: "Samsung Galaxy S24 Ultra", slug: "samsung-galaxy-s24-ultra", brand: "Samsung", stock: 6 },
-    ],
-  },
-  {
-    id: "2",
-    name: "Gold Edge Luxe Case",
-    slug: "gold-edge-luxe-case",
-    description: "A statement piece for those who appreciate the finer things. Electroplated gold accents frame this premium case.",
-    price: "129",
-    comparePrice: null,
-    images: ["/images/products/gold-edge.svg"],
-    badge: "new",
-    isFeatured: true,
-    isActive: true,
-    sortOrder: 2,
-    viewCount: 156,
-    orderCount: 34,
-    lastSoldAt: new Date(Date.now() - 5 * 60 * 60 * 1000),
-    metaTitle: null,
-    metaDescription: null,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    categoryId: "cat-2",
-    categoryName: "Premium",
-    modelSlug: "iphone-15-pro-max",
-    modelName: "iPhone 15 Pro Max",
-    stock: 15,
-    inStock: true,
-    models: [
-      { id: "m1", name: "iPhone 15 Pro Max", slug: "iphone-15-pro-max", brand: "iPhone", stock: 8 },
-      { id: "m2", name: "iPhone 15 Pro", slug: "iphone-15-pro", brand: "iPhone", stock: 7 },
-    ],
-  },
-  {
-    id: "3",
-    name: "Royal Blue Classic Case",
-    slug: "royal-blue-classic-case",
-    description: "Classic design meets modern protection. The deep royal blue color gives your phone a regal look.",
-    price: "59",
-    comparePrice: "79",
-    images: ["/images/products/royal-blue.svg"],
-    badge: "sale",
-    isFeatured: false,
-    isActive: true,
-    sortOrder: 3,
-    viewCount: 189,
-    orderCount: 67,
-    lastSoldAt: new Date(Date.now() - 1 * 60 * 60 * 1000),
-    metaTitle: null,
-    metaDescription: null,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    categoryId: "cat-1",
-    categoryName: "Classic",
-    modelSlug: "samsung-galaxy-s24-ultra",
-    modelName: "Samsung Galaxy S24 Ultra",
-    stock: 18,
-    inStock: true,
-    models: [
-      { id: "m1", name: "Samsung Galaxy S24 Ultra", slug: "samsung-galaxy-s24-ultra", brand: "Samsung", stock: 6 },
-      { id: "m2", name: "Samsung Galaxy S24", slug: "samsung-galaxy-s24", brand: "Samsung", stock: 6 },
-      { id: "m3", name: "iPhone 15", slug: "iphone-15", brand: "iPhone", stock: 6 },
-    ],
-  },
-  {
-    id: "4",
-    name: "Matte Carbon Fiber Case",
-    slug: "matte-carbon-fiber-case",
-    description: "Lightweight yet incredibly strong. The carbon fiber texture adds a sporty, tech-forward aesthetic.",
-    price: "89",
-    comparePrice: null,
-    images: ["/images/products/carbon-fiber.svg"],
-    badge: null,
-    isFeatured: true,
-    isActive: true,
-    sortOrder: 4,
-    viewCount: 145,
-    orderCount: 45,
-    lastSoldAt: new Date(Date.now() - 8 * 60 * 60 * 1000),
-    metaTitle: null,
-    metaDescription: null,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    categoryId: "cat-3",
-    categoryName: "Sport",
-    modelSlug: "google-pixel-8-pro",
-    modelName: "Google Pixel 8 Pro",
-    stock: 12,
-    inStock: true,
-    models: [
-      { id: "m1", name: "Google Pixel 8 Pro", slug: "google-pixel-8-pro", brand: "Google", stock: 6 },
-      { id: "m2", name: "iPhone 15 Pro", slug: "iphone-15-pro", brand: "iPhone", stock: 6 },
-    ],
-  },
-  {
-    id: "5",
-    name: "Clear Crystal Case",
-    slug: "clear-crystal-case",
-    description: "Show off your phone's original design while keeping it protected. Crystal clear, 100% anti-yellowing optical composite.",
-    price: "49",
-    comparePrice: null,
-    images: ["/images/products/clear-crystal.svg"],
-    badge: null,
-    isFeatured: false,
-    isActive: true,
-    sortOrder: 5,
-    viewCount: 210,
-    orderCount: 112,
-    lastSoldAt: new Date(Date.now() - 30 * 60 * 1000),
-    metaTitle: null,
-    metaDescription: null,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    categoryId: "cat-1",
-    categoryName: "Classic",
-    modelSlug: "iphone-15-pro",
-    modelName: "iPhone 15 Pro",
-    stock: 30,
-    inStock: true,
-    models: [
-      { id: "m1", name: "iPhone 15 Pro", slug: "iphone-15-pro", brand: "iPhone", stock: 10 },
-      { id: "m2", name: "iPhone 15", slug: "iphone-15", brand: "iPhone", stock: 10 },
-      { id: "m3", name: "Samsung Galaxy S24", slug: "samsung-galaxy-s24", brand: "Samsung", stock: 10 },
-    ],
-  },
-  {
-    id: "6",
-    name: "Rose Gold Slim Case",
-    slug: "rose-gold-slim-case",
-    description: "Ultra-slim profile with a stunning metallic champagne rose finish. Currently sold out in Qatar atelier.",
-    price: "69",
-    comparePrice: "89",
-    images: ["/images/products/rose-gold.svg"],
-    badge: "sale",
-    isFeatured: false,
-    isActive: true,
-    sortOrder: 6,
-    viewCount: 167,
-    orderCount: 52,
-    lastSoldAt: new Date(Date.now() - 4 * 60 * 60 * 1000),
-    metaTitle: null,
-    metaDescription: null,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    categoryId: "cat-4",
-    categoryName: "Designer",
-    modelSlug: "samsung-galaxy-s24-ultra",
-    modelName: "Samsung Galaxy S24 Ultra",
-    stock: 0,
-    inStock: false,
-    models: [
-      { id: "m1", name: "Samsung Galaxy S24 Ultra", slug: "samsung-galaxy-s24-ultra", brand: "Samsung", stock: 0 },
-      { id: "m2", name: "iPhone 15 Pro Max", slug: "iphone-15-pro-max", brand: "iPhone", stock: 0 },
-    ],
-  },
-  {
-    id: "7",
-    name: "Forest Green Leather Case",
-    slug: "forest-green-leather-case",
-    description: "Premium leather with a rich forest green hue. Ages beautifully over time, developing a unique patina.",
-    price: "119",
-    comparePrice: null,
-    images: ["/images/products/forest-green.svg"],
-    badge: "new",
-    isFeatured: true,
-    isActive: true,
-    sortOrder: 7,
-    viewCount: 98,
-    orderCount: 23,
-    lastSoldAt: new Date(Date.now() - 12 * 60 * 60 * 1000),
-    metaTitle: null,
-    metaDescription: null,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    categoryId: "cat-2",
-    categoryName: "Premium",
-    modelSlug: "iphone-15-pro-max",
-    modelName: "iPhone 15 Pro Max",
-    stock: 6,
-    inStock: true,
-    models: [
-      { id: "m1", name: "iPhone 15 Pro Max", slug: "iphone-15-pro-max", brand: "iPhone", stock: 3 },
-      { id: "m2", name: "iPhone 15 Pro", slug: "iphone-15-pro", brand: "iPhone", stock: 3 },
-    ],
-  },
-  {
-    id: "8",
-    name: "Matte Black Armor Case",
-    slug: "matte-black-armor-case",
-    description: "Maximum protection with a tactical look. Reinforced corners and raised edges for ultimate device safety.",
-    price: "99",
-    comparePrice: null,
-    images: ["/images/products/matte-black.svg"],
-    badge: "bestseller",
-    isFeatured: true,
-    isActive: true,
-    sortOrder: 8,
-    viewCount: 178,
-    orderCount: 61,
-    lastSoldAt: new Date(Date.now() - 6 * 60 * 60 * 1000),
-    metaTitle: null,
-    metaDescription: null,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    categoryId: "cat-3",
-    categoryName: "Sport",
-    modelSlug: "google-pixel-8-pro",
-    modelName: "Google Pixel 8 Pro",
-    stock: 20,
-    inStock: true,
-    models: [
-      { id: "m1", name: "Google Pixel 8 Pro", slug: "google-pixel-8-pro", brand: "Google", stock: 7 },
-      { id: "m2", name: "Samsung Galaxy S24 Ultra", slug: "samsung-galaxy-s24-ultra", brand: "Samsung", stock: 7 },
-      { id: "m3", name: "iPhone 15 Pro", slug: "iphone-15-pro", brand: "iPhone", stock: 6 },
-    ],
-  },
-];
-
-const FALLBACK_MODELS: ModelWithCount[] = [
-  { id: "1", brand: "iPhone", name: "iPhone 15 Pro Max", slug: "iphone-15-pro-max", count: 4 },
-  { id: "2", brand: "iPhone", name: "iPhone 15 Pro", slug: "iphone-15-pro", count: 6 },
-  { id: "3", brand: "iPhone", name: "iPhone 15", slug: "iphone-15", count: 2 },
-  { id: "4", brand: "Samsung", name: "Samsung Galaxy S24 Ultra", slug: "samsung-galaxy-s24-ultra", count: 3 },
-  { id: "5", brand: "Samsung", name: "Samsung Galaxy S24", slug: "samsung-galaxy-s24", count: 4 },
-  { id: "6", brand: "Google", name: "Google Pixel 8 Pro", slug: "google-pixel-8-pro", count: 3 },
-];
-
-const FALLBACK_CATEGORIES: CategoryWithCount[] = [
-  { id: "cat-1", name: "Classic", slug: "classic", description: "Timeless elegance", count: 2, salePercent: null },
-  { id: "cat-2", name: "Premium", slug: "premium", description: "Luxury materials", count: 3, salePercent: null },
-  { id: "cat-3", name: "Sport", slug: "sport", description: "Active lifestyle", count: 2, salePercent: null },
-  { id: "cat-4", name: "Designer", slug: "designer", description: "Limited editions", count: 1, salePercent: null },
-];
-
-const FALLBACK_ORDERS = [
-  { id: "ORD-248", customerName: "Rashid Al-Kuwari", customerPhone: "+974 5512 3456", items: [{ name: "Midnight Black Case", model: "iPhone 15 Pro", qty: 1, price: 79 }], subtotal: 79, tierDiscount: 0, flashDiscount: 0, promoDiscount: 0, bundleDiscount: 0, total: 79, status: "pending", createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(), address: "The Pearl, Doha" },
-  { id: "ORD-247", customerName: "Fatima Al-Thani", customerPhone: "+974 5523 4567", items: [{ name: "Gold Edge Luxe", model: "iPhone 15 Pro Max", qty: 1, price: 129 }], subtotal: 129, tierDiscount: 0, flashDiscount: 0, promoDiscount: 0, bundleDiscount: 0, total: 129, status: "confirmed", createdAt: new Date(Date.now() - 15 * 60 * 1000).toISOString(), address: "West Bay, Doha" },
-  { id: "ORD-246", customerName: "Ahmed Al-Sulaiti", customerPhone: "+974 5534 5678", items: [{ name: "Royal Blue Classic", model: "Samsung S24 Ultra", qty: 1, price: 59 }], subtotal: 59, tierDiscount: 0, flashDiscount: 0, promoDiscount: 0, bundleDiscount: 0, total: 59, status: "dispatched", createdAt: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString(), address: "Lusail Marina, Lusail" },
-  { id: "ORD-245", customerName: "Sara Al-Khelaifi", customerPhone: "+974 5545 6789", items: [{ name: "Clear Crystal", model: "iPhone 15 Pro", qty: 1, price: 49 }], subtotal: 49, tierDiscount: 0, flashDiscount: 0, promoDiscount: 0, bundleDiscount: 0, total: 49, status: "delivered", createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(), address: "Al Waab, Doha" },
-  { id: "ORD-244", customerName: "Omar Al-Kuwari", customerPhone: "+974 5556 7890", items: [{ name: "Matte Black Armor", model: "Pixel 8 Pro", qty: 1, price: 99 }], subtotal: 99, tierDiscount: 0, flashDiscount: 0, promoDiscount: 0, bundleDiscount: 0, total: 99, status: "confirmed", createdAt: new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString(), address: "Al Khor Community, Al Khor" },
-];
-
-// ─── Helper: try DB, fall back ──────────────────────────────────
-async function tryDb<T>(fn: () => Promise<T>, fallback: T): Promise<T> {
-  try {
-    return await fn();
-  } catch (error) {
-    console.error("DB query failed, using fallback:", error);
-    return fallback;
-  }
-}
-
 // ─── Product queries ─────────────────────────────────────────────
 
 export async function getAllProducts(): Promise<ProductWithRelations[]> {
-  return tryDb(async () => {
+  try {
     const products = await prisma.product.findMany({
       where: { isActive: true },
       include: {
@@ -348,10 +65,6 @@ export async function getAllProducts(): Promise<ProductWithRelations[]> {
       },
       orderBy: { sortOrder: "asc" },
     });
-
-    if (!products || products.length === 0) {
-      return FALLBACK_PRODUCTS;
-    }
 
     return products.map((p) => {
       const models = p.productModels.map((pm) => ({
@@ -384,14 +97,17 @@ export async function getAllProducts(): Promise<ProductWithRelations[]> {
         updatedAt: p.updatedAt,
         categoryId: p.categoryId,
         categoryName: p.category?.name ?? "Uncategorized",
-        modelSlug: p.productModels[0]?.model.slug ?? "iphone-15-pro",
-        modelName: p.productModels[0]?.model.modelName ?? "Unknown",
+        modelSlug: p.productModels[0]?.model.slug ?? "",
+        modelName: p.productModels[0]?.model.modelName ?? "",
         stock: totalStock,
         inStock: totalStock > 0,
         models,
       };
     });
-  }, FALLBACK_PRODUCTS);
+  } catch (error) {
+    console.error("getAllProducts query error:", error);
+    return [];
+  }
 }
 
 export async function getProductBySlug(slug: string): Promise<ProductWithRelations | null> {
@@ -413,7 +129,7 @@ export async function getProductsByModel(modelSlug: string): Promise<ProductWith
 
 export async function getProductsByCategory(categorySlug: string): Promise<ProductWithRelations[]> {
   const products = await getAllProducts();
-  return products.filter((p) => p.categoryName.toLowerCase().includes(categorySlug));
+  return products.filter((p) => p.categoryName.toLowerCase().includes(categorySlug.toLowerCase()));
 }
 
 export async function getRelatedProducts(productId: string, modelSlug: string, limit = 4): Promise<ProductWithRelations[]> {
@@ -421,20 +137,17 @@ export async function getRelatedProducts(productId: string, modelSlug: string, l
   const current = products.find((p) => p.id === productId);
   if (!current) return products.slice(0, limit);
 
-  // First try same model, different product
   const sameModel = products.filter(
     (p) => p.id !== productId && p.models.some((m) => m.slug === modelSlug)
   );
   if (sameModel.length >= limit) return sameModel.slice(0, limit);
 
-  // Fill with same category
   const sameCategory = products.filter(
     (p) => p.id !== productId && p.categoryId === current.categoryId && !sameModel.includes(p)
   );
   const combined = [...sameModel, ...sameCategory];
   if (combined.length >= limit) return combined.slice(0, limit);
 
-  // Fill with any other products
   const remaining = products.filter(
     (p) => p.id !== productId && !combined.includes(p)
   );
@@ -444,7 +157,7 @@ export async function getRelatedProducts(productId: string, modelSlug: string, l
 // ─── Model queries ───────────────────────────────────────────────
 
 export async function getAllModels(): Promise<ModelWithCount[]> {
-  return tryDb(async () => {
+  try {
     const models = await prisma.phoneModel.findMany({
       where: { isActive: true },
       include: {
@@ -455,10 +168,6 @@ export async function getAllModels(): Promise<ModelWithCount[]> {
       orderBy: { sortOrder: "asc" },
     });
 
-    if (!models || models.length === 0) {
-      return FALLBACK_MODELS;
-    }
-
     return models.map((m) => ({
       id: m.id,
       brand: m.brand,
@@ -466,7 +175,10 @@ export async function getAllModels(): Promise<ModelWithCount[]> {
       slug: m.slug,
       count: m.products.length,
     }));
-  }, FALLBACK_MODELS);
+  } catch (error) {
+    console.error("getAllModels query error:", error);
+    return [];
+  }
 }
 
 export async function getModelBySlug(slug: string): Promise<ModelWithCount | null> {
@@ -477,7 +189,7 @@ export async function getModelBySlug(slug: string): Promise<ModelWithCount | nul
 // ─── Category queries ────────────────────────────────────────────
 
 export async function getAllCategories(): Promise<CategoryWithCount[]> {
-  return tryDb(async () => {
+  try {
     const categories = await prisma.category.findMany({
       where: { isActive: true },
       include: {
@@ -488,10 +200,6 @@ export async function getAllCategories(): Promise<CategoryWithCount[]> {
       orderBy: { sortOrder: "asc" },
     });
 
-    if (!categories || categories.length === 0) {
-      return FALLBACK_CATEGORIES;
-    }
-
     return categories.map((c) => ({
       id: c.id,
       name: c.name,
@@ -500,7 +208,10 @@ export async function getAllCategories(): Promise<CategoryWithCount[]> {
       count: c.products.length,
       salePercent: c.salePercent,
     }));
-  }, FALLBACK_CATEGORIES);
+  } catch (error) {
+    console.error("getAllCategories query error:", error);
+    return [];
+  }
 }
 
 export async function getCategoryBySlug(slug: string): Promise<CategoryWithCount | null> {
@@ -511,7 +222,7 @@ export async function getCategoryBySlug(slug: string): Promise<CategoryWithCount
 // ─── Order queries ───────────────────────────────────────────────
 
 export async function getOrdersByPhone(phone: string) {
-  return tryDb(async () => {
+  try {
     const orders = await prisma.order.findMany({
       where: { customerPhone: phone },
       orderBy: { createdAt: "desc" },
@@ -532,7 +243,10 @@ export async function getOrdersByPhone(phone: string) {
       createdAt: o.createdAt.toISOString(),
       address: o.address,
     }));
-  }, FALLBACK_ORDERS.filter((o) => o.customerPhone === phone));
+  } catch (error) {
+    console.error("getOrdersByPhone query error:", error);
+    return [];
+  }
 }
 
 // ─── Search ──────────────────────────────────────────────────────
@@ -553,7 +267,7 @@ export async function searchProducts(query: string): Promise<ProductWithRelation
 // ─── Admin queries ───────────────────────────────────────────────
 
 export async function getAdminStats() {
-  return tryDb(async () => {
+  try {
     const [totalProducts, totalOrders, totalCustomers, recentOrders] = await Promise.all([
       prisma.product.count({ where: { isActive: true } }),
       prisma.order.count(),
@@ -599,7 +313,10 @@ export async function getAdminStats() {
         price: Number(p.price),
       })),
     };
-  }, null);
+  } catch (error) {
+    console.error("getAdminStats query error:", error);
+    return null;
+  }
 }
 
 export async function createOrder(data: {
@@ -615,7 +332,7 @@ export async function createOrder(data: {
   promoCode?: string;
   total: number;
 }) {
-  return tryDb(async () => {
+  try {
     const order = await prisma.order.create({
       data: {
         customerName: data.customerName,
@@ -632,7 +349,6 @@ export async function createOrder(data: {
       },
     });
 
-    // Increment order counts for products
     for (const item of data.items) {
       try {
         await prisma.product.update({
@@ -643,15 +359,16 @@ export async function createOrder(data: {
           },
         });
       } catch {
-        // Product may not exist in DB, continue
+        // Continue
       }
     }
 
     return order;
-  }, null);
+  } catch (error) {
+    console.error("createOrder error:", error);
+    return null;
+  }
 }
-
-// ─── Category page helper ────────────────────────────────────────
 
 export async function getProductsByCategorySlug(categorySlug: string): Promise<ProductWithRelations[]> {
   const products = await getAllProducts();

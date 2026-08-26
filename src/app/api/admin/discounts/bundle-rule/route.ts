@@ -10,17 +10,7 @@ export const fetchCache = "force-no-store";
 // ─── GET: Fetch Bundle Discount Configuration ─────────────────
 export async function GET(request: NextRequest) {
   try {
-    let config = await prisma.bundleDiscountConfig.findFirst();
-
-    if (!config) {
-      config = await prisma.bundleDiscountConfig.create({
-        data: {
-          buy2Percent: 5,
-          buy3Percent: 10,
-          isActive: true,
-        },
-      });
-    }
+    const config = await prisma.bundleDiscountConfig.findFirst();
 
     return NextResponse.json(
       { config },
@@ -35,14 +25,7 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error("Fetch bundle discount config error:", error);
     return NextResponse.json(
-      {
-        config: {
-          id: "default-bundle-config",
-          buy2Percent: 5,
-          buy3Percent: 10,
-          isActive: true,
-        },
-      },
+      { config: null },
       { status: 200 }
     );
   }

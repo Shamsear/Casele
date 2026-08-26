@@ -10,16 +10,19 @@ export const fetchCache = "force-no-store";
 // ─── GET: Fetch Delivery Configuration ────────────────────────
 export async function GET(request: NextRequest) {
   try {
-    let config = await prisma.deliveryConfig.findFirst();
+    const config = await prisma.deliveryConfig.findFirst();
 
     if (!config) {
-      config = await prisma.deliveryConfig.create({
-        data: {
-          freeThreshold: 100,
-          expressFee: 20,
-          isFreeDeliveryActive: true,
-        },
-      });
+      return NextResponse.json(
+        { config: null },
+        {
+          headers: {
+            "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+            Pragma: "no-cache",
+            Expires: "0",
+          },
+        }
+      );
     }
 
     return NextResponse.json(
@@ -42,14 +45,7 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error("Fetch delivery config error:", error);
     return NextResponse.json(
-      {
-        config: {
-          id: "default-delivery-config",
-          freeThreshold: 100,
-          expressFee: 20,
-          isFreeDeliveryActive: true,
-        },
-      },
+      { config: null },
       { status: 200 }
     );
   }

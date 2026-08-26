@@ -9,28 +9,9 @@ export const fetchCache = "force-no-store";
 // ─── GET: Fetch all Tiered Discounts from Database ─────────────
 export async function GET(request: NextRequest) {
   try {
-    let tiers = await prisma.tierDiscount.findMany({
+    const tiers = await prisma.tierDiscount.findMany({
       orderBy: { minAmount: "asc" },
     });
-
-    // If database has 0 tiers, seed default tiers into PostgreSQL
-    if (tiers.length === 0) {
-      try {
-        await prisma.tierDiscount.createMany({
-          data: [
-            { minAmount: 50, discountPercent: 5, isActive: true, sortOrder: 0 },
-            { minAmount: 100, discountPercent: 10, isActive: true, sortOrder: 1 },
-            { minAmount: 200, discountPercent: 15, isActive: true, sortOrder: 2 },
-          ],
-        });
-
-        tiers = await prisma.tierDiscount.findMany({
-          orderBy: { minAmount: "asc" },
-        });
-      } catch (seedErr) {
-        console.warn("Auto-seeding tiers warning:", seedErr);
-      }
-    }
 
     return NextResponse.json(
       {
@@ -38,7 +19,7 @@ export async function GET(request: NextRequest) {
           id: t.id,
           minAmount: Number(t.minAmount),
           discountPercent: t.discountPercent,
-          isActive: t.isActive,
+          isActive: Boolean(t.isActive),
           sortOrder: t.sortOrder,
         })),
       },
@@ -53,20 +34,8 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error("Fetch tiers error:", error);
     return NextResponse.json(
-      {
-        tiers: [
-          { id: "default-tier-1", minAmount: 50, discountPercent: 5, isActive: true, sortOrder: 0 },
-          { id: "default-tier-2", minAmount: 100, discountPercent: 10, isActive: true, sortOrder: 1 },
-          { id: "default-tier-3", minAmount: 200, discountPercent: 15, isActive: true, sortOrder: 2 },
-        ],
-      },
-      {
-        headers: {
-          "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
-          Pragma: "no-cache",
-          Expires: "0",
-        },
-      }
+      { error: "Failed to fetch tiered discounts from database", details: String(error) },
+      { status: 500 }
     );
   }
 }
@@ -135,7 +104,7 @@ export async function PUT(request: NextRequest) {
           id: t.id,
           minAmount: Number(t.minAmount),
           discountPercent: t.discountPercent,
-          isActive: t.isActive,
+          isActive: Boolean(t.isActive),
           sortOrder: t.sortOrder,
         })),
       });
@@ -160,7 +129,7 @@ export async function PUT(request: NextRequest) {
             id: updated.id,
             minAmount: Number(updated.minAmount),
             discountPercent: updated.discountPercent,
-            isActive: updated.isActive,
+            isActive: Boolean(updated.isActive),
           },
         });
       } catch (err) {
@@ -189,7 +158,7 @@ export async function PUT(request: NextRequest) {
             id: updated.id,
             minAmount: Number(updated.minAmount),
             discountPercent: updated.discountPercent,
-            isActive: updated.isActive,
+            isActive: Boolean(updated.isActive),
           },
         });
       } else {
@@ -207,7 +176,7 @@ export async function PUT(request: NextRequest) {
             id: created.id,
             minAmount: Number(created.minAmount),
             discountPercent: created.discountPercent,
-            isActive: created.isActive,
+            isActive: Boolean(created.isActive),
           },
         });
       }
@@ -216,7 +185,7 @@ export async function PUT(request: NextRequest) {
     return NextResponse.json({ error: "Missing tier ID or minAmount" }, { status: 400 });
   } catch (error) {
     console.error("Update tier error:", error);
-    return NextResponse.json({ error: "Failed to update tiered discount in database" }, { status: 500 });
+    return NextResponse.json({ error: "Failed to update tiered discount in database", details: String(error) }, { status: 500 });
   }
 }
 

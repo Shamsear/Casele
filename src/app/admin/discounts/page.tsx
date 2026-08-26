@@ -52,8 +52,8 @@ export default function AdminDiscountsPage() {
   const [bundleBuy2, setBundleBuy2] = useState("5");
   const [bundleBuy3, setBundleBuy3] = useState("10");
   const [freeDeliveryThreshold, setFreeDeliveryThreshold] = useState("100");
-  const [freeDeliveryEnabled, setFreeDeliveryEnabled] = useState(true);
-  const [bundleEnabled, setBundleEnabled] = useState(true);
+  const [freeDeliveryEnabled, setFreeDeliveryEnabled] = useState(false);
+  const [bundleEnabled, setBundleEnabled] = useState(false);
   const [savingSettings, setSavingSettings] = useState(false);
   const [togglingBundle, setTogglingBundle] = useState(false);
   const [togglingDelivery, setTogglingDelivery] = useState(false);
