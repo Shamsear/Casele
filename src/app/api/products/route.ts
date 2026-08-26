@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getAllProducts } from "@/lib/db/products";
+import { prisma } from "@/lib/db/prisma";
 
 export async function GET(request: Request) {
   try {
@@ -63,5 +64,52 @@ export async function GET(request: Request) {
   } catch (error) {
     console.error("GET /api/products error:", error);
     return NextResponse.json([], { status: 500 });
+  }
+}
+
+export async function POST(request: Request) {
+  try {
+    const body = await request.json();
+    const slug = (body.name || "")
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/(^-|-$)/g, "");
+
+    const product = await prisma.product.create({
+      data: {
+        name: body.name,
+        slug: slug || `case-${Date.now()}`,
+        description: body.description,
+        price: body.price,
+        comparePrice: body.comparePrice || null,
+        images: body.images || [],
+        badge: body.badge || null,
+        isFeatured: Boolean(body.isFeatured),
+        categoryId: body.category && body.category.length > 10 ? body.category : null,
+      },
+    });
+
+    // Automatically link to top Qatar phone models with initial stock
+    const models = await prisma.phoneModel.findMany({ take: 3 });
+    const stockQty = Number(body.stock || 20);
+    const perModel = Math.max(1, Math.floor(stockQty / Math.max(1, models.length)));
+
+    for (const m of models) {
+      await prisma.productModel.create({
+        data: {
+          productId: product.id,
+          modelId: m.id,
+          stock: perModel,
+        },
+      });
+    }
+
+    return NextResponse.json({ success: true, product });
+  } catch (error: any) {
+    console.error("POST /api/products error:", error);
+    return NextResponse.json(
+      { error: error.message || "Failed to create product" },
+      { status: 500 }
+    );
   }
 }

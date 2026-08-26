@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import { useCartStore } from "@/lib/store/cart";
 import { useHaptic } from "@/hooks/use-haptic";
-import { useToast } from "@/components/ui/toast";
 import { Price } from "@/components/ui/price";
 import { QuickBuyModal } from "@/components/products/quick-buy-modal";
 import { getWhatsAppNumber } from "@/lib/settings";
@@ -21,6 +20,7 @@ interface StickyAddToCartProps {
   finish?: string;
   caseType?: string;
   quantity: number;
+  stock?: number;
 }
 
 export function StickyAddToCart({
@@ -34,13 +34,15 @@ export function StickyAddToCart({
   finish = "Matte",
   caseType = "Slim Precision",
   quantity,
+  stock,
 }: StickyAddToCartProps) {
   const [visible, setVisible] = useState(false);
   const [quickBuyOpen, setQuickBuyOpen] = useState(false);
   const [whatsappNumber, setWhatsappNumber] = useState("+97455364455");
   const addItem = useCartStore((s) => s.addItem);
   const { vibrate } = useHaptic();
-  const { toast } = useToast();
+
+  const isOutOfStock = stock !== undefined && stock <= 0;
 
   useEffect(() => {
     const handleScroll = () => {
@@ -53,6 +55,7 @@ export function StickyAddToCart({
   }, []);
 
   const handleAdd = () => {
+    if (isOutOfStock) return;
     addItem(
       {
         productId,
@@ -71,6 +74,7 @@ export function StickyAddToCart({
   };
 
   const handleBuyNow = () => {
+    if (isOutOfStock) return;
     setQuickBuyOpen(true);
   };
 
@@ -114,42 +118,52 @@ export function StickyAddToCart({
             </div>
 
             <div className="flex items-center gap-1.5 sm:gap-2">
-              <button
-                onClick={handleBuyNow}
-                className="flex items-center gap-1 rounded-xl bg-neutral-950 px-3 py-2 sm:px-4 sm:py-2.5 text-[11px] sm:text-xs font-bold uppercase tracking-wider text-white hover:bg-neutral-800 active:scale-95 shadow-xs transition-all cursor-pointer"
-              >
-                <MessageSquare className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
-                <span className="hidden sm:inline">WhatsApp Order</span>
-                <span className="sm:hidden">Order</span>
-              </button>
+              {isOutOfStock ? (
+                <div className="flex items-center rounded-xl bg-neutral-100 border border-neutral-200 px-3 py-2 sm:px-4 sm:py-2.5 text-[11px] sm:text-xs font-bold uppercase tracking-wider text-neutral-400">
+                  Sold Out
+                </div>
+              ) : (
+                <>
+                  <button
+                    onClick={handleBuyNow}
+                    className="flex items-center gap-1 rounded-xl bg-neutral-950 px-3 py-2 sm:px-4 sm:py-2.5 text-[11px] sm:text-xs font-bold uppercase tracking-wider text-white hover:bg-neutral-800 active:scale-95 shadow-xs transition-all cursor-pointer"
+                  >
+                    <MessageSquare className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
+                    <span className="hidden sm:inline">WhatsApp Order</span>
+                    <span className="sm:hidden">Order</span>
+                  </button>
 
-              <button
-                onClick={handleAdd}
-                aria-label="Add to Bag"
-                className="flex items-center gap-1 rounded-xl border border-neutral-300 bg-white p-2 sm:px-3.5 sm:py-2.5 text-[11px] sm:text-xs font-bold uppercase tracking-wider text-neutral-900 hover:bg-neutral-50 active:scale-95 shadow-2xs transition-all cursor-pointer"
-              >
-                <ShoppingBag className="h-3.5 w-3.5" />
-                <span className="hidden md:inline">Add to Bag</span>
-              </button>
+                  <button
+                    onClick={handleAdd}
+                    aria-label="Add to Bag"
+                    className="flex items-center gap-1 rounded-xl border border-neutral-300 bg-white p-2 sm:px-3.5 sm:py-2.5 text-[11px] sm:text-xs font-bold uppercase tracking-wider text-neutral-900 hover:bg-neutral-50 active:scale-95 shadow-2xs transition-all cursor-pointer"
+                  >
+                    <ShoppingBag className="h-3.5 w-3.5" />
+                    <span className="hidden md:inline">Add to Bag</span>
+                  </button>
+                </>
+              )}
             </div>
           </div>
         </div>
       </div>
 
-      <QuickBuyModal
-        isOpen={quickBuyOpen}
-        onClose={() => setQuickBuyOpen(false)}
-        product={{
-          name,
-          price: parseFloat(price),
-          modelName,
-          finish,
-          caseType,
-          image,
-          quantity,
-        }}
-        whatsappNumber={whatsappNumber}
-      />
+      {!isOutOfStock && (
+        <QuickBuyModal
+          isOpen={quickBuyOpen}
+          onClose={() => setQuickBuyOpen(false)}
+          product={{
+            name,
+            price: parseFloat(price),
+            modelName,
+            finish,
+            caseType,
+            image,
+            quantity,
+          }}
+          whatsappNumber={whatsappNumber}
+        />
+      )}
     </>
   );
 }

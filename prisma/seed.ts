@@ -188,13 +188,13 @@ async function main() {
       );
     } else if (product.slug === "rose-gold-slim-case" && samsungS24Ultra && iphone15ProMax) {
       modelLinks.push(
-        { productId: created.id, modelId: samsungS24Ultra.id, stock: 35 },
-        { productId: created.id, modelId: iphone15ProMax.id, stock: 20 },
+        { productId: created.id, modelId: samsungS24Ultra.id, stock: 0 },
+        { productId: created.id, modelId: iphone15ProMax.id, stock: 0 },
       );
     } else if (product.slug === "forest-green-leather-case" && iphone15ProMax && iphone15Pro) {
       modelLinks.push(
-        { productId: created.id, modelId: iphone15ProMax.id, stock: 15 },
-        { productId: created.id, modelId: iphone15Pro.id, stock: 15 },
+        { productId: created.id, modelId: iphone15ProMax.id, stock: 3 },
+        { productId: created.id, modelId: iphone15Pro.id, stock: 4 },
       );
     } else if (product.slug === "matte-black-armor-case" && pixel8Pro && samsungS24Ultra && iphone15Pro) {
       modelLinks.push(
@@ -207,7 +207,7 @@ async function main() {
     for (const link of modelLinks) {
       await prisma.productModel.upsert({
         where: { productId_modelId: { productId: link.productId, modelId: link.modelId } },
-        update: {},
+        update: { stock: link.stock },
         create: link,
       });
     }

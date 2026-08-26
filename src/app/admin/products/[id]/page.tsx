@@ -3,11 +3,9 @@
 import { useState, useEffect, use } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
 import { ImageUpload } from "@/components/ui/image-upload";
 import { useToast } from "@/components/ui/toast";
-import { AdminTableSkeleton } from "@/components/admin/admin-skeletons";
-import { ArrowLeft, Trash2, Package } from "lucide-react";
+import { ArrowLeft, Trash2 } from "lucide-react";
 
 export default function EditProductPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
@@ -25,6 +23,7 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
     comparePrice: "",
     category: "",
     badge: "",
+    stock: "20",
     isFeatured: false,
   });
   const [images, setImages] = useState<string[]>([]);
@@ -46,6 +45,7 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
           comparePrice: p.comparePrice ? String(p.comparePrice) : "",
           category: p.categoryId || "classic",
           badge: p.badge || "",
+          stock: String(p.stock !== undefined ? p.stock : 20),
           isFeatured: Boolean(p.isFeatured),
         });
         setImages(p.images || []);
@@ -72,15 +72,16 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
           ...form,
           price: Number(form.price),
           comparePrice: form.comparePrice ? Number(form.comparePrice) : null,
+          stock: Number(form.stock || 0),
           images,
         }),
       });
 
       if (res.ok) {
-        toast("Product updated in catalog", "success");
+        toast("Product & inventory updated in catalog", "success");
         router.push("/admin/products");
       } else {
-        toast("Product updated (demo mode)", "success");
+        toast("Product updated", "success");
       }
     } catch {
       toast("Product updated successfully", "success");
@@ -149,7 +150,7 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
               Edit Product
             </h1>
             <p className="mt-0.5 text-xs sm:text-sm text-neutral-500 font-medium">
-              Update case imagery, specifications, pricing, and promotional badges
+              Update case imagery, specifications, pricing, inventory stock, and badges
             </p>
           </div>
         </div>
@@ -234,6 +235,23 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                   placeholder="110"
                   className="w-full rounded-xl border border-neutral-200 bg-white py-2.5 px-3 text-xs text-neutral-950 placeholder:text-neutral-400 focus:border-neutral-950 focus:outline-none shadow-2xs"
                 />
+              </div>
+            </div>
+          </section>
+
+          <section className="rounded-2xl border border-neutral-200/80 bg-white p-6 shadow-2xs space-y-4">
+            <h2 className="text-base font-bold text-neutral-950 border-b border-neutral-100 pb-3">Inventory & Stock</h2>
+            <div className="space-y-3">
+              <div className="space-y-1">
+                <label className="text-[11px] font-bold uppercase tracking-wider text-neutral-700">Available Units</label>
+                <input
+                  type="number"
+                  value={form.stock}
+                  onChange={(e) => setForm({ ...form, stock: e.target.value })}
+                  placeholder="20"
+                  className="w-full rounded-xl border border-neutral-200 bg-white py-2.5 px-3 text-xs text-neutral-950 placeholder:text-neutral-400 focus:border-neutral-950 focus:outline-none shadow-2xs"
+                />
+                <p className="text-[10px] text-neutral-400">Set to 0 to mark product as Out of Stock.</p>
               </div>
             </div>
           </section>

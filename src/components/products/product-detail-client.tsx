@@ -156,11 +156,23 @@ export function ProductDetailClient({
                   {selectedModel.name}
                 </span>
 
-                {/* Shelled-style Live Stock Pill */}
-                <div className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 text-[10px] font-bold text-emerald-700 whitespace-nowrap shrink-0">
-                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-600 animate-pulse shrink-0" />
-                  <span className="whitespace-nowrap">In Stock • Dispatches Today</span>
-                </div>
+                {/* Live Stock Indicator */}
+                {((selectedModel as any).stock !== undefined && (selectedModel as any).stock <= 0) || (product.stock !== undefined && product.stock <= 0) ? (
+                  <div className="inline-flex items-center gap-1.5 rounded-full bg-neutral-100 border border-neutral-300 px-2.5 py-0.5 text-[10px] font-bold text-neutral-600 whitespace-nowrap shrink-0">
+                    <span className="h-1.5 w-1.5 rounded-full bg-neutral-400 shrink-0" />
+                    <span>Out of Stock</span>
+                  </div>
+                ) : (selectedModel as any).stock !== undefined && (selectedModel as any).stock <= 5 ? (
+                  <div className="inline-flex items-center gap-1.5 rounded-full bg-amber-50 border border-amber-200 px-2.5 py-0.5 text-[10px] font-bold text-amber-700 whitespace-nowrap shrink-0">
+                    <span className="h-1.5 w-1.5 rounded-full bg-amber-600 animate-pulse shrink-0" />
+                    <span>Low Stock: Only {(selectedModel as any).stock} Left</span>
+                  </div>
+                ) : (
+                  <div className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 text-[10px] font-bold text-emerald-700 whitespace-nowrap shrink-0">
+                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-600 animate-pulse shrink-0" />
+                    <span>In Stock • Dispatches Today</span>
+                  </div>
+                )}
               </div>
 
               <h1 className="font-display text-3xl sm:text-4xl text-neutral-950 font-normal leading-tight">
@@ -179,20 +191,31 @@ export function ProductDetailClient({
                 <span className="text-neutral-500 font-medium">{selectedModel.name}</span>
               </div>
               <div className="flex flex-wrap gap-2">
-                {product.models.map((model) => (
-                  <button
-                    key={model.id}
-                    onClick={() => setSelectedModel(model)}
-                    className={cn(
-                      "px-3.5 py-2 rounded-xl text-xs font-semibold uppercase tracking-wider transition-all duration-200 cursor-pointer select-none whitespace-nowrap",
-                      selectedModel.id === model.id
-                        ? "bg-neutral-950 text-white shadow-sm"
-                        : "border border-neutral-200/80 bg-neutral-50 text-neutral-600 hover:border-neutral-400 hover:text-neutral-950"
-                    )}
-                  >
-                    {model.name}
-                  </button>
-                ))}
+                {product.models.map((model) => {
+                  const modelStock = (model as any).stock;
+                  const modelSoldOut = modelStock !== undefined && modelStock <= 0;
+                  return (
+                    <button
+                      key={model.id}
+                      onClick={() => setSelectedModel(model)}
+                      className={cn(
+                        "px-3.5 py-2 rounded-xl text-xs font-semibold uppercase tracking-wider transition-all duration-200 cursor-pointer select-none whitespace-nowrap flex items-center gap-1.5",
+                        selectedModel.id === model.id
+                          ? "bg-neutral-950 text-white shadow-sm"
+                          : modelSoldOut
+                          ? "border border-neutral-200/60 bg-neutral-100/60 text-neutral-400 hover:border-neutral-300"
+                          : "border border-neutral-200/80 bg-neutral-50 text-neutral-600 hover:border-neutral-400 hover:text-neutral-950"
+                      )}
+                    >
+                      <span>{model.name}</span>
+                      {modelSoldOut && (
+                        <span className="text-[9px] font-bold text-rose-700 uppercase tracking-tight bg-rose-50 px-1 py-0.5 rounded border border-rose-200">
+                          Sold Out
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
               </div>
             </div>
 
@@ -292,15 +315,19 @@ export function ProductDetailClient({
                 <div className="flex items-center rounded-xl border border-neutral-200 bg-neutral-50">
                   <button
                     onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                    className="flex h-10 w-10 items-center justify-center text-neutral-600 hover:text-neutral-950 transition-colors cursor-pointer"
+                    disabled={((selectedModel as any).stock !== undefined && (selectedModel as any).stock <= 0) || quantity <= 1}
+                    className="flex h-10 w-10 items-center justify-center text-neutral-600 hover:text-neutral-950 transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
                     aria-label="Decrease"
                   >
                     <Minus className="h-4 w-4" />
                   </button>
-                  <span className="w-10 text-center text-xs font-bold text-neutral-950">{quantity}</span>
+                  <span className="w-10 text-center text-xs font-bold text-neutral-950">
+                    {((selectedModel as any).stock !== undefined && (selectedModel as any).stock <= 0) ? 0 : quantity}
+                  </span>
                   <button
-                    onClick={() => setQuantity(Math.min(10, quantity + 1))}
-                    className="flex h-10 w-10 items-center justify-center text-neutral-600 hover:text-neutral-950 transition-colors cursor-pointer"
+                    onClick={() => setQuantity(Math.min(((selectedModel as any).stock || 10), quantity + 1))}
+                    disabled={((selectedModel as any).stock !== undefined && (selectedModel as any).stock <= 0) || quantity >= ((selectedModel as any).stock || 10)}
+                    className="flex h-10 w-10 items-center justify-center text-neutral-600 hover:text-neutral-950 transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
                     aria-label="Increase"
                   >
                     <Plus className="h-4 w-4" />
@@ -316,21 +343,47 @@ export function ProductDetailClient({
 
             {/* 5. CTAs */}
             <div className="space-y-3 pt-5 border-t border-neutral-100">
-              <button
-                onClick={handleBuyNow}
-                className="w-full flex items-center justify-center gap-2 rounded-xl bg-neutral-950 py-4 text-xs font-semibold uppercase tracking-widest text-white hover:bg-neutral-800 transition-all shadow-sm active:scale-[0.98] cursor-pointer"
-              >
-                <MessageSquare className="h-4 w-4" />
-                <span>Instant Order via WhatsApp</span>
-              </button>
+              {((selectedModel as any).stock !== undefined && (selectedModel as any).stock <= 0) || (product.stock !== undefined && product.stock <= 0) ? (
+                <>
+                  <a
+                    href={`https://wa.me/${whatsappNumber.replace(/\D/g, "")}?text=${encodeURIComponent(
+                      `Hello CASELÉ Concierge, I would like to request restock priority for ${product.name} (${selectedModel.name} • ${selectedFinish}).`
+                    )}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full flex items-center justify-center gap-2 rounded-xl bg-neutral-950 py-4 text-xs font-semibold uppercase tracking-widest text-white hover:bg-neutral-800 transition-all shadow-sm active:scale-[0.98]"
+                  >
+                    <MessageSquare className="h-4 w-4 text-emerald-400" />
+                    <span>Request Restock on WhatsApp</span>
+                  </a>
 
-              <button
-                onClick={handleAddToCart}
-                className="w-full flex items-center justify-center gap-2 rounded-xl border border-neutral-300 bg-white py-4 text-xs font-semibold uppercase tracking-widest text-neutral-900 hover:bg-neutral-50 hover:border-neutral-400 transition-all active:scale-[0.98] cursor-pointer"
-              >
-                <ShoppingBag className="h-4 w-4" />
-                <span>Add to Bag ({selectedFinish})</span>
-              </button>
+                  <button
+                    disabled
+                    className="w-full flex items-center justify-center gap-2 rounded-xl border border-neutral-200 bg-neutral-100 py-4 text-xs font-semibold uppercase tracking-widest text-neutral-400 cursor-not-allowed"
+                  >
+                    <ShoppingBag className="h-4 w-4" />
+                    <span>Out of Stock</span>
+                  </button>
+                </>
+              ) : (
+                <>
+                  <button
+                    onClick={handleBuyNow}
+                    className="w-full flex items-center justify-center gap-2 rounded-xl bg-neutral-950 py-4 text-xs font-semibold uppercase tracking-widest text-white hover:bg-neutral-800 transition-all shadow-sm active:scale-[0.98] cursor-pointer"
+                  >
+                    <MessageSquare className="h-4 w-4" />
+                    <span>Instant Order via WhatsApp</span>
+                  </button>
+
+                  <button
+                    onClick={handleAddToCart}
+                    className="w-full flex items-center justify-center gap-2 rounded-xl border border-neutral-300 bg-white py-4 text-xs font-semibold uppercase tracking-widest text-neutral-900 hover:bg-neutral-50 hover:border-neutral-400 transition-all active:scale-[0.98] cursor-pointer"
+                  >
+                    <ShoppingBag className="h-4 w-4" />
+                    <span>Add to Bag ({selectedFinish})</span>
+                  </button>
+                </>
+              )}
 
               <button
                 onClick={() => toggleWishlist(product.id)}
