@@ -3,12 +3,12 @@
 import { useState, useMemo } from "react";
 import { ProductCard } from "@/components/products/product-card";
 import { cn } from "@/lib/utils";
+import { useI18n } from "@/lib/i18n/context";
 import type { ProductWithRelations, ModelWithCount } from "@/lib/db/products";
 import {
   ChevronDown,
   ChevronUp,
   LayoutGrid,
-  Grid2X2,
   Grid3X3,
   SlidersHorizontal,
   X,
@@ -30,6 +30,9 @@ const SORT_OPTIONS = [
 ];
 
 export function ShopPageClient({ products, models, brands }: ShopPageClientProps) {
+  const { locale } = useI18n();
+  const currencySymbol = locale === "ar" ? "ر.ق" : "QR";
+
   // Filter States
   const [inStockOnly, setInStockOnly] = useState(false);
   const [outOfStockOnly, setOutOfStockOnly] = useState(false);
@@ -257,7 +260,7 @@ export function ShopPageClient({ products, models, brands }: ShopPageClientProps
                   <div className="flex items-center gap-2">
                     {/* Min Price Box */}
                     <div className="flex-1 flex items-center rounded-xl border border-neutral-200 bg-white px-2.5 py-1.5 shadow-2xs focus-within:border-neutral-950">
-                      <span className="text-xs text-neutral-400 font-medium mr-1.5 select-none">ر.ق</span>
+                      <span className="text-xs text-neutral-400 font-medium mr-1.5 select-none">{currencySymbol}</span>
                       <input
                         type="number"
                         placeholder="0"
@@ -271,7 +274,7 @@ export function ShopPageClient({ products, models, brands }: ShopPageClientProps
 
                     {/* Max Price Box */}
                     <div className="flex-1 flex items-center rounded-xl border border-neutral-200 bg-white px-2.5 py-1.5 shadow-2xs focus-within:border-neutral-950">
-                      <span className="text-xs text-neutral-400 font-medium mr-1.5 select-none">ر.ق</span>
+                      <span className="text-xs text-neutral-400 font-medium mr-1.5 select-none">{currencySymbol}</span>
                       <input
                         type="number"
                         placeholder={highestPrice.toString()}
