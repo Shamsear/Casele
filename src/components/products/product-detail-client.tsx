@@ -76,8 +76,8 @@ export function ProductDetailClient({
   }, [product.id]);
 
   const handleAddToCart = () => {
-    for (let i = 0; i < quantity; i++) {
-      addItem({
+    addItem(
+      {
         productId: product.id,
         name: product.name,
         image: product.images[0],
@@ -89,8 +89,9 @@ export function ProductDetailClient({
         modelName: selectedModel.name,
         finish: selectedFinish,
         caseType: selectedStyle,
-      });
-    }
+      },
+      quantity
+    );
     vibrate(10);
     toast(`${product.name} (${selectedFinish} • ${selectedModel.name}) added to bag`);
   };

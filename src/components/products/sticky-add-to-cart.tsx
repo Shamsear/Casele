@@ -53,8 +53,8 @@ export function StickyAddToCart({
   }, []);
 
   const handleAdd = () => {
-    for (let i = 0; i < quantity; i++) {
-      addItem({
+    addItem(
+      {
         productId,
         name,
         image,
@@ -64,8 +64,9 @@ export function StickyAddToCart({
         modelName,
         finish,
         caseType,
-      });
-    }
+      },
+      quantity
+    );
     vibrate(10);
     toast(`${name} (${finish} • ${modelName}) added to bag`);
   };

@@ -233,18 +233,18 @@ export function CartDrawer() {
 
                     {/* Quantity Controls */}
                     <div className="mt-auto flex items-center justify-between pt-2">
-                      <div className="flex items-center rounded-lg border border-neutral-200 bg-white">
+                      <div className="flex items-center rounded-xl border border-neutral-200 bg-white shadow-2xs">
                         <button
                           onClick={() => updateQuantity(item.productId, item.modelId, item.quantity - 1, item.finish, item.caseType)}
-                          className="flex h-6 w-6 items-center justify-center text-neutral-600 hover:text-neutral-950 hover:bg-neutral-100 rounded-l transition-colors cursor-pointer"
+                          className="flex h-7 w-7 items-center justify-center text-neutral-600 hover:text-neutral-950 hover:bg-neutral-100 rounded-l-xl transition-colors cursor-pointer"
                           aria-label="Decrease quantity"
                         >
                           <Minus className="h-3 w-3" />
                         </button>
-                        <span className="w-6 text-center text-xs font-semibold text-neutral-950">{item.quantity}</span>
+                        <span className="w-7 text-center text-xs font-bold text-neutral-950 font-mono">{item.quantity}</span>
                         <button
                           onClick={() => updateQuantity(item.productId, item.modelId, item.quantity + 1, item.finish, item.caseType)}
-                          className="flex h-6 w-6 items-center justify-center text-neutral-600 hover:text-neutral-950 hover:bg-neutral-100 rounded-r transition-colors cursor-pointer"
+                          className="flex h-7 w-7 items-center justify-center text-neutral-600 hover:text-neutral-950 hover:bg-neutral-100 rounded-r-xl transition-colors cursor-pointer"
                           aria-label="Increase quantity"
                         >
                           <Plus className="h-3 w-3" />
