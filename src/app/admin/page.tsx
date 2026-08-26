@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { formatPrice } from "@/lib/utils";
 import {
   TrendingUp,
   ShoppingBag,
@@ -13,7 +12,8 @@ import {
   Tag,
   Percent,
   Clock,
-  Sparkles
+  Sparkles,
+  Inbox
 } from "lucide-react";
 
 interface AdminStats {
@@ -53,47 +53,28 @@ export default function AdminDashboardPage() {
     fetch("/api/admin/stats")
       .then((res) => res.json())
       .then((data) => {
-        setStats(data);
+        if (data && !data.error) {
+          setStats(data);
+        } else {
+          setStats({
+            totalProducts: 0,
+            totalOrders: 0,
+            totalCustomers: 0,
+            totalRevenue: 0,
+            recentOrders: [],
+            topProducts: [],
+          });
+        }
         setLoading(false);
       })
       .catch(() => {
-        // Fallback graceful demo data
         setStats({
-          totalProducts: 14,
-          totalOrders: 68,
-          totalCustomers: 52,
-          totalRevenue: 5780,
-          recentOrders: [
-            {
-              id: "ORD-9481",
-              customerName: "Rashid Al-Kuwari",
-              total: 170,
-              status: "delivered",
-              createdAt: "2026-08-25T19:20:00Z",
-              items: [{ name: "Titanium Armor Case", model: "iPhone 15 Pro Max", qty: 2, price: 85 }],
-            },
-            {
-              id: "ORD-9482",
-              customerName: "Fatima Al-Thani",
-              total: 95,
-              status: "dispatched",
-              createdAt: "2026-08-26T09:15:00Z",
-              items: [{ name: "Luxe Leather Case", model: "Samsung S24 Ultra", qty: 1, price: 95 }],
-            },
-            {
-              id: "ORD-9483",
-              customerName: "Mohammed Hassan",
-              total: 100,
-              status: "pending",
-              createdAt: "2026-08-26T11:45:00Z",
-              items: [{ name: "Carbon Fiber Shield", model: "iPhone 15 Pro", qty: 1, price: 100 }],
-            },
-          ],
-          topProducts: [
-            { id: "p1", name: "Titanium Armor MagSafe Case", orderCount: 28, price: 85 },
-            { id: "p2", name: "Luxe Nappa Leather Enclosure", orderCount: 22, price: 95 },
-            { id: "p3", name: "Matte Minimalist Carbon Case", orderCount: 18, price: 75 },
-          ],
+          totalProducts: 0,
+          totalOrders: 0,
+          totalCustomers: 0,
+          totalRevenue: 0,
+          recentOrders: [],
+          topProducts: [],
         });
         setLoading(false);
       });
@@ -108,7 +89,7 @@ export default function AdminDashboardPage() {
             Overview & Metrics
           </h1>
           <p className="mt-1 text-xs sm:text-sm text-neutral-500 font-medium">
-            Real-time Doha storefront metrics, sales volume, and order activity
+            Real-time database metrics, gross sales volume, and live customer orders
           </p>
         </div>
 
@@ -126,7 +107,7 @@ export default function AdminDashboardPage() {
             className="inline-flex items-center gap-1.5 rounded-xl border border-neutral-200 bg-white px-3.5 py-2 text-xs font-semibold text-neutral-800 hover:bg-neutral-50 hover:border-neutral-300 transition-colors shadow-2xs"
           >
             <Percent className="h-3.5 w-3.5 text-[#A88B4D]" />
-            <span>Spend Tiers</span>
+            <span>Discounts & Sales</span>
           </Link>
           <Link
             href="/admin/promo-codes"
@@ -149,11 +130,11 @@ export default function AdminDashboardPage() {
             </div>
           </div>
           <p className="mt-3 font-display text-2xl sm:text-3xl font-bold text-neutral-950 tracking-tight">
-            {loading ? "..." : `QR ${stats?.totalRevenue ?? 0}`}
+            {loading ? "..." : `QR ${stats?.totalRevenue?.toLocaleString() ?? 0}`}
           </p>
           <div className="mt-2 flex items-center gap-1.5 text-[11px] font-semibold text-emerald-700">
             <Sparkles className="h-3 w-3" />
-            <span>Live Doha Orders</span>
+            <span>Live Database Records</span>
           </div>
         </div>
 
@@ -168,13 +149,13 @@ export default function AdminDashboardPage() {
           <p className="mt-3 font-display text-2xl sm:text-3xl font-bold text-neutral-950 tracking-tight">
             {loading ? "..." : stats?.totalOrders ?? 0}
           </p>
-          <p className="mt-2 text-[11px] text-neutral-500 font-medium">WhatsApp & Web checkouts</p>
+          <p className="mt-2 text-[11px] text-neutral-500 font-medium">Customer checkouts</p>
         </div>
 
         {/* Customers */}
         <div className="rounded-2xl border border-neutral-200/80 bg-white p-5 shadow-2xs relative overflow-hidden">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold uppercase tracking-wider text-neutral-500">Client Base</span>
+            <span className="text-xs font-bold uppercase tracking-wider text-neutral-500">Clients</span>
             <div className="rounded-xl border border-neutral-200 bg-neutral-50 p-2 text-neutral-700">
               <Users className="h-4 w-4" />
             </div>
@@ -182,7 +163,7 @@ export default function AdminDashboardPage() {
           <p className="mt-3 font-display text-2xl sm:text-3xl font-bold text-neutral-950 tracking-tight">
             {loading ? "..." : stats?.totalCustomers ?? 0}
           </p>
-          <p className="mt-2 text-[11px] text-neutral-500 font-medium">Verified Qatar clients</p>
+          <p className="mt-2 text-[11px] text-neutral-500 font-medium">Unique verified shoppers</p>
         </div>
 
         {/* Active Products */}
@@ -196,7 +177,7 @@ export default function AdminDashboardPage() {
           <p className="mt-3 font-display text-2xl sm:text-3xl font-bold text-neutral-950 tracking-tight">
             {loading ? "..." : stats?.totalProducts ?? 0}
           </p>
-          <p className="mt-2 text-[11px] text-neutral-500 font-medium">Active flagships & models</p>
+          <p className="mt-2 text-[11px] text-neutral-500 font-medium">Active database products</p>
         </div>
       </div>
 
@@ -207,7 +188,7 @@ export default function AdminDashboardPage() {
           <div className="flex items-center justify-between border-b border-neutral-100 pb-3">
             <div>
               <h2 className="text-base font-bold text-neutral-950">Recent Orders</h2>
-              <p className="text-xs text-neutral-500">Live order queue and fulfillment</p>
+              <p className="text-xs text-neutral-500">Real-time order queue from PostgreSQL database</p>
             </div>
             <Link
               href="/admin/orders"
@@ -220,7 +201,11 @@ export default function AdminDashboardPage() {
 
           <div className="space-y-2.5 pt-1">
             {!stats?.recentOrders || stats.recentOrders.length === 0 ? (
-              <p className="py-8 text-center text-xs text-neutral-400">No orders recorded yet.</p>
+              <div className="py-10 text-center space-y-2">
+                <Inbox className="h-6 w-6 text-neutral-300 mx-auto" />
+                <p className="text-xs text-neutral-500 font-medium">No client orders recorded in database yet.</p>
+                <p className="text-[11px] text-neutral-400">Customer checkout orders will appear here automatically.</p>
+              </div>
             ) : (
               stats.recentOrders.map((order) => {
                 const badge = STATUS_BADGES[order.status] || {
@@ -262,7 +247,7 @@ export default function AdminDashboardPage() {
           <div className="flex items-center justify-between border-b border-neutral-100 pb-3">
             <div>
               <h2 className="text-base font-bold text-neutral-950">Best Selling Cases</h2>
-              <p className="text-xs text-neutral-500">Top customer favorites in Qatar</p>
+              <p className="text-xs text-neutral-500">Ranked by actual sales in database</p>
             </div>
             <Link
               href="/admin/products"
@@ -275,7 +260,10 @@ export default function AdminDashboardPage() {
 
           <div className="space-y-2.5 pt-1">
             {!stats?.topProducts || stats.topProducts.length === 0 ? (
-              <p className="py-8 text-center text-xs text-neutral-400">No products found.</p>
+              <div className="py-10 text-center space-y-2">
+                <Package className="h-6 w-6 text-neutral-300 mx-auto" />
+                <p className="text-xs text-neutral-500 font-medium">No sales recorded on products yet.</p>
+              </div>
             ) : (
               stats.topProducts.map((product, idx) => (
                 <div

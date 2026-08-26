@@ -1,24 +1,47 @@
 "use client";
 
-import { Activity } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Activity, Inbox } from "lucide-react";
 
-const SAMPLE_ACTIVITY = [
-  { id: "1", action: "Created Product", details: "Titanium Armor MagSafe Case", admin: "Administrator", time: "2m ago" },
-  { id: "2", action: "Updated Order", details: "ORD-9481 → Marked Delivered (The Pearl)", admin: "Administrator", time: "5m ago" },
-  { id: "3", action: "Created Promo Code", details: "DOHA25 (25% off minimum QR 150)", admin: "Administrator", time: "1h ago" },
-  { id: "4", action: "Updated Settings", details: "Announcement bar & Hero copy updated", admin: "Administrator", time: "2h ago" },
-  { id: "5", action: "Created Phone Model", details: "iPhone 16 Pro Max added to catalog", admin: "Administrator", time: "3h ago" },
-];
+interface AdminActivity {
+  id: string;
+  action: string;
+  details: string;
+  admin: string;
+  time: string;
+}
 
 const ACTION_COLORS: Record<string, string> = {
-  "Created Product": "bg-emerald-50 text-emerald-700 border-emerald-200",
-  "Updated Order": "bg-blue-50 text-blue-700 border-blue-200",
-  "Created Promo Code": "bg-purple-50 text-purple-700 border-purple-200",
-  "Updated Settings": "bg-amber-50 text-amber-700 border-amber-200",
-  "Created Phone Model": "bg-neutral-100 text-neutral-800 border-neutral-200",
+  "create_product": "bg-emerald-50 text-emerald-700 border-emerald-200",
+  "update_product": "bg-blue-50 text-blue-700 border-blue-200",
+  "delete_product": "bg-rose-50 text-rose-700 border-rose-200",
+  "create_promo": "bg-purple-50 text-purple-700 border-purple-200",
+  "update_settings": "bg-amber-50 text-amber-700 border-amber-200",
 };
 
 export default function AdminActivityPage() {
+  const [logs, setLogs] = useState<AdminActivity[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchLogs();
+  }, []);
+
+  const fetchLogs = async () => {
+    try {
+      setLoading(true);
+      const res = await fetch("/api/admin/activity");
+      if (res.ok) {
+        const data = await res.json();
+        setLogs(data.logs || []);
+      }
+    } catch (err) {
+      console.error("Failed to load activity logs:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="space-y-6 animate-fade-in">
       <div>
@@ -26,7 +49,7 @@ export default function AdminActivityPage() {
           Activity Audit Log
         </h1>
         <p className="mt-1 text-xs sm:text-sm text-neutral-500 font-medium">
-          Chronological record of administrator actions, catalog changes, and fulfillment updates
+          Live chronological record of administrator actions, catalog changes, and settings modifications from database
         </p>
       </div>
 
@@ -42,22 +65,40 @@ export default function AdminActivityPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-neutral-100 text-xs">
-              {SAMPLE_ACTIVITY.map((log) => (
-                <tr key={log.id} className="hover:bg-neutral-50/60 transition-colors">
-                  <td className="px-5 py-3.5">
-                    <span
-                      className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider border ${
-                        ACTION_COLORS[log.action] || "bg-neutral-100 text-neutral-700 border-neutral-200"
-                      }`}
-                    >
-                      {log.action}
-                    </span>
+              {loading ? (
+                <tr>
+                  <td colSpan={4} className="py-12 text-center text-neutral-400">
+                    Loading activity records from database...
                   </td>
-                  <td className="px-4 py-3.5 font-semibold text-neutral-900">{log.details}</td>
-                  <td className="px-4 py-3.5 text-neutral-600 font-medium">{log.admin}</td>
-                  <td className="px-5 py-3.5 text-right text-neutral-400 font-mono">{log.time}</td>
                 </tr>
-              ))}
+              ) : logs.length === 0 ? (
+                <tr>
+                  <td colSpan={4} className="py-12 text-center">
+                    <div className="space-y-2">
+                      <Activity className="h-6 w-6 text-neutral-300 mx-auto" />
+                      <p className="text-xs text-neutral-500 font-medium">No activity logged in database yet.</p>
+                      <p className="text-[11px] text-neutral-400">Admin operations and store events will be recorded here.</p>
+                    </div>
+                  </td>
+                </tr>
+              ) : (
+                logs.map((log) => (
+                  <tr key={log.id} className="hover:bg-neutral-50/60 transition-colors">
+                    <td className="px-5 py-3.5">
+                      <span
+                        className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider border ${
+                          ACTION_COLORS[log.action] || "bg-neutral-100 text-neutral-700 border-neutral-200"
+                        }`}
+                      >
+                        {log.action.replace(/_/g, " ")}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3.5 font-semibold text-neutral-900">{log.details}</td>
+                    <td className="px-4 py-3.5 text-neutral-600 font-medium">{log.admin}</td>
+                    <td className="px-5 py-3.5 text-right text-neutral-400 font-mono">{log.time}</td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>

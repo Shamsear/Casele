@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import { formatPrice } from "@/lib/utils";
-import { Search, ShoppingBag, MessageSquare, ExternalLink, Filter } from "lucide-react";
+import { useToast } from "@/components/ui/toast";
+import { Search, ShoppingBag, MessageSquare, ExternalLink, Filter, Inbox, ChevronDown } from "lucide-react";
 
 interface AdminOrder {
   id: string;
@@ -14,15 +14,9 @@ interface AdminOrder {
   status: string;
   time: string;
   address: string;
+  createdAt: string;
+  itemsDetail?: { name: string; model: string; qty: number; price: number }[];
 }
-
-const SAMPLE_ORDERS: AdminOrder[] = [
-  { id: "ORD-9481", customer: "Rashid Al-Kuwari", phone: "+974 5512 3456", items: 2, total: 170, status: "delivered", time: "10m ago", address: "The Pearl, Doha" },
-  { id: "ORD-9482", customer: "Fatima Al-Thani", phone: "+974 6623 4567", items: 1, total: 95, status: "dispatched", time: "45m ago", address: "West Bay Lagoon, Doha" },
-  { id: "ORD-9483", customer: "Mohammed Hassan", phone: "+974 7734 5678", items: 1, total: 100, status: "confirmed", time: "2h ago", address: "Lusail Marina, Doha" },
-  { id: "ORD-9484", customer: "Sara Al-Attiyah", phone: "+974 5545 6789", items: 3, total: 245, status: "pending", time: "3h ago", address: "Al Waab, Doha" },
-  { id: "ORD-9485", customer: "Hamad Al-Marri", phone: "+974 3356 7890", items: 2, total: 160, status: "pending", time: "5h ago", address: "Al Wakrah" },
-];
 
 const STATUS_CONFIG: Record<string, { bg: string; text: string; border: string }> = {
   pending: { bg: "bg-amber-50", text: "text-amber-800", border: "border-amber-200" },
@@ -33,9 +27,55 @@ const STATUS_CONFIG: Record<string, { bg: string; text: string; border: string }
 };
 
 export default function AdminOrdersPage() {
-  const [orders, setOrders] = useState<AdminOrder[]>(SAMPLE_ORDERS);
+  const { toast } = useToast();
+  const [orders, setOrders] = useState<AdminOrder[]>([]);
+  const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("all");
   const [search, setSearch] = useState("");
+  const [updatingId, setUpdatingId] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetchOrders();
+  }, []);
+
+  const fetchOrders = async () => {
+    try {
+      setLoading(true);
+      const res = await fetch("/api/admin/orders");
+      if (res.ok) {
+        const data = await res.json();
+        setOrders(data.orders || []);
+      }
+    } catch (err) {
+      console.error("Failed to load orders:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleStatusChange = async (orderId: string, newStatus: string) => {
+    try {
+      setUpdatingId(orderId);
+      const res = await fetch("/api/admin/orders", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: orderId, status: newStatus }),
+      });
+
+      if (res.ok) {
+        toast(`Order status updated to ${newStatus}`, "success");
+        setOrders((prev) =>
+          prev.map((o) => (o.id === orderId ? { ...o, status: newStatus } : o))
+        );
+      } else {
+        toast("Failed to update order status", "error");
+      }
+    } catch {
+      toast("Failed to update order status", "error");
+    } finally {
+      setUpdatingId(null);
+    }
+  };
 
   const filtered = orders.filter((o) => {
     const matchesTab = activeTab === "all" || o.status === activeTab;
@@ -53,6 +93,7 @@ export default function AdminOrdersPage() {
     confirmed: orders.filter((o) => o.status === "confirmed").length,
     dispatched: orders.filter((o) => o.status === "dispatched").length,
     delivered: orders.filter((o) => o.status === "delivered").length,
+    cancelled: orders.filter((o) => o.status === "cancelled").length,
   };
 
   return (
@@ -64,7 +105,7 @@ export default function AdminOrdersPage() {
             Client Orders
           </h1>
           <p className="mt-1 text-xs sm:text-sm text-neutral-500 font-medium">
-            Monitor WhatsApp and online orders, dispatch status, and client delivery addresses
+            Live database orders received via WhatsApp checkouts and online carts
           </p>
         </div>
       </div>
@@ -79,6 +120,7 @@ export default function AdminOrdersPage() {
             { id: "confirmed", label: "Confirmed", count: counts.confirmed },
             { id: "dispatched", label: "Dispatched", count: counts.dispatched },
             { id: "delivered", label: "Delivered", count: counts.delivered },
+            { id: "cancelled", label: "Cancelled", count: counts.cancelled },
           ].map((tab) => (
             <button
               key={tab.id}
@@ -130,10 +172,20 @@ export default function AdminOrdersPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-neutral-100 text-xs">
-              {filtered.length === 0 ? (
+              {loading ? (
                 <tr>
-                  <td colSpan={7} className="py-10 text-center text-neutral-400">
-                    No orders match the selected filters.
+                  <td colSpan={7} className="py-12 text-center text-neutral-400">
+                    Loading real orders from database...
+                  </td>
+                </tr>
+              ) : filtered.length === 0 ? (
+                <tr>
+                  <td colSpan={7} className="py-12 text-center">
+                    <div className="space-y-2">
+                      <Inbox className="h-6 w-6 text-neutral-300 mx-auto" />
+                      <p className="text-xs text-neutral-500 font-medium">No orders found in database.</p>
+                      <p className="text-[11px] text-neutral-400">When customers place orders on your store, they will appear here in real time.</p>
+                    </div>
                   </td>
                 </tr>
               ) : (
@@ -163,11 +215,18 @@ export default function AdminOrdersPage() {
                         QR {order.total}
                       </td>
                       <td className="px-4 py-3.5">
-                        <span
-                          className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider border ${badge.bg} ${badge.text} ${badge.border}`}
+                        <select
+                          value={order.status}
+                          disabled={updatingId === order.id}
+                          onChange={(e) => handleStatusChange(order.id, e.target.value)}
+                          className={`rounded-lg px-2 py-1 text-[11px] font-bold uppercase tracking-wider border focus:outline-none cursor-pointer ${badge.bg} ${badge.text} ${badge.border}`}
                         >
-                          {order.status}
-                        </span>
+                          <option value="pending">PENDING</option>
+                          <option value="confirmed">CONFIRMED</option>
+                          <option value="dispatched">DISPATCHED</option>
+                          <option value="delivered">DELIVERED</option>
+                          <option value="cancelled">CANCELLED</option>
+                        </select>
                       </td>
                       <td className="px-5 py-3.5 text-right">
                         <div className="inline-flex items-center gap-2">
@@ -176,16 +235,10 @@ export default function AdminOrdersPage() {
                             target="_blank"
                             rel="noopener noreferrer"
                             className="p-1.5 rounded-lg border border-neutral-200 bg-white text-emerald-700 hover:border-emerald-300 hover:bg-emerald-50 transition-colors shadow-2xs"
-                            title="Open WhatsApp Chat"
+                            title="Open WhatsApp Chat with Client"
                           >
                             <MessageSquare className="h-3.5 w-3.5" />
                           </a>
-                          <Link
-                            href={`/admin/orders/${order.id}`}
-                            className="inline-flex items-center gap-1 rounded-lg border border-neutral-200 bg-white px-2.5 py-1 text-xs font-semibold text-neutral-700 hover:text-neutral-950 hover:border-neutral-300 transition-colors shadow-2xs"
-                          >
-                            <span>Review</span>
-                          </Link>
                         </div>
                       </td>
                     </tr>
