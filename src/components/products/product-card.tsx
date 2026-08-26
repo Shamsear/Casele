@@ -3,8 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { cn, getDiscountPercent } from "@/lib/utils";
-import { Price } from "@/components/ui/price";
+import { cn } from "@/lib/utils";
 import { ProductBadge } from "@/components/ui/badge";
 import { useCartStore } from "@/lib/store/cart";
 import { useWishlistStore } from "@/lib/store/wishlist";
@@ -41,13 +40,24 @@ export function ProductCard({ product, className }: ProductCardProps) {
 
   const [isAdded, setIsAdded] = useState(false);
 
-  const discount = getDiscountPercent(product.price, product.comparePrice ?? null);
   const modelSlug = product.modelSlug || "iphone-15-pro";
   const imageUrl = product.images[0] || "/images/products/midnight-black.svg";
   const hasSecondImage = product.images.length > 1;
   const secondImageUrl = hasSecondImage ? product.images[1] : null;
 
   const isOutOfStock = product.inStock === false || (product.stock !== undefined && product.stock <= 0);
+
+  // Format title: e.g. "Blush Lace | Phone Case"
+  const formattedTitle = (() => {
+    const cleaned = product.name.replace(/\s*(Premium|Luxe|Classic)?\s*Case$/i, "").trim();
+    return `${cleaned} | Phone Case`;
+  })();
+
+  // Format price: e.g. "QAR 99,00"
+  const formattedPrice = (() => {
+    const num = parseFloat(product.price);
+    return `QAR ${isNaN(num) ? product.price : num.toFixed(2).replace(".", ",")}`;
+  })();
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -97,36 +107,36 @@ export function ProductCard({ product, className }: ProductCardProps) {
         className
       )}
     >
-      {/* ═══ 4:5 Aspect Ratio Product Image Frame (Containerless Editorial Look) ═══ */}
+      {/* ═══ Portrait Aspect Ratio Canvas with Soft Shadow ═══ */}
       <Link
         href={`/shop/${modelSlug}/${product.slug}`}
-        className="relative aspect-[4/5] w-full overflow-hidden rounded-2xl bg-neutral-100/70 block transition-all duration-300 group-hover:bg-neutral-100"
+        className="relative aspect-[3/4] w-full overflow-hidden rounded-2xl sm:rounded-3xl bg-neutral-100/50 block transition-all duration-300 group-hover:bg-neutral-100/80"
       >
-        {/* Primary Studio Angle */}
+        {/* Primary Phone Case Image */}
         <Image
           src={imageUrl}
           alt={product.name}
           fill
           className={cn(
-            "object-contain p-4 sm:p-6 transition-all duration-500 ease-out group-hover:scale-105 drop-shadow-sm",
+            "object-contain p-3 sm:p-5 transition-all duration-500 ease-out group-hover:scale-105 drop-shadow-[0_10px_20px_rgba(0,0,0,0.08)]",
             hasSecondImage && "group-hover:opacity-0",
             isOutOfStock && "opacity-60 grayscale-[30%]"
           )}
           sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
         />
 
-        {/* Secondary Detail Angle on Hover */}
+        {/* Alternate Angle on Hover */}
         {secondImageUrl && !isOutOfStock && (
           <Image
             src={secondImageUrl}
-            alt={`${product.name} alternate angle`}
+            alt={`${product.name} alternate view`}
             fill
-            className="object-contain p-4 sm:p-6 transition-all duration-500 ease-out opacity-0 group-hover:opacity-100 group-hover:scale-105 drop-shadow-sm"
+            className="object-contain p-3 sm:p-5 transition-all duration-500 ease-out opacity-0 group-hover:opacity-100 group-hover:scale-105 drop-shadow-[0_10px_20px_rgba(0,0,0,0.08)]"
             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
           />
         )}
 
-        {/* Badges / Out of Stock Pill */}
+        {/* Badges / Sold Out Indicator */}
         <div className="absolute top-3 left-3 flex flex-col gap-1 z-10 pointer-events-none">
           {isOutOfStock ? (
             <span className="inline-flex items-center gap-1 rounded-full bg-neutral-950/90 text-white backdrop-blur-md px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider border border-white/15 shadow-sm">
@@ -142,8 +152,8 @@ export function ProductCard({ product, className }: ProductCardProps) {
           onClick={handleWishlist}
           aria-label={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
           className={cn(
-            "absolute top-3 right-3 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 backdrop-blur-sm border border-neutral-200/80 text-neutral-600 transition-all duration-200 hover:scale-110 active:scale-95 shadow-2xs cursor-pointer",
-            isWishlisted && "text-red-500 border-red-200 bg-red-50/90"
+            "absolute top-3 right-3 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 backdrop-blur-sm border border-neutral-200/80 text-neutral-600 transition-all duration-200 hover:scale-110 active:scale-95 shadow-2xs cursor-pointer opacity-0 group-hover:opacity-100 sm:opacity-0",
+            isWishlisted && "opacity-100 text-red-500 border-red-200 bg-red-50/90"
           )}
         >
           <Heart
@@ -151,20 +161,16 @@ export function ProductCard({ product, className }: ProductCardProps) {
           />
         </button>
 
-        {/* Quick Action Overlay (Slide-up button directly on bottom of image) */}
+        {/* Quick Add Overlay on Hover */}
         <div className="absolute bottom-3 inset-x-3 z-10 hidden sm:block pointer-events-none">
-          {isOutOfStock ? (
-            <div className="w-full flex items-center justify-center py-2 px-3 rounded-xl text-[11px] font-semibold uppercase tracking-wider bg-neutral-200/90 text-neutral-600 backdrop-blur-sm shadow-xs pointer-events-auto">
-              Out of Stock
-            </div>
-          ) : (
+          {!isOutOfStock && (
             <button
               onClick={handleAddToCart}
               className={cn(
                 "w-full flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl text-xs font-semibold uppercase tracking-wider transition-all duration-200 pointer-events-auto cursor-pointer shadow-md",
                 "opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0",
                 isAdded
-                  ? "bg-neutral-950 text-[#DFCA9B] border border-neutral-900"
+                  ? "bg-neutral-950 text-[#DFCA9B] border border-neutral-900 ring-2 ring-[#C5A869]/40"
                   : "bg-neutral-950 text-white hover:bg-neutral-800 active:scale-[0.98]"
               )}
             >
@@ -184,49 +190,18 @@ export function ProductCard({ product, className }: ProductCardProps) {
         </div>
       </Link>
 
-      {/* ═══ Details Directly on Canvas ═══ */}
-      <div className="flex flex-1 flex-col pt-3">
-        <div className="flex items-center justify-between gap-1 text-[11px] font-bold text-neutral-400">
-          <span className="uppercase tracking-widest truncate">{product.modelName}</span>
-          {product.categoryName && (
-            <span className="text-[10px] text-neutral-400 shrink-0 font-medium uppercase tracking-wider whitespace-nowrap">
-              {product.categoryName}
-            </span>
-          )}
-        </div>
-
+      {/* ═══ Editorial Typography: Title & Price ═══ */}
+      <div className="flex flex-1 flex-col pt-3 space-y-0.5">
         <Link
           href={`/shop/${modelSlug}/${product.slug}`}
-          className="mt-1 font-medium text-sm text-neutral-950 line-clamp-1 hover:text-neutral-600 transition-colors"
+          className="font-display text-sm sm:text-base text-neutral-800 font-normal leading-snug truncate hover:text-neutral-950 transition-colors"
         >
-          {product.name}
+          {formattedTitle}
         </Link>
 
-        <div className="mt-1.5 flex items-center justify-between gap-2">
-          <div className="min-w-0">
-            <Price price={product.price} comparePrice={product.comparePrice} size="sm" showBadge={false} />
-          </div>
-
-          {/* Mobile Quick Add / Out of Stock Indicator */}
-          {isOutOfStock ? (
-            <span className="sm:hidden flex h-6 items-center justify-center px-2 rounded-lg text-[9px] font-bold uppercase tracking-wider text-neutral-500 bg-neutral-100 border border-neutral-200 whitespace-nowrap shrink-0">
-              Sold Out
-            </span>
-          ) : (
-            <button
-              onClick={handleAddToCart}
-              aria-label="Add to bag"
-              className={cn(
-                "sm:hidden flex h-7 items-center justify-center gap-1 px-2.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all cursor-pointer whitespace-nowrap shrink-0",
-                isAdded
-                  ? "bg-neutral-950 text-white"
-                  : "bg-neutral-950 text-white active:scale-95"
-              )}
-            >
-              {isAdded ? <Check className="h-3 w-3 text-[#DFCA9B]" /> : "+ Bag"}
-            </button>
-          )}
-        </div>
+        <p className="text-xs sm:text-sm font-normal text-neutral-500">
+          {formattedPrice}
+        </p>
       </div>
     </div>
   );
