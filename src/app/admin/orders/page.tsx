@@ -419,18 +419,27 @@ export default function AdminOrdersPage() {
                           </select>
                         </td>
                         <td className="px-5 py-3.5 text-right">
-                          <div className="inline-flex items-center gap-2">
+                          <div className="inline-flex items-center gap-1.5">
                             <a
                               href={`https://wa.me/${order.phone.replace(/[^0-9]/g, "")}?text=${encodeURIComponent(
-                                `Hello ${order.customer}, this is CASELÉ Atelier Qatar regarding your order #${order.id}.`
+                                `Hello ${order.customer}, your CASELÉ delivery status is now [${order.status.toUpperCase()}]. Track live delivery here: https://casele.vercel.app/track?id=${order.id}`
                               )}`}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="p-1.5 rounded-lg border border-neutral-200 bg-white text-emerald-700 hover:border-emerald-300 hover:bg-emerald-50 transition-colors shadow-2xs"
-                              title="Open WhatsApp Chat with Client"
+                              className="inline-flex items-center gap-1 px-2 py-1 rounded-lg border border-emerald-200 bg-emerald-50 text-[11px] font-bold uppercase tracking-wider text-emerald-700 hover:bg-emerald-100 transition-colors shadow-2xs"
+                              title="Send live tracking link to client on WhatsApp"
                             >
-                              <MessageSquare className="h-3.5 w-3.5" />
+                              <MessageSquare className="h-3 w-3" />
+                              <span>WhatsApp</span>
                             </a>
+                            <Link
+                              href={`/track?id=${order.id}`}
+                              target="_blank"
+                              className="p-1.5 rounded-lg border border-neutral-200 bg-white text-neutral-600 hover:text-neutral-950 hover:border-neutral-300 transition-colors shadow-2xs"
+                              title="View Public Tracking Page"
+                            >
+                              <ExternalLink className="h-3.5 w-3.5" />
+                            </Link>
                           </div>
                         </td>
                       </tr>
