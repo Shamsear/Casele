@@ -49,13 +49,31 @@ export function StickyAddToCart({
   const isOutOfStock = stock !== undefined && stock <= 0;
 
   useEffect(() => {
-    const handleScroll = () => {
-      // Trigger after user scrolls past the main hero/gallery section
-      setVisible(window.scrollY > 350);
-    };
-    window.addEventListener("scroll", handleScroll, { passive: true });
     getWhatsAppNumber().then(setWhatsappNumber);
-    return () => window.removeEventListener("scroll", handleScroll);
+
+    const target = document.getElementById("main-add-to-cart-btn");
+    if (!target) {
+      const handleScroll = () => {
+        setVisible(window.scrollY > 600);
+      };
+      window.addEventListener("scroll", handleScroll, { passive: true });
+      return () => window.removeEventListener("scroll", handleScroll);
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        // Visible ONLY when the main Add to Bag button has scrolled above the viewport
+        const isAbove = entry.boundingClientRect.top < 0;
+        setVisible(!entry.isIntersecting && isAbove);
+      },
+      {
+        root: null,
+        threshold: 0.1,
+      }
+    );
+
+    observer.observe(target);
+    return () => observer.disconnect();
   }, []);
 
   const handleAdd = (e?: React.MouseEvent) => {

@@ -365,6 +365,7 @@ export function ProductDetailClient({
                   </a>
 
                   <button
+                    id="main-add-to-cart-btn"
                     disabled
                     className="w-full flex items-center justify-center gap-2 rounded-xl border border-neutral-200 bg-neutral-100 py-4 text-xs font-semibold uppercase tracking-widest text-neutral-400 cursor-not-allowed"
                   >
@@ -383,6 +384,7 @@ export function ProductDetailClient({
                   </button>
 
                   <button
+                    id="main-add-to-cart-btn"
                     onClick={handleAddToCart}
                     className={cn(
                       "w-full flex items-center justify-center gap-2 rounded-xl py-4 text-xs font-semibold uppercase tracking-widest transition-all duration-300 active:scale-[0.98] cursor-pointer",
