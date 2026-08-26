@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { getToken } from "next-auth/jwt";
-import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/db/prisma";
 import { clearSettingsCache } from "@/lib/settings";
+import { verifyAdminAuth } from "@/lib/admin-auth";
 
 // ─── GET: Fetch Bundle Discount Configuration ─────────────────
 export async function GET(request: NextRequest) {
@@ -47,18 +45,7 @@ export async function GET(request: NextRequest) {
 // ─── PUT: Update or Toggle Bundle Discount Configuration ───────
 export async function PUT(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
-    const token = await getToken({
-      req: request,
-      secret: process.env.NEXTAUTH_SECRET || "casele-luxury-secure-secret-key-2026-doha",
-    });
-
-    const isAuthorized =
-      Boolean(session?.user) ||
-      Boolean(token) ||
-      (session?.user as any)?.role === "admin" ||
-      token?.role === "admin";
-
+    const isAuthorized = await verifyAdminAuth(request);
     if (!isAuthorized) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }

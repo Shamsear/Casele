@@ -1,13 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/db/prisma";
+import { verifyAdminAuth } from "@/lib/admin-auth";
 
 // ─── GET: Fetch All Flash Sales from Database ──────────────────
 export async function GET(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session || (session.user as any)?.role !== "admin") {
+    const isAuthorized = await verifyAdminAuth(request);
+    if (!isAuthorized) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -44,7 +43,14 @@ export async function GET(request: NextRequest) {
       };
     });
 
-    return NextResponse.json({ sales: formatted });
+    return NextResponse.json(
+      { sales: formatted },
+      {
+        headers: {
+          "Cache-Control": "no-store, no-cache, must-revalidate",
+        },
+      }
+    );
   } catch (error) {
     console.error("Fetch flash sales error:", error);
     return NextResponse.json({ error: "Failed to fetch flash sales" }, { status: 500 });
@@ -54,8 +60,8 @@ export async function GET(request: NextRequest) {
 // ─── POST: Create Date & Time Based Sale in Database ───────────
 export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session || (session.user as any)?.role !== "admin") {
+    const isAuthorized = await verifyAdminAuth(request);
+    if (!isAuthorized) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -87,8 +93,8 @@ export async function POST(request: NextRequest) {
 // ─── PUT: Update or Toggle Deactivate/Activate Status ──────────
 export async function PUT(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session || (session.user as any)?.role !== "admin") {
+    const isAuthorized = await verifyAdminAuth(request);
+    if (!isAuthorized) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -121,8 +127,8 @@ export async function PUT(request: NextRequest) {
 // ─── DELETE: Delete Flash Sale ─────────────────────────────────
 export async function DELETE(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session || (session.user as any)?.role !== "admin") {
+    const isAuthorized = await verifyAdminAuth(request);
+    if (!isAuthorized) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 

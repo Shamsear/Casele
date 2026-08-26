@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { getToken } from "next-auth/jwt";
-import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/db/prisma";
+import { verifyAdminAuth } from "@/lib/admin-auth";
 
 // ─── GET: Fetch all Tiered Discounts from Database ─────────────
 export async function GET(request: NextRequest) {
@@ -68,20 +66,7 @@ export async function GET(request: NextRequest) {
 // ─── POST: Create New Tiered Discount ──────────────────────────
 export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
-    const token = await getToken({
-      req: request as any,
-      secret: process.env.NEXTAUTH_SECRET || "casele-luxury-secure-secret-key-2026-doha",
-    });
-
-    const isAuthorized =
-      Boolean(session?.user) ||
-      Boolean(token) ||
-      (session?.user as any)?.role === "admin" ||
-      token?.role === "admin" ||
-      Boolean(request.cookies.get("next-auth.session-token")?.value) ||
-      Boolean(request.cookies.get("__Secure-next-auth.session-token")?.value);
-
+    const isAuthorized = await verifyAdminAuth(request);
     if (!isAuthorized) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -121,20 +106,7 @@ export async function POST(request: NextRequest) {
 // ─── PUT: Update / Toggle Existing Tiered Discount ─────────────
 export async function PUT(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
-    const token = await getToken({
-      req: request as any,
-      secret: process.env.NEXTAUTH_SECRET || "casele-luxury-secure-secret-key-2026-doha",
-    });
-
-    const isAuthorized =
-      Boolean(session?.user) ||
-      Boolean(token) ||
-      (session?.user as any)?.role === "admin" ||
-      token?.role === "admin" ||
-      Boolean(request.cookies.get("next-auth.session-token")?.value) ||
-      Boolean(request.cookies.get("__Secure-next-auth.session-token")?.value);
-
+    const isAuthorized = await verifyAdminAuth(request);
     if (!isAuthorized) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -163,7 +135,7 @@ export async function PUT(request: NextRequest) {
 
     const { id, minAmount, discountPercent, isActive } = body;
 
-    // 2. Direct ID update (if real database ID)
+    // 2. Direct ID update (if real database UUID)
     if (id && !id.startsWith("default-tier")) {
       try {
         const updated = await prisma.tierDiscount.update({
@@ -243,20 +215,7 @@ export async function PUT(request: NextRequest) {
 // ─── DELETE: Remove Tiered Discount ────────────────────────────
 export async function DELETE(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
-    const token = await getToken({
-      req: request as any,
-      secret: process.env.NEXTAUTH_SECRET || "casele-luxury-secure-secret-key-2026-doha",
-    });
-
-    const isAuthorized =
-      Boolean(session?.user) ||
-      Boolean(token) ||
-      (session?.user as any)?.role === "admin" ||
-      token?.role === "admin" ||
-      Boolean(request.cookies.get("next-auth.session-token")?.value) ||
-      Boolean(request.cookies.get("__Secure-next-auth.session-token")?.value);
-
+    const isAuthorized = await verifyAdminAuth(request);
     if (!isAuthorized) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
