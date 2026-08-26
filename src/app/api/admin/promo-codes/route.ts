@@ -4,12 +4,6 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/db/prisma";
 import { rateLimit, getClientIp, RATE_LIMITS } from "@/lib/rate-limit";
 
-const SAMPLE_PROMOS = [
-  { id: "promo-1", code: "WELCOME10", discountType: "percentage", discountValue: 10, minOrder: 50, maxUses: 100, usedCount: 42, isActive: true },
-  { id: "promo-2", code: "FLAT10QR", discountType: "flat", discountValue: 10, minOrder: 80, maxUses: null, usedCount: 15, isActive: true },
-  { id: "promo-3", code: "WELCOME20", discountType: "percentage", discountValue: 20, minOrder: 100, maxUses: 50, usedCount: 12, isActive: true },
-];
-
 // ─── GET: Fetch all Promo Codes ────────────────────────────────
 export async function GET(request: NextRequest) {
   try {
@@ -19,33 +13,25 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Too many requests" }, { status: 429 });
     }
 
-    try {
-      const promos = await prisma.promoCode.findMany({
-        orderBy: { createdAt: "desc" },
-      });
+    const promos = await prisma.promoCode.findMany({
+      orderBy: { createdAt: "desc" },
+    });
 
-      if (promos.length > 0) {
-        return NextResponse.json({
-          promos: promos.map((p) => ({
-            id: p.id,
-            code: p.code,
-            discountType: p.discountType,
-            discountValue: Number(p.discountValue),
-            minOrder: Number(p.minOrder),
-            maxUses: p.maxUses,
-            usedCount: p.usedCount,
-            isActive: p.isActive,
-          })),
-        });
-      }
-    } catch (e) {
-      console.warn("DB promo codes fetch failed, returning sample:", e);
-    }
-
-    return NextResponse.json({ promos: SAMPLE_PROMOS });
+    return NextResponse.json({
+      promos: promos.map((p) => ({
+        id: p.id,
+        code: p.code,
+        discountType: p.discountType,
+        discountValue: Number(p.discountValue),
+        minOrder: Number(p.minOrder),
+        maxUses: p.maxUses,
+        usedCount: p.usedCount,
+        isActive: p.isActive,
+      })),
+    });
   } catch (error) {
     console.error("Fetch promos error:", error);
-    return NextResponse.json({ error: "Failed to fetch promo codes" }, { status: 500 });
+    return NextResponse.json({ error: "Failed to fetch promo codes", promos: [] }, { status: 500 });
   }
 }
 
@@ -58,7 +44,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { code, discountType, discountValue, minOrder, maxUses, isActive } = body;
+    const { code, discountType, discountValue, minOrder, maxUses, isActive = true } = body;
 
     if (!code || !discountType || discountValue === undefined) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
@@ -73,7 +59,7 @@ export async function POST(request: NextRequest) {
         discountValue: Number(discountValue),
         minOrder: Number(minOrder || 0),
         maxUses: maxUses ? Number(maxUses) : null,
-        isActive: isActive ?? true,
+        isActive: Boolean(isActive),
       },
     });
 
@@ -96,7 +82,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// ─── PUT: Update Promo Code ────────────────────────────────────
+// ─── PUT: Update Promo Code & Toggle Active/Deactive ──────────
 export async function PUT(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
