@@ -1,51 +1,51 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import { useToast } from "@/components/ui/toast";
 import { AdminTableSkeleton } from "@/components/admin/admin-skeletons";
-import { Plus, Trash2, Tag, Percent, Sparkles, Clock, Calendar, Power, PowerOff, AlertCircle } from "lucide-react";
+import {
+  Percent,
+  Plus,
+  Trash2,
+  Tag,
+  Clock,
+  Sparkles,
+  Zap,
+  Power,
+  PowerOff,
+  Inbox
+} from "lucide-react";
 
-interface Tier {
+interface TierDiscount {
   id: string;
   minAmount: number;
   discountPercent: number;
   isActive: boolean;
-  sortOrder?: number;
 }
 
 interface FlashSale {
   id: string;
   name: string;
-  discountType: string;
+  discountType: "percentage" | "flat";
   discountValue: number;
   startsAt: string;
   endsAt: string;
   isActive: boolean;
-  timingStatus: "live" | "upcoming" | "expired" | "deactivated";
+  timingStatus: "upcoming" | "live" | "expired";
 }
 
 export default function AdminDiscountsPage() {
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState<"tiered" | "flash" | "bundle">("tiered");
 
-  // Tiered spend state
-  const [tiers, setTiers] = useState<Tier[]>([]);
+  // Tier discounts state
+  const [tiers, setTiers] = useState<TierDiscount[]>([]);
   const [loadingTiers, setLoadingTiers] = useState(true);
-  const [isAddingTier, setIsAddingTier] = useState(false);
-  const [newMinAmount, setNewMinAmount] = useState("");
-  const [newDiscountPercent, setNewDiscountPercent] = useState("");
-  const [submittingTier, setSubmittingTier] = useState(false);
 
-  // Flash sales (Time & Date based) state
+  // Flash sales state
   const [flashSales, setFlashSales] = useState<FlashSale[]>([]);
   const [loadingFlash, setLoadingFlash] = useState(true);
-  const [isAddingFlash, setIsAddingFlash] = useState(false);
-  const [flashName, setFlashName] = useState("");
-  const [flashType, setFlashType] = useState("percentage");
-  const [flashValue, setFlashValue] = useState("");
-  const [flashStartsAt, setFlashStartsAt] = useState("");
-  const [flashEndsAt, setFlashEndsAt] = useState("");
-  const [submittingFlash, setSubmittingFlash] = useState(false);
 
   // Bundle & Threshold settings
   const [bundleBuy2, setBundleBuy2] = useState("5");
@@ -112,41 +112,7 @@ export default function AdminDiscountsPage() {
   };
 
   // ─── Tiers Actions ─────────────────────────────────────────────
-  const handleCreateTier = async () => {
-    if (!newMinAmount || !newDiscountPercent) {
-      toast("Please enter spend amount and discount percentage", "error");
-      return;
-    }
-
-    try {
-      setSubmittingTier(true);
-      const res = await fetch("/api/admin/discounts/tiered", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          minAmount: Number(newMinAmount),
-          discountPercent: Number(newDiscountPercent),
-          isActive: true,
-        }),
-      });
-
-      if (res.ok) {
-        toast("Tiered discount created successfully", "success");
-        setNewMinAmount("");
-        setNewDiscountPercent("");
-        setIsAddingTier(false);
-        fetchTiers();
-      } else {
-        toast("Failed to create tier", "error");
-      }
-    } catch {
-      toast("Failed to create tier", "error");
-    } finally {
-      setSubmittingTier(false);
-    }
-  };
-
-  const handleToggleTier = async (tier: Tier) => {
+  const handleToggleTier = async (tier: TierDiscount) => {
     try {
       const res = await fetch("/api/admin/discounts/tiered", {
         method: "PUT",
@@ -158,75 +124,33 @@ export default function AdminDiscountsPage() {
       });
 
       if (res.ok) {
-        toast(`Tier ${!tier.isActive ? "activated" : "deactivated"}`, "success");
+        toast(`Tier status updated to ${!tier.isActive ? "ACTIVE" : "DEACTIVATED"}`, "success");
         setTiers((prev) =>
           prev.map((t) => (t.id === tier.id ? { ...t, isActive: !t.isActive } : t))
         );
       }
     } catch {
-      toast("Failed to update tier", "error");
+      toast("Failed to update tier status", "error");
     }
   };
 
   const handleDeleteTier = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this discount tier?")) return;
-
+    if (!confirm("Are you sure you want to delete this spend tier?")) return;
     try {
       const res = await fetch(`/api/admin/discounts/tiered?id=${id}`, {
         method: "DELETE",
       });
 
       if (res.ok) {
-        toast("Tier deleted", "success");
+        toast("Spend tier deleted", "success");
         setTiers((prev) => prev.filter((t) => t.id !== id));
-      } else {
-        toast("Failed to delete tier", "error");
       }
     } catch {
       toast("Failed to delete tier", "error");
     }
   };
 
-  // ─── Flash Sales (Time/Date based) Actions ────────────────────
-  const handleCreateFlashSale = async () => {
-    if (!flashName.trim() || !flashValue || !flashStartsAt || !flashEndsAt) {
-      toast("Please provide sale name, discount value, and start/end dates", "error");
-      return;
-    }
-
-    try {
-      setSubmittingFlash(true);
-      const res = await fetch("/api/admin/flash-sales", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: flashName.trim(),
-          discountType: flashType,
-          discountValue: Number(flashValue),
-          startsAt: new Date(flashStartsAt).toISOString(),
-          endsAt: new Date(flashEndsAt).toISOString(),
-          isActive: true,
-        }),
-      });
-
-      if (res.ok) {
-        toast("Flash sale created in database", "success");
-        setFlashName("");
-        setFlashValue("");
-        setFlashStartsAt("");
-        setFlashEndsAt("");
-        setIsAddingFlash(false);
-        fetchFlashSales();
-      } else {
-        toast("Failed to create flash sale", "error");
-      }
-    } catch {
-      toast("Failed to create flash sale", "error");
-    } finally {
-      setSubmittingFlash(false);
-    }
-  };
-
+  // ─── Flash Sales Actions ──────────────────────────────────────
   const handleToggleFlashSale = async (sale: FlashSale) => {
     try {
       const nextActive = !sale.isActive;
@@ -240,10 +164,13 @@ export default function AdminDiscountsPage() {
       });
 
       if (res.ok) {
-        toast(`Flash sale ${nextActive ? "activated" : "deactivated and hidden from store"}`, "success");
-        fetchFlashSales();
-      } else {
-        toast("Failed to update flash sale status", "error");
+        toast(
+          `Flash sale is now ${nextActive ? "ACTIVE" : "DEACTIVATED"}`,
+          nextActive ? "success" : "info"
+        );
+        setFlashSales((prev) =>
+          prev.map((s) => (s.id === sale.id ? { ...s, isActive: nextActive } : s))
+        );
       }
     } catch {
       toast("Failed to update flash sale status", "error");
@@ -251,8 +178,7 @@ export default function AdminDiscountsPage() {
   };
 
   const handleDeleteFlashSale = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this flash sale from database?")) return;
-
+    if (!confirm("Are you sure you want to delete this flash sale?")) return;
     try {
       const res = await fetch(`/api/admin/flash-sales?id=${id}`, {
         method: "DELETE",
@@ -261,8 +187,6 @@ export default function AdminDiscountsPage() {
       if (res.ok) {
         toast("Flash sale deleted", "success");
         setFlashSales((prev) => prev.filter((s) => s.id !== id));
-      } else {
-        toast("Failed to delete flash sale", "error");
       }
     } catch {
       toast("Failed to delete flash sale", "error");
@@ -367,68 +291,32 @@ export default function AdminDiscountsPage() {
                 Automatic percentage savings triggered when cart subtotal reaches target amount
               </p>
             </div>
-            {!isAddingTier && (
-              <button
-                onClick={() => setIsAddingTier(true)}
-                className="inline-flex items-center gap-1.5 rounded-xl bg-neutral-950 px-3.5 py-2 text-xs font-bold uppercase tracking-wider text-white shadow-xs hover:bg-neutral-800 transition-all cursor-pointer self-start sm:self-auto"
-              >
-                <Plus className="w-3.5 h-3.5" />
-                <span>Add Spend Tier</span>
-              </button>
-            )}
+            <Link
+              href="/admin/discounts/tiered/new"
+              className="inline-flex items-center gap-1.5 rounded-xl bg-neutral-950 px-3.5 py-2 text-xs font-bold uppercase tracking-wider text-white shadow-xs hover:bg-neutral-800 transition-all cursor-pointer self-start sm:self-auto"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              <span>Add Spend Tier</span>
+            </Link>
           </div>
-
-          {/* Add New Tier Form */}
-          {isAddingTier && (
-            <div className="rounded-xl border border-neutral-200 bg-neutral-50/70 p-5 space-y-4 animate-scale-in shadow-2xs">
-              <h4 className="text-xs font-bold uppercase tracking-wider text-neutral-950">Create New Spend Tier</h4>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-1">
-                  <label className="text-[11px] font-bold uppercase tracking-wider text-neutral-700">Minimum Cart Spend (QR)</label>
-                  <input
-                    type="number"
-                    placeholder="e.g. 150"
-                    value={newMinAmount}
-                    onChange={(e) => setNewMinAmount(e.target.value)}
-                    className="w-full rounded-xl border border-neutral-200 bg-white py-2.5 px-3 text-xs text-neutral-950 placeholder:text-neutral-400 focus:border-neutral-950 focus:outline-none shadow-2xs"
-                  />
-                </div>
-                <div className="space-y-1">
-                  <label className="text-[11px] font-bold uppercase tracking-wider text-neutral-700">Discount Percentage (%)</label>
-                  <input
-                    type="number"
-                    placeholder="e.g. 10"
-                    value={newDiscountPercent}
-                    onChange={(e) => setNewDiscountPercent(e.target.value)}
-                    className="w-full rounded-xl border border-neutral-200 bg-white py-2.5 px-3 text-xs text-neutral-950 placeholder:text-neutral-400 focus:border-neutral-950 focus:outline-none shadow-2xs"
-                  />
-                </div>
-              </div>
-              <div className="flex gap-2 justify-end pt-2">
-                <button
-                  type="button"
-                  onClick={() => setIsAddingTier(false)}
-                  className="rounded-xl border border-neutral-200 bg-white px-3.5 py-1.5 text-xs font-semibold text-neutral-700 hover:bg-neutral-50 transition-colors cursor-pointer"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="button"
-                  onClick={handleCreateTier}
-                  disabled={submittingTier}
-                  className="rounded-xl bg-neutral-950 px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-white hover:bg-neutral-800 transition-all cursor-pointer shadow-xs disabled:opacity-50"
-                >
-                  {submittingTier ? "Saving..." : "Save Tier Rule"}
-                </button>
-              </div>
-            </div>
-          )}
 
           {/* Tiers List */}
           {loadingTiers ? (
             <AdminTableSkeleton rows={3} cols={3} />
           ) : tiers.length === 0 ? (
-            <div className="py-8 text-center text-neutral-400 text-xs">No spend tiers created in database yet.</div>
+            <div className="py-12 text-center text-neutral-400 text-xs">
+              <div className="space-y-3">
+                <Inbox className="h-8 w-8 text-neutral-300 mx-auto" />
+                <p className="text-xs text-neutral-500 font-medium">No spend tiers created in database yet.</p>
+                <Link
+                  href="/admin/discounts/tiered/new"
+                  className="inline-flex items-center gap-1.5 rounded-xl bg-neutral-950 px-3.5 py-2 text-xs font-bold uppercase tracking-wider text-white hover:bg-neutral-800 transition-all"
+                >
+                  <Plus className="h-3.5 w-3.5" />
+                  <span>Create First Spend Tier</span>
+                </Link>
+              </div>
+            </div>
           ) : (
             <div className="space-y-2.5">
               {tiers.map((tier) => (
@@ -471,7 +359,7 @@ export default function AdminDiscountsPage() {
         </div>
       )}
 
-      {/* ═══ TAB 2: TIME & DATE BASED FLASH SALES (WITH INSTANT DEACTIVATE) ═══ */}
+      {/* ═══ TAB 2: TIME & DATE BASED FLASH SALES ═══ */}
       {activeTab === "flash" && (
         <div className="rounded-2xl border border-neutral-200/80 bg-white p-6 shadow-2xs space-y-6">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-neutral-100 pb-4">
@@ -481,99 +369,32 @@ export default function AdminDiscountsPage() {
                 Create countdown sales with specific start & end dates/times, or deactivate instantly with 1 click
               </p>
             </div>
-            {!isAddingFlash && (
-              <button
-                onClick={() => setIsAddingFlash(true)}
-                className="inline-flex items-center gap-1.5 rounded-xl bg-neutral-950 px-3.5 py-2 text-xs font-bold uppercase tracking-wider text-white shadow-xs hover:bg-neutral-800 transition-all cursor-pointer self-start sm:self-auto"
-              >
-                <Plus className="w-3.5 h-3.5" />
-                <span>Create Time-Based Sale</span>
-              </button>
-            )}
+            <Link
+              href="/admin/discounts/flash-sales/new"
+              className="inline-flex items-center gap-1.5 rounded-xl bg-neutral-950 px-3.5 py-2 text-xs font-bold uppercase tracking-wider text-white shadow-xs hover:bg-neutral-800 transition-all cursor-pointer self-start sm:self-auto"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              <span>Schedule Flash Sale</span>
+            </Link>
           </div>
-
-          {/* Add Flash Sale Form */}
-          {isAddingFlash && (
-            <div className="rounded-xl border border-neutral-200 bg-neutral-50/70 p-5 space-y-4 animate-scale-in shadow-2xs">
-              <h4 className="text-xs font-bold uppercase tracking-wider text-neutral-950">Schedule New Flash Deal</h4>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                <div className="space-y-1">
-                  <label className="text-[11px] font-bold uppercase tracking-wider text-neutral-700">Sale Title</label>
-                  <input
-                    type="text"
-                    placeholder="e.g. Doha Weekend Flash"
-                    value={flashName}
-                    onChange={(e) => setFlashName(e.target.value)}
-                    className="w-full rounded-xl border border-neutral-200 bg-white py-2 px-3 text-xs text-neutral-950 placeholder:text-neutral-400 focus:border-neutral-950 focus:outline-none shadow-2xs"
-                  />
-                </div>
-                <div className="space-y-1">
-                  <label className="text-[11px] font-bold uppercase tracking-wider text-neutral-700">Discount Type</label>
-                  <select
-                    value={flashType}
-                    onChange={(e) => setFlashType(e.target.value)}
-                    className="w-full h-9 px-3 rounded-xl border border-neutral-200 bg-white text-neutral-950 text-xs font-semibold focus:outline-none focus:border-neutral-950 shadow-2xs"
-                  >
-                    <option value="percentage">Percentage (%) Off</option>
-                    <option value="flat">Fixed Flat Amount (QR) Off</option>
-                  </select>
-                </div>
-                <div className="space-y-1">
-                  <label className="text-[11px] font-bold uppercase tracking-wider text-neutral-700">
-                    {flashType === "percentage" ? "Discount (%)" : "Discount Amount (QR)"}
-                  </label>
-                  <input
-                    type="number"
-                    placeholder={flashType === "percentage" ? "e.g. 20" : "e.g. 25"}
-                    value={flashValue}
-                    onChange={(e) => setFlashValue(e.target.value)}
-                    className="w-full rounded-xl border border-neutral-200 bg-white py-2 px-3 text-xs text-neutral-950 placeholder:text-neutral-400 focus:border-neutral-950 focus:outline-none shadow-2xs"
-                  />
-                </div>
-                <div className="space-y-1">
-                  <label className="text-[11px] font-bold uppercase tracking-wider text-neutral-700">Start Date & Time</label>
-                  <input
-                    type="datetime-local"
-                    value={flashStartsAt}
-                    onChange={(e) => setFlashStartsAt(e.target.value)}
-                    className="w-full rounded-xl border border-neutral-200 bg-white py-2 px-3 text-xs text-neutral-950 focus:border-neutral-950 focus:outline-none shadow-2xs"
-                  />
-                </div>
-                <div className="space-y-1">
-                  <label className="text-[11px] font-bold uppercase tracking-wider text-neutral-700">End Date & Time</label>
-                  <input
-                    type="datetime-local"
-                    value={flashEndsAt}
-                    onChange={(e) => setFlashEndsAt(e.target.value)}
-                    className="w-full rounded-xl border border-neutral-200 bg-white py-2 px-3 text-xs text-neutral-950 focus:border-neutral-950 focus:outline-none shadow-2xs"
-                  />
-                </div>
-              </div>
-              <div className="flex gap-2 justify-end pt-2">
-                <button
-                  type="button"
-                  onClick={() => setIsAddingFlash(false)}
-                  className="rounded-xl border border-neutral-200 bg-white px-3.5 py-1.5 text-xs font-semibold text-neutral-700 hover:bg-neutral-50 transition-colors cursor-pointer"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="button"
-                  onClick={handleCreateFlashSale}
-                  disabled={submittingFlash}
-                  className="rounded-xl bg-neutral-950 px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-white hover:bg-neutral-800 transition-all cursor-pointer shadow-xs disabled:opacity-50"
-                >
-                  {submittingFlash ? "Saving..." : "Save Flash Deal"}
-                </button>
-              </div>
-            </div>
-          )}
 
           {/* Flash Sales List */}
           {loadingFlash ? (
             <AdminTableSkeleton rows={3} cols={4} />
           ) : flashSales.length === 0 ? (
-            <div className="py-8 text-center text-neutral-400 text-xs">No scheduled flash sales in database.</div>
+            <div className="py-12 text-center text-neutral-400 text-xs">
+              <div className="space-y-3">
+                <Inbox className="h-8 w-8 text-neutral-300 mx-auto" />
+                <p className="text-xs text-neutral-500 font-medium">No scheduled flash sales in database.</p>
+                <Link
+                  href="/admin/discounts/flash-sales/new"
+                  className="inline-flex items-center gap-1.5 rounded-xl bg-neutral-950 px-3.5 py-2 text-xs font-bold uppercase tracking-wider text-white hover:bg-neutral-800 transition-all"
+                >
+                  <Plus className="h-3.5 w-3.5" />
+                  <span>Schedule First Flash Sale</span>
+                </Link>
+              </div>
+            </div>
           ) : (
             <div className="space-y-3">
               {flashSales.map((sale) => {
@@ -668,7 +489,7 @@ export default function AdminDiscountsPage() {
           <div className="rounded-2xl border border-neutral-200/80 bg-white p-6 shadow-2xs space-y-4">
             <div className="flex items-center justify-between border-b border-neutral-100 pb-3">
               <div>
-                <h3 className="text-base font-bold text-neutral-950">Multi-Case Bundle Discounts</h3>
+                <h3 className="text-base font-bold text-neutral-950">Multi-Case Bundle Volume Discounts</h3>
                 <p className="text-xs text-neutral-500">
                   Automatic percentage savings calculated when shoppers buy 2 or 3+ cases in a single order
                 </p>

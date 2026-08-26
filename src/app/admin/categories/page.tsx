@@ -1,9 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import { useToast } from "@/components/ui/toast";
 import { AdminGridSkeleton } from "@/components/admin/admin-skeletons";
-import { Plus, Trash2, Edit2, Layers, Tag, Percent } from "lucide-react";
+import { Plus, Trash2, Edit2, Layers, Percent } from "lucide-react";
 
 interface Category {
   id: string;
@@ -19,15 +20,6 @@ export default function AdminCategoriesPage() {
   const { toast } = useToast();
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
-
-  // Modal / form state
-  const [isAdding, setIsAdding] = useState(false);
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [name, setName] = useState("");
-  const [slug, setSlug] = useState("");
-  const [description, setDescription] = useState("");
-  const [salePercent, setSalePercent] = useState("");
-  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     fetchCategories();
@@ -48,71 +40,8 @@ export default function AdminCategoriesPage() {
     }
   };
 
-  const handleNameChange = (val: string) => {
-    setName(val);
-    if (!editingId) {
-      setSlug(val.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, ""));
-    }
-  };
-
-  const handleSaveCategory = async () => {
-    if (!name.trim() || !slug.trim()) {
-      toast("Category Name and Slug are required", "error");
-      return;
-    }
-
-    try {
-      setSubmitting(true);
-      const url = "/api/admin/categories";
-      const method = editingId ? "PUT" : "POST";
-      const body = {
-        ...(editingId && { id: editingId }),
-        name: name.trim(),
-        slug: slug.trim(),
-        description: description.trim() || null,
-        salePercent: salePercent ? Number(salePercent) : null,
-      };
-
-      const res = await fetch(url, {
-        method,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-      });
-
-      if (res.ok) {
-        toast(`Category ${editingId ? "updated" : "created"} successfully`, "success");
-        resetForm();
-        fetchCategories();
-      } else {
-        toast("Failed to save category", "error");
-      }
-    } catch {
-      toast("Failed to save category", "error");
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  const startEdit = (cat: Category) => {
-    setEditingId(cat.id);
-    setName(cat.name);
-    setSlug(cat.slug);
-    setDescription(cat.description || "");
-    setSalePercent(cat.salePercent ? String(cat.salePercent) : "");
-    setIsAdding(true);
-  };
-
-  const resetForm = () => {
-    setIsAdding(false);
-    setEditingId(null);
-    setName("");
-    setSlug("");
-    setDescription("");
-    setSalePercent("");
-  };
-
-  const handleDeleteCategory = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this category?")) return;
+  const handleDeleteCategory = async (id: string, name: string) => {
+    if (!confirm(`Are you sure you want to delete collection "${name}"?`)) return;
 
     try {
       const res = await fetch(`/api/admin/categories?id=${id}`, {
@@ -120,7 +49,7 @@ export default function AdminCategoriesPage() {
       });
 
       if (res.ok) {
-        toast("Category deleted", "success");
+        toast(`Collection ${name} deleted`, "success");
         setCategories((prev) => prev.filter((c) => c.id !== id));
       } else {
         toast("Failed to delete category", "error");
@@ -131,7 +60,7 @@ export default function AdminCategoriesPage() {
   };
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className="space-y-6 animate-fade-in pb-12">
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
@@ -142,87 +71,14 @@ export default function AdminCategoriesPage() {
             Manage case collections, category-wide sales, and descriptions
           </p>
         </div>
-        {!isAdding && (
-          <button
-            onClick={() => setIsAdding(true)}
-            className="inline-flex items-center gap-1.5 rounded-xl bg-neutral-950 px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-white shadow-xs hover:bg-neutral-800 active:scale-95 transition-all self-start sm:self-auto cursor-pointer"
-          >
-            <Plus className="w-4 h-4" />
-            <span>Add Collection</span>
-          </button>
-        )}
+        <Link
+          href="/admin/categories/new"
+          className="inline-flex items-center gap-1.5 rounded-xl bg-neutral-950 px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-white shadow-xs hover:bg-neutral-800 active:scale-95 transition-all self-start sm:self-auto cursor-pointer"
+        >
+          <Plus className="w-4 h-4" />
+          <span>Add Collection</span>
+        </Link>
       </div>
-
-      {/* Add / Edit Category Form */}
-      {isAdding && (
-        <div className="rounded-2xl border border-neutral-200 bg-white p-6 space-y-4 shadow-2xs animate-scale-in">
-          <div className="flex items-center gap-2 border-b border-neutral-100 pb-3">
-            <Layers className="w-4 h-4 text-[#A88B4D]" />
-            <h3 className="text-sm font-bold text-neutral-950 uppercase tracking-wider">
-              {editingId ? "Edit Collection" : "Create New Collection"}
-            </h3>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
-            <div className="space-y-1">
-              <label className="text-[11px] font-bold uppercase tracking-wider text-neutral-700">Collection Name</label>
-              <input
-                type="text"
-                placeholder="e.g. Titanium Atelier"
-                value={name}
-                onChange={(e) => handleNameChange(e.target.value)}
-                className="w-full rounded-xl border border-neutral-200 bg-white py-2.5 px-3 text-xs text-neutral-950 placeholder:text-neutral-400 focus:border-neutral-950 focus:outline-none shadow-2xs"
-              />
-            </div>
-            <div className="space-y-1">
-              <label className="text-[11px] font-bold uppercase tracking-wider text-neutral-700">URL Slug</label>
-              <input
-                type="text"
-                placeholder="e.g. titanium-atelier"
-                value={slug}
-                onChange={(e) => setSlug(e.target.value)}
-                className="w-full rounded-xl border border-neutral-200 bg-white py-2.5 px-3 text-xs font-mono text-neutral-950 placeholder:text-neutral-400 focus:border-neutral-950 focus:outline-none shadow-2xs"
-              />
-            </div>
-            <div className="space-y-1">
-              <label className="text-[11px] font-bold uppercase tracking-wider text-neutral-700">Description</label>
-              <input
-                type="text"
-                placeholder="Brief editorial headline..."
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                className="w-full rounded-xl border border-neutral-200 bg-white py-2.5 px-3 text-xs text-neutral-950 placeholder:text-neutral-400 focus:border-neutral-950 focus:outline-none shadow-2xs"
-              />
-            </div>
-            <div className="space-y-1">
-              <label className="text-[11px] font-bold uppercase tracking-wider text-neutral-700">Collection-Wide Sale (%)</label>
-              <input
-                type="number"
-                placeholder="e.g. 15 for 15% off all cases in this collection"
-                value={salePercent}
-                onChange={(e) => setSalePercent(e.target.value)}
-                className="w-full rounded-xl border border-neutral-200 bg-white py-2.5 px-3 text-xs text-neutral-950 placeholder:text-neutral-400 focus:border-neutral-950 focus:outline-none shadow-2xs"
-              />
-            </div>
-          </div>
-          <div className="flex gap-2 justify-end pt-3">
-            <button
-              type="button"
-              onClick={resetForm}
-              className="rounded-xl border border-neutral-200 bg-white px-3.5 py-1.5 text-xs font-semibold text-neutral-700 hover:bg-neutral-50 transition-colors cursor-pointer"
-            >
-              Cancel
-            </button>
-            <button
-              type="button"
-              onClick={handleSaveCategory}
-              disabled={submitting}
-              className="rounded-xl bg-neutral-950 px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-white hover:bg-neutral-800 transition-all cursor-pointer shadow-xs disabled:opacity-50"
-            >
-              {editingId ? "Update Collection" : "Save Collection"}
-            </button>
-          </div>
-        </div>
-      )}
 
       {/* Categories Cards Grid or Shimmer Skeleton */}
       {loading ? (
@@ -234,6 +90,13 @@ export default function AdminCategoriesPage() {
           <p className="text-xs text-neutral-500 max-w-sm mx-auto">
             Organize your luxury phone cases into curated collections.
           </p>
+          <Link
+            href="/admin/categories/new"
+            className="inline-flex items-center gap-1.5 rounded-xl bg-neutral-950 px-4 py-2 text-xs font-bold uppercase tracking-wider text-white hover:bg-neutral-800 transition-all"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Create First Collection</span>
+          </Link>
         </div>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -263,15 +126,15 @@ export default function AdminCategoriesPage() {
               </div>
 
               <div className="mt-5 pt-3 border-t border-neutral-100 flex items-center justify-between">
-                <button
-                  onClick={() => startEdit(cat)}
-                  className="inline-flex items-center gap-1 text-xs font-bold text-neutral-800 hover:text-neutral-950 transition-colors cursor-pointer"
+                <Link
+                  href={`/admin/categories/${cat.id}`}
+                  className="inline-flex items-center gap-1 text-xs font-bold text-neutral-800 hover:text-neutral-950 transition-colors"
                 >
                   <Edit2 className="w-3.5 h-3.5" />
                   <span>Edit Collection</span>
-                </button>
+                </Link>
                 <button
-                  onClick={() => handleDeleteCategory(cat.id)}
+                  onClick={() => handleDeleteCategory(cat.id, cat.name)}
                   className="p-1.5 text-neutral-400 hover:text-rose-600 transition-colors cursor-pointer"
                   title="Delete Category"
                   aria-label="Delete Category"
