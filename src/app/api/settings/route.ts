@@ -16,7 +16,14 @@ export async function GET(request: NextRequest) {
       settingsObj[s.key] = s.value;
     });
 
-    return NextResponse.json({ settings: settingsObj });
+    return NextResponse.json(
+      { settings: settingsObj },
+      {
+        headers: {
+          "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+        },
+      }
+    );
   } catch (error) {
     console.error("Fetch settings error:", error);
     return NextResponse.json(
@@ -79,7 +86,14 @@ export async function PUT(request: NextRequest) {
     // Invalidate memory cache so updates take effect immediately everywhere
     clearSettingsCache();
 
-    return NextResponse.json({ success: true, updatedKeys: Object.keys(settings) });
+    return NextResponse.json(
+      { success: true, updatedKeys: Object.keys(settings) },
+      {
+        headers: {
+          "Cache-Control": "no-store, no-cache, must-revalidate",
+        },
+      }
+    );
   } catch (error) {
     console.error("Update settings error:", error);
     return NextResponse.json(
