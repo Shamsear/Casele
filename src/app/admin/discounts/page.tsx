@@ -126,6 +126,9 @@ export default function AdminDiscountsPage() {
 
   const handleToggleTierMaster = async () => {
     const nextActive = !isAnyTierActive;
+    // 1. Optimistic UI update immediately
+    setTiers((prev) => prev.map((t) => ({ ...t, isActive: nextActive })));
+
     try {
       const res = await fetch("/api/admin/discounts/tiered", {
         method: "PUT",
@@ -135,42 +138,60 @@ export default function AdminDiscountsPage() {
           isActive: nextActive,
         }),
       });
+
       if (res.ok) {
         toast(
           `All spend tiers are now ${nextActive ? "ACTIVE" : "DISABLED"} in database`,
           nextActive ? "success" : "info"
         );
-        setTiers((prev) => prev.map((t) => ({ ...t, isActive: nextActive })));
       } else {
-        toast("Failed to update tier status", "error");
+        const err = await res.json().catch(() => ({}));
+        toast(err.error || "Failed to update tier status", "error");
+        // Revert on failure
+        setTiers((prev) => prev.map((t) => ({ ...t, isActive: !nextActive })));
       }
     } catch {
       toast("Failed to update tier status", "error");
+      setTiers((prev) => prev.map((t) => ({ ...t, isActive: !nextActive })));
     }
   };
 
   const handleToggleTier = async (tier: TierDiscount) => {
+    const nextActive = !tier.isActive;
+    // 1. Optimistic UI update immediately
+    setTiers((prev) =>
+      prev.map((t) => (t.id === tier.id ? { ...t, isActive: nextActive } : t))
+    );
+
     try {
-      const nextActive = !tier.isActive;
       const res = await fetch("/api/admin/discounts/tiered", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           id: tier.id,
+          minAmount: tier.minAmount,
           isActive: nextActive,
         }),
       });
 
       if (res.ok) {
-        toast(`Spend Tier (QR ${tier.minAmount}+) is now ${nextActive ? "ACTIVE" : "DISABLED"} in database`, nextActive ? "success" : "info");
-        setTiers((prev) =>
-          prev.map((t) => (t.id === tier.id ? { ...t, isActive: nextActive } : t))
+        toast(
+          `Spend Tier (QR ${tier.minAmount}+) is now ${nextActive ? "ACTIVE" : "DISABLED"} in database`,
+          nextActive ? "success" : "info"
         );
       } else {
-        toast("Failed to update tier status", "error");
+        const err = await res.json().catch(() => ({}));
+        toast(err.error || "Failed to update tier status", "error");
+        // Revert on failure
+        setTiers((prev) =>
+          prev.map((t) => (t.id === tier.id ? { ...t, isActive: !nextActive } : t))
+        );
       }
     } catch {
       toast("Failed to update tier status", "error");
+      setTiers((prev) =>
+        prev.map((t) => (t.id === tier.id ? { ...t, isActive: !nextActive } : t))
+      );
     }
   };
 
