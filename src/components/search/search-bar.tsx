@@ -10,8 +10,18 @@ import { Search, Smartphone, X, ArrowRight, Sparkles } from "lucide-react";
 export function SearchBar() {
   const [query, setQuery] = useState("");
   const [focused, setFocused] = useState(false);
+  const [shortcutKey, setShortcutKey] = useState("Ctrl K");
   const wrapperRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // Detect platform for shortcut key (⌘K on Mac, Ctrl K on Windows/Linux)
+  useEffect(() => {
+    if (typeof window !== "undefined" && /(Mac|iPhone|iPod|iPad)/i.test(navigator.platform || navigator.userAgent)) {
+      setShortcutKey("⌘K");
+    } else {
+      setShortcutKey("Ctrl K");
+    }
+  }, []);
 
   // Close dropdown on outside click
   useEffect(() => {
@@ -100,7 +110,7 @@ export function SearchBar() {
           </button>
         ) : (
           <kbd className="hidden sm:inline-flex items-center gap-0.5 rounded border border-neutral-200 bg-white px-1.5 py-0.5 text-[9px] font-semibold text-neutral-400 font-mono shadow-2xs">
-            ⌘K
+            {shortcutKey}
           </kbd>
         )}
       </div>
