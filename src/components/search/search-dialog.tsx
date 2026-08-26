@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -13,6 +13,25 @@ export function SearchDialog() {
   const { isOpen, query, setOpen, setQuery } = useSearchStore();
   const inputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
+  const [liveProducts, setLiveProducts] = useState(PRODUCTS);
+  const [liveModels, setLiveModels] = useState(MODELS);
+
+  // Fetch live products & models on mount
+  useEffect(() => {
+    fetch("/api/products")
+      .then((res) => res.json())
+      .then((data) => {
+        if (Array.isArray(data) && data.length > 0) setLiveProducts(data);
+      })
+      .catch(() => {});
+
+    fetch("/api/models")
+      .then((res) => res.json())
+      .then((data) => {
+        if (Array.isArray(data) && data.length > 0) setLiveModels(data);
+      })
+      .catch(() => {});
+  }, []);
 
   // Keyboard shortcut Cmd/Ctrl + K and Escape
   useEffect(() => {
@@ -49,20 +68,20 @@ export function SearchDialog() {
 
   const filteredProducts =
     query.trim().length > 0
-      ? PRODUCTS.filter(
+      ? liveProducts.filter(
           (p) =>
             p.name.toLowerCase().includes(query.toLowerCase()) ||
-            p.modelName.toLowerCase().includes(query.toLowerCase()) ||
+            p.modelName?.toLowerCase().includes(query.toLowerCase()) ||
             p.description?.toLowerCase().includes(query.toLowerCase())
         ).slice(0, 6)
       : [];
 
   const filteredModels =
     query.trim().length > 0
-      ? MODELS.filter(
+      ? liveModels.filter(
           (m) =>
-            m.name.toLowerCase().includes(query.toLowerCase()) ||
-            m.brand.toLowerCase().includes(query.toLowerCase())
+            m.name?.toLowerCase().includes(query.toLowerCase()) ||
+            m.brand?.toLowerCase().includes(query.toLowerCase())
         ).slice(0, 4)
       : [];
 

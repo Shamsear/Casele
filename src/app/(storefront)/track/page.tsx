@@ -3,6 +3,7 @@
 import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { useI18n } from "@/lib/i18n/context";
+import { getWhatsAppNumber } from "@/lib/settings";
 import {
   Search,
   Package,
@@ -93,7 +94,12 @@ function TrackPageContent() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(false);
   const [searched, setSearched] = useState(false);
+  const [whatsappNumber, setWhatsappNumber] = useState("+97455364455");
   const { formatPrice } = useI18n();
+
+  useEffect(() => {
+    getWhatsAppNumber().then(setWhatsappNumber);
+  }, []);
 
   useEffect(() => {
     const idParam = searchParams.get("id");
@@ -189,7 +195,7 @@ function TrackPageContent() {
               Please double check your phone number or Order ID. If you placed an order via WhatsApp, our concierge is available 24/7.
             </p>
             <a
-              href="https://wa.me/97455000000"
+              href={`https://wa.me/${whatsappNumber.replace(/\D/g, "")}`}
               target="_blank"
               rel="noopener noreferrer"
               className="mt-4 inline-flex items-center gap-1.5 rounded-xl bg-emerald-600 px-4 py-2 text-xs font-bold uppercase tracking-wider text-white hover:bg-emerald-700 transition-colors shadow-xs"
@@ -344,7 +350,7 @@ function TrackPageContent() {
                   {/* WhatsApp Direct Concierge Help */}
                   <div className="pt-2">
                     <a
-                      href={`https://wa.me/97455000000?text=${encodeURIComponent(
+                      href={`https://wa.me/${whatsappNumber.replace(/\D/g, "")}?text=${encodeURIComponent(
                         `Hello CASELÉ Concierge, I am inquiring about my order #${order.id}.`
                       )}`}
                       target="_blank"

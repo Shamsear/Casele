@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { MODELS } from "@/lib/data";
 
 interface ShopFiltersProps {
@@ -14,7 +14,7 @@ export interface FilterState {
   model: string;
 }
 
-const BRANDS = ["All", "iPhone", "Samsung", "Huawei", "OnePlus"];
+const BRANDS = ["All", "iPhone", "Samsung", "Huawei", "OnePlus", "Google"];
 
 const PRICE_RANGES = [
   { label: "All Prices", value: "" },
@@ -41,6 +41,16 @@ export function ShopFilters({ onFilterChange }: ShopFiltersProps) {
   });
 
   const [isExpanded, setIsExpanded] = useState(false);
+  const [liveModels, setLiveModels] = useState(MODELS);
+
+  useEffect(() => {
+    fetch("/api/models")
+      .then((res) => res.json())
+      .then((data) => {
+        if (Array.isArray(data) && data.length > 0) setLiveModels(data);
+      })
+      .catch(() => {});
+  }, []);
 
   const updateFilter = (key: keyof FilterState, value: string) => {
     const newFilters = { ...filters, [key]: value };
@@ -50,8 +60,8 @@ export function ShopFilters({ onFilterChange }: ShopFiltersProps) {
 
   // Get unique models for selected brand
   const availableModels = filters.brand === "All"
-    ? MODELS
-    : MODELS.filter((m) => m.brand === filters.brand);
+    ? liveModels
+    : liveModels.filter((m) => m.brand === filters.brand);
 
   return (
     <div className="space-y-4">

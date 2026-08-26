@@ -11,8 +11,27 @@ export function SearchBar() {
   const [query, setQuery] = useState("");
   const [focused, setFocused] = useState(false);
   const [shortcutKey, setShortcutKey] = useState("Ctrl K");
+  const [liveProducts, setLiveProducts] = useState(PRODUCTS);
+  const [liveModels, setLiveModels] = useState(MODELS);
   const wrapperRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // Fetch live products & models on mount
+  useEffect(() => {
+    fetch("/api/products")
+      .then((res) => res.json())
+      .then((data) => {
+        if (Array.isArray(data) && data.length > 0) setLiveProducts(data);
+      })
+      .catch(() => {});
+
+    fetch("/api/models")
+      .then((res) => res.json())
+      .then((data) => {
+        if (Array.isArray(data) && data.length > 0) setLiveModels(data);
+      })
+      .catch(() => {});
+  }, []);
 
   // Detect platform for shortcut key (⌘K on Mac, Ctrl K on Windows/Linux)
   useEffect(() => {
@@ -62,20 +81,20 @@ export function SearchBar() {
 
   const filteredProducts =
     query.trim().length > 0
-      ? PRODUCTS.filter(
+      ? liveProducts.filter(
           (p) =>
             p.name.toLowerCase().includes(query.toLowerCase()) ||
-            p.modelName.toLowerCase().includes(query.toLowerCase()) ||
+            p.modelName?.toLowerCase().includes(query.toLowerCase()) ||
             p.description?.toLowerCase().includes(query.toLowerCase())
         ).slice(0, 5)
       : [];
 
   const filteredModels =
     query.trim().length > 0
-      ? MODELS.filter(
+      ? liveModels.filter(
           (m) =>
-            m.name.toLowerCase().includes(query.toLowerCase()) ||
-            m.brand.toLowerCase().includes(query.toLowerCase())
+            m.name?.toLowerCase().includes(query.toLowerCase()) ||
+            m.brand?.toLowerCase().includes(query.toLowerCase())
         ).slice(0, 3)
       : [];
 

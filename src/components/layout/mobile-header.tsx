@@ -14,8 +14,27 @@ import { SITE } from "@/lib/seo";
 export function MobileHeader() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [query, setQuery] = useState("");
+  const [liveProducts, setLiveProducts] = useState(PRODUCTS);
+  const [liveModels, setLiveModels] = useState(MODELS);
   const inputRef = useRef<HTMLInputElement>(null);
   const headerRef = useRef<HTMLElement>(null);
+
+  // Fetch live products & models on mount
+  useEffect(() => {
+    fetch("/api/products")
+      .then((res) => res.json())
+      .then((data) => {
+        if (Array.isArray(data) && data.length > 0) setLiveProducts(data);
+      })
+      .catch(() => {});
+
+    fetch("/api/models")
+      .then((res) => res.json())
+      .then((data) => {
+        if (Array.isArray(data) && data.length > 0) setLiveModels(data);
+      })
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     const handleOpen = () => {
@@ -41,20 +60,20 @@ export function MobileHeader() {
 
   const filteredProducts =
     query.trim().length > 0
-      ? PRODUCTS.filter(
+      ? liveProducts.filter(
           (p) =>
             p.name.toLowerCase().includes(query.toLowerCase()) ||
-            p.modelName.toLowerCase().includes(query.toLowerCase()) ||
+            p.modelName?.toLowerCase().includes(query.toLowerCase()) ||
             p.description?.toLowerCase().includes(query.toLowerCase())
         ).slice(0, 5)
       : [];
 
   const filteredModels =
     query.trim().length > 0
-      ? MODELS.filter(
+      ? liveModels.filter(
           (m) =>
-            m.name.toLowerCase().includes(query.toLowerCase()) ||
-            m.brand.toLowerCase().includes(query.toLowerCase())
+            m.name?.toLowerCase().includes(query.toLowerCase()) ||
+            m.brand?.toLowerCase().includes(query.toLowerCase())
         ).slice(0, 3)
       : [];
 
