@@ -143,7 +143,10 @@ export default function NewOrderPage() {
     // 1. Extract Client Name
     const nameMatch = text.match(/(?:client|name|full name)[:\s•\-\*]+([^\n\r,•]+)/i);
     if (nameMatch && nameMatch[1]) {
-      setCustomerName(nameMatch[1].replace(/[\*\_]/g, "").trim());
+      const parsedName = nameMatch[1].replace(/[\*\_]/g, "").trim();
+      if (parsedName && parsedName.toLowerCase() !== "customer") {
+        setCustomerName(parsedName);
+      }
     }
 
     // 2. Extract Phone Number

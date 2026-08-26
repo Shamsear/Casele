@@ -16,6 +16,7 @@ import { useI18n } from "@/lib/i18n/context";
 import { Price } from "@/components/ui/price";
 import { addRecentlyViewed } from "@/lib/recently-viewed";
 import { StickyAddToCart } from "@/components/products/sticky-add-to-cart";
+import { QuickBuyModal } from "@/components/products/quick-buy-modal";
 import { buildWhatsAppMessage, openWhatsApp } from "@/lib/whatsapp";
 import { getWhatsAppNumber } from "@/lib/settings";
 import type { ProductWithRelations } from "@/lib/db/products";
@@ -58,6 +59,7 @@ export function ProductDetailClient({
   const [quantity, setQuantity] = useState(1);
   const [whatsappNumber, setWhatsappNumber] = useState("+97455364455");
   const [openAccordion, setOpenAccordion] = useState<string | null>("specs");
+  const [quickBuyOpen, setQuickBuyOpen] = useState(false);
 
   const addItem = useCartStore((s) => s.addItem);
   const toggleWishlist = useWishlistStore((s) => s.toggleItem);
@@ -94,27 +96,7 @@ export function ProductDetailClient({
   };
 
   const handleBuyNow = () => {
-    const message = buildWhatsAppMessage({
-      customerName: "Customer",
-      customerPhone: "",
-      items: [
-        {
-          name: product.name,
-          model: selectedModel.name,
-          finish: selectedFinish,
-          caseType: selectedStyle,
-          qty: quantity,
-          price: parseFloat(product.price),
-        },
-      ],
-      subtotal: parseFloat(product.price) * quantity,
-      tierDiscount: 0,
-      flashDiscount: 0,
-      bundleDiscount: 0,
-      promoDiscount: 0,
-      total: parseFloat(product.price) * quantity,
-    });
-    openWhatsApp(whatsappNumber, message);
+    setQuickBuyOpen(true);
   };
 
   return (
@@ -454,6 +436,21 @@ export function ProductDetailClient({
         finish={selectedFinish}
         caseType={selectedStyle}
         quantity={quantity}
+      />
+
+      <QuickBuyModal
+        isOpen={quickBuyOpen}
+        onClose={() => setQuickBuyOpen(false)}
+        product={{
+          name: product.name,
+          price: parseFloat(product.price),
+          modelName: selectedModel.name,
+          finish: selectedFinish,
+          caseType: selectedStyle,
+          image: product.images[0],
+          quantity,
+        }}
+        whatsappNumber={whatsappNumber}
       />
     </div>
   );
