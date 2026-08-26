@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { usePathname } from "next/navigation";
 import { AdminSidebar } from "@/components/layout/admin-sidebar";
 import { Menu, X, ExternalLink, ShieldCheck } from "lucide-react";
 import Link from "next/link";
@@ -10,7 +11,13 @@ export default function AdminLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  // If on login page, render clean standalone full-screen page WITHOUT sidebar or navbar
+  if (pathname === "/admin/login") {
+    return <>{children}</>;
+  }
 
   return (
     <div className="min-h-screen bg-neutral-950 text-neutral-100 flex selection:bg-[#C5A869]/30 selection:text-white">
