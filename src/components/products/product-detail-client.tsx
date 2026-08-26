@@ -145,8 +145,8 @@ export function ProductDetailClient({
         />
 
         <div className="mt-6 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 xl:gap-16 items-start">
-          {/* Left: Huge Product Showcase — No container box */}
-          <div className="lg:col-span-7 xl:col-span-7">
+          {/* Left: Huge Sticky Product Gallery — moves with scroll till end of right section */}
+          <div className="lg:col-span-7 xl:col-span-7 lg:sticky lg:top-24 self-start">
             <ProductGallery
               images={product.images}
               alt={`${product.name} — ${selectedModel.name}`}
@@ -155,8 +155,8 @@ export function ProductDetailClient({
             />
           </div>
 
-          {/* Right: Sticky Purchase Details & Customizer */}
-          <div className="lg:col-span-5 xl:col-span-5 lg:sticky lg:top-24 space-y-6 rounded-3xl border border-neutral-200/80 bg-white p-6 sm:p-8 shadow-xs">
+          {/* Right: Purchase Details & Customizer Section */}
+          <div className="lg:col-span-5 xl:col-span-5 space-y-6 rounded-3xl border border-neutral-200/80 bg-white p-6 sm:p-8 shadow-xs">
             {/* Header / Live Stock Status */}
             <div>
               <div className="flex items-center justify-between gap-2 mb-2">
