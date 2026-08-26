@@ -72,40 +72,40 @@ export function HomePageClient({
           <div className="mx-auto max-w-7xl w-full relative z-10 my-auto">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-6 items-center">
               {/* Left Editorial Copy (7 Cols on desktop) */}
-              <div className="lg:col-span-7 space-y-2 sm:space-y-2.5 flex flex-col justify-center">
+              <div className="lg:col-span-7 space-y-3 sm:space-y-4 flex flex-col justify-center">
                 {/* Live Atelier Badge */}
                 <Reveal animation="fade-up" delay={50}>
-                  <div className="inline-flex items-center gap-1.5 rounded-full border border-neutral-200 bg-white px-2.5 py-0.5 shadow-2xs">
+                  <div className="inline-flex items-center gap-2 rounded-full border border-neutral-200 bg-white px-3 py-1 shadow-2xs">
                     <span className="flex h-1.5 w-1.5 rounded-full bg-[#C5A869] animate-ping" />
-                    <span className="text-[9px] sm:text-[9.5px] font-bold tracking-[0.18em] uppercase text-neutral-900">
-                      Doha Atelier • 2026 Collection
+                    <span className="text-[9px] sm:text-[10px] font-bold tracking-[0.18em] uppercase text-neutral-900">
+                      Doha Atelier • Bespoke Protection
                     </span>
                   </div>
                 </Reveal>
 
                 {/* Main Headline */}
                 <Reveal animation="fade-up" delay={120}>
-                  <h1 className="font-display text-2.5xl sm:text-4xl lg:text-[2.35rem] xl:text-[2.65rem] font-normal leading-[1.06] tracking-tight text-neutral-950">
-                    Refined Protection. <br />
-                    <span className="italic font-light text-neutral-700">Uncompromised Design.</span>
+                  <h1 className="font-display text-3xl sm:text-4xl lg:text-[2.65rem] xl:text-[3rem] font-normal leading-[1.08] tracking-tight text-neutral-950">
+                    Sculpted for Flagships. <br />
+                    <span className="italic font-light text-neutral-700">Artistry in Armor.</span>
                   </h1>
                 </Reveal>
 
                 {/* Subtitle */}
                 <Reveal animation="fade-up" delay={190}>
-                  <p className="max-w-md text-[11px] sm:text-xs leading-relaxed text-neutral-600">
-                    Engineered with aerospace composites, surgical tolerances, and tactile metallic accents. Hand-finished for contemporary iPhone and Galaxy flagships in Qatar.
+                  <p className="max-w-md text-xs sm:text-sm leading-relaxed text-neutral-600">
+                    Every silhouette is machined with aerospace-grade composites and tactile metallic accents. Hand-finished in Qatar for discerning device owners.
                   </p>
                 </Reveal>
 
                 {/* Dual CTAs with Shimmer Hover */}
                 <Reveal animation="fade-up" delay={260}>
-                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 pt-0.5">
+                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 pt-1">
                     <Link
                       href="/shop"
-                      className="btn-shimmer inline-flex items-center justify-center gap-2 rounded-xl bg-neutral-950 px-5 sm:px-6 py-2.5 text-xs font-semibold uppercase tracking-widest text-white shadow-xs transition-all hover:bg-neutral-800 active:scale-[0.98]"
+                      className="btn-shimmer inline-flex items-center justify-center gap-2 rounded-xl bg-neutral-950 px-6 py-2.5 sm:py-3 text-xs font-semibold uppercase tracking-widest text-white shadow-xs transition-all hover:bg-neutral-800 active:scale-[0.98]"
                     >
-                      <span>Shop All Cases</span>
+                      <span>Explore Collection</span>
                       <ArrowRight className="h-3.5 w-3.5" />
                     </Link>
 
@@ -113,29 +113,11 @@ export function HomePageClient({
                       href="https://wa.me/97455364455?text=Hello%20CASEL%C3%89%20Atelier%2C%20I%20would%20like%20to%20inquire%20about%20your%20protective%20cases."
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center justify-center gap-2 rounded-xl border border-neutral-300 bg-white px-5 sm:px-6 py-2.5 text-xs font-semibold uppercase tracking-widest text-neutral-900 transition-all hover:bg-neutral-50 active:scale-[0.98] shadow-2xs"
+                      className="inline-flex items-center justify-center gap-2 rounded-xl border border-neutral-300 bg-white px-6 py-2.5 sm:py-3 text-xs font-semibold uppercase tracking-widest text-neutral-900 transition-all hover:bg-neutral-50 active:scale-[0.98] shadow-2xs"
                     >
                       <MessageSquare className="h-3.5 w-3.5" />
                       <span>WhatsApp Concierge</span>
                     </a>
-                  </div>
-                </Reveal>
-
-                {/* Trust Points with Staggered Fade */}
-                <Reveal animation="fade-up" delay={330}>
-                  <div className="grid grid-cols-3 gap-2 sm:gap-4 pt-2 border-t border-neutral-200/60">
-                    <div className="min-w-0">
-                      <span className="block text-xs sm:text-sm font-bold text-neutral-950 font-mono whitespace-nowrap">0.1mm</span>
-                      <span className="text-[10px] sm:text-[11px] text-neutral-500 font-medium whitespace-nowrap block truncate">Precision Fit</span>
-                    </div>
-                    <div className="min-w-0">
-                      <span className="block text-xs sm:text-sm font-bold text-neutral-950 font-mono whitespace-nowrap">24H Express</span>
-                      <span className="text-[10px] sm:text-[11px] text-neutral-500 font-medium whitespace-nowrap block truncate">Doha Dispatch</span>
-                    </div>
-                    <div className="min-w-0">
-                      <span className="block text-xs sm:text-sm font-bold text-neutral-950 font-mono whitespace-nowrap">100% Fit</span>
-                      <span className="text-[10px] sm:text-[11px] text-neutral-500 font-medium whitespace-nowrap block truncate">7-Day Guarantee</span>
-                    </div>
                   </div>
                 </Reveal>
               </div>

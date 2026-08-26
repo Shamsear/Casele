@@ -3,12 +3,12 @@
 import { ShieldCheck, Truck, Sparkles, Magnet, RefreshCw, Zap } from "lucide-react";
 
 const MARQUEE_ITEMS = [
-  { icon: ShieldCheck, text: "0.1mm Aerospace Tolerance Fit" },
-  { icon: Truck, text: "Doha Express Same-Day Dispatch" },
   { icon: Magnet, text: "MagSafe Neo-Array 15W Alignment" },
-  { icon: Sparkles, text: "Anti-Yellowing Scratch-Proof Shield" },
-  { icon: RefreshCw, text: "7-Day Atelier Fit Guarantee" },
-  { icon: Zap, text: "10-Foot Multi-Angle Shock Absorption" },
+  { icon: Sparkles, text: "Aerospace Composite Alloys" },
+  { icon: ShieldCheck, text: "Optical Grade Scratch-Proof Shield" },
+  { icon: Zap, text: "Multi-Angle Shock Dissipation Geometry" },
+  { icon: Sparkles, text: "Tactile Anodized Aluminum Buttons" },
+  { icon: ShieldCheck, text: "Precision Sculpted For iPhone & Galaxy" },
 ];
 
 export function MarqueeTicker() {
