@@ -12,6 +12,10 @@ interface Settings {
   store_email: string;
   currency: string;
   tax_rate: string;
+  free_delivery_threshold: string;
+  express_delivery_fee: string;
+  bundle_buy_2_discount: string;
+  bundle_buy_3_discount: string;
   meta_title: string;
   meta_description: string;
   instagram: string;
@@ -19,6 +23,8 @@ interface Settings {
   social_proof_enabled: string;
   flash_sale_banner_enabled: string;
   bundle_suggestions_enabled: string;
+  tier_discounts_enabled: string;
+  bundle_discounts_enabled: string;
 }
 
 const DEFAULT_SETTINGS: Settings = {
@@ -27,6 +33,10 @@ const DEFAULT_SETTINGS: Settings = {
   store_email: "info@casele.qa",
   currency: "QAR",
   tax_rate: "0",
+  free_delivery_threshold: "100",
+  express_delivery_fee: "20",
+  bundle_buy_2_discount: "5",
+  bundle_buy_3_discount: "10",
   meta_title: "CASELÉ — Premium Phone Cases in Qatar",
   meta_description: "Premium mobile phone cases designed for style and durability. Shop now in Qatar.",
   instagram: "https://www.instagram.com/casele_premium_mobile_case?igsi=MW55cTM4MmN6dGF3ag%3D%3D&utm_source=qr",
@@ -34,6 +44,8 @@ const DEFAULT_SETTINGS: Settings = {
   social_proof_enabled: "true",
   flash_sale_banner_enabled: "true",
   bundle_suggestions_enabled: "true",
+  tier_discounts_enabled: "true",
+  bundle_discounts_enabled: "true",
 };
 
 export default function AdminSettingsPage() {
@@ -218,10 +230,80 @@ export default function AdminSettingsPage() {
         </div>
       </section>
 
+      {/* Delivery & Shipping */}
+      <section className="rounded-xl border border-dark-border bg-dark-surface p-6">
+        <h2 className="text-lg font-semibold text-white">Delivery & Shipping</h2>
+        <p className="mt-1 text-sm text-warm-gray">
+          Configure express delivery rates and free shipping threshold for Doha storefront
+        </p>
+        <div className="mt-4 grid gap-4 max-w-md">
+          <Input
+            label="Free Express Delivery Minimum (QR)"
+            type="number"
+            value={settings.free_delivery_threshold}
+            onChange={(e) =>
+              setSettings({ ...settings, free_delivery_threshold: e.target.value })
+            }
+            placeholder="100"
+          />
+          <Input
+            label="Standard Express Delivery Fee (QR)"
+            type="number"
+            value={settings.express_delivery_fee}
+            onChange={(e) =>
+              setSettings({ ...settings, express_delivery_fee: e.target.value })
+            }
+            placeholder="20"
+          />
+        </div>
+      </section>
+
+      {/* Bundle & Tier Discount Rules */}
+      <section className="rounded-xl border border-dark-border bg-dark-surface p-6">
+        <h2 className="text-lg font-semibold text-white">Bundle & Multi-Item Savings</h2>
+        <p className="mt-1 text-sm text-warm-gray">
+          Set automatic percentage savings when customers purchase multiple cases
+        </p>
+        <div className="mt-4 grid gap-4 max-w-md">
+          <Input
+            label="Buy 2 Cases Discount (%)"
+            type="number"
+            value={settings.bundle_buy_2_discount}
+            onChange={(e) =>
+              setSettings({ ...settings, bundle_buy_2_discount: e.target.value })
+            }
+            placeholder="5"
+          />
+          <Input
+            label="Buy 3+ Cases Discount (%)"
+            type="number"
+            value={settings.bundle_buy_3_discount}
+            onChange={(e) =>
+              setSettings({ ...settings, bundle_buy_3_discount: e.target.value })
+            }
+            placeholder="10"
+          />
+        </div>
+      </section>
+
       {/* Features */}
       <section className="rounded-xl border border-dark-border bg-dark-surface p-6">
-        <h2 className="text-lg font-semibold text-white">Features</h2>
+        <h2 className="text-lg font-semibold text-white">Features & Automations</h2>
         <div className="mt-4 space-y-4">
+          <Switch
+            checked={settings.bundle_discounts_enabled === "true"}
+            onCheckedChange={(v) =>
+              setSettings({ ...settings, bundle_discounts_enabled: String(v) })
+            }
+            label="Enable multi-case bundle savings (Buy 2 / Buy 3+ discounts)"
+          />
+          <Switch
+            checked={settings.tier_discounts_enabled === "true"}
+            onCheckedChange={(v) =>
+              setSettings({ ...settings, tier_discounts_enabled: String(v) })
+            }
+            label="Enable spend tier discounts (e.g. Spend QR 100+ save 10%)"
+          />
           <Switch
             checked={settings.social_proof_enabled === "true"}
             onCheckedChange={(v) =>

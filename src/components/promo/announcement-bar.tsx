@@ -27,8 +27,9 @@ export function AnnouncementBar() {
   const [current, setCurrent] = useState(0);
   const [isDismissed, setIsDismissed] = useState<boolean | null>(null);
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const [deliveryThreshold, setDeliveryThreshold] = useState(100);
 
-  // Sync dismissal state on mount without layout flash
+  // Sync dismissal state and fetch settings on mount
   useEffect(() => {
     try {
       const dismissed = localStorage.getItem(DISMISSED_KEY) === "true";
@@ -36,6 +37,16 @@ export function AnnouncementBar() {
     } catch {
       setIsDismissed(false);
     }
+
+    fetch("/api/settings")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.settings?.free_delivery_threshold) {
+          const val = Number(data.settings.free_delivery_threshold);
+          if (val > 0) setDeliveryThreshold(val);
+        }
+      })
+      .catch(() => {});
   }, []);
 
   // Rotate announcements with smooth transition
@@ -66,7 +77,25 @@ export function AnnouncementBar() {
     return null;
   }
 
-  const item = ANNOUNCEMENTS[current];
+  const announcementsList = [
+    {
+      text: `Complimentary Doha Express Delivery on Orders Over QR ${deliveryThreshold}`,
+      badge: "FREE DELIVERY",
+      link: "/shop",
+    },
+    {
+      text: "20% OFF Your First Order — Use Code: WELCOME20",
+      badge: "EXCLUSIVE",
+      link: "/shop",
+    },
+    {
+      text: "Bespoke Aerospace Composites • 100% Precision Fit Guarantee",
+      badge: "PRECISION FIT",
+      link: "/about",
+    },
+  ];
+
+  const item = announcementsList[current % announcementsList.length];
 
   return (
     <div className="relative z-50 border-b border-neutral-200/80 bg-neutral-900 text-white select-none transition-all duration-300">

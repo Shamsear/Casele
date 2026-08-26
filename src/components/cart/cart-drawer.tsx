@@ -30,14 +30,25 @@ export function CartDrawer() {
   const [customerName, setCustomerName] = useState("");
   const { formatPrice } = useI18n();
 
+  const [deliveryThreshold, setDeliveryThreshold] = useState(100);
+
   // Automatically close cart drawer when navigating to another page
   useEffect(() => {
     setOpen(false);
   }, [pathname, setOpen]);
 
-  // Fetch WhatsApp number on mount
+  // Fetch WhatsApp number and delivery threshold on mount
   useEffect(() => {
     getWhatsAppNumber().then(setWhatsappNumber);
+    fetch("/api/settings")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.settings?.free_delivery_threshold) {
+          const val = Number(data.settings.free_delivery_threshold);
+          if (val > 0) setDeliveryThreshold(val);
+        }
+      })
+      .catch(() => {});
   }, []);
 
   // Close on escape
@@ -52,22 +63,17 @@ export function CartDrawer() {
   // Prevent body scroll when open (preserves scroll position)
   useEffect(() => {
     if (isOpen) {
-      const scrollY = window.scrollY;
+      document.body.style.overflow = "hidden";
       document.body.style.position = "fixed";
-      document.body.style.top = `-${scrollY}px`;
       document.body.style.width = "100%";
     } else {
-      const scrollY = document.body.style.top;
+      document.body.style.overflow = "";
       document.body.style.position = "";
-      document.body.style.top = "";
       document.body.style.width = "";
-      if (scrollY) {
-        window.scrollTo(0, parseInt(scrollY || "0") * -1);
-      }
     }
     return () => {
+      document.body.style.overflow = "";
       document.body.style.position = "";
-      document.body.style.top = "";
       document.body.style.width = "";
     };
   }, [isOpen]);
@@ -95,7 +101,6 @@ export function CartDrawer() {
     openWhatsApp(whatsappNumber, message);
   };
 
-  const deliveryThreshold = 100;
   const currentSubtotal = subtotal();
   const progressPercent = Math.min(100, (currentSubtotal / deliveryThreshold) * 100);
   const qualifiesForFreeDelivery = currentSubtotal >= deliveryThreshold;

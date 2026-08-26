@@ -1,6 +1,4 @@
-import { db } from "@/lib/db";
-import { tierDiscounts } from "@/lib/db/schema";
-import { eq } from "drizzle-orm";
+import { prisma } from "@/lib/db/prisma";
 
 interface TierResult {
   applicablePercent: number;
@@ -17,57 +15,56 @@ const DEFAULT_TIERS = [
 export async function calculateTierDiscount(
   subtotal: number
 ): Promise<TierResult> {
-  let tiers;
-
   try {
-    tiers = await db
-      .select()
-      .from(tierDiscounts)
-      .where(eq(tierDiscounts.isActive, true))
-      .orderBy(tierDiscounts.sortOrder);
-  } catch {
-    // Fallback to defaults if DB unavailable
-    tiers = DEFAULT_TIERS.map((t, i) => ({
-      id: "",
-      minAmount: String(t.min),
-      discountPercent: t.percent,
-      isActive: true,
-      sortOrder: i,
-    }));
-  }
-
-  if (!tiers || tiers.length === 0) {
-    // Use defaults
-    let applicablePercent = 0;
-    let tierMin = 0;
-    for (const tier of DEFAULT_TIERS) {
-      if (subtotal >= tier.min) {
-        applicablePercent = tier.percent;
-        tierMin = tier.min;
-      }
+    // Check if tier discounts are enabled in settings
+    const tierSetting = await prisma.setting.findUnique({
+      where: { key: "tier_discounts_enabled" },
+    });
+    if (tierSetting && tierSetting.value === "false") {
+      return { applicablePercent: 0, discountAmount: 0, tierLabel: null };
     }
-    const discountAmount = Math.round((subtotal * applicablePercent) / 100);
-    return {
-      applicablePercent,
-      discountAmount,
-      tierLabel: applicablePercent > 0
-        ? `Spend QR ${tierMin}+ and save ${applicablePercent}%`
-        : null,
-    };
+
+    const tiers = await prisma.tierDiscount.findMany({
+      where: { isActive: true },
+      orderBy: { minAmount: "asc" },
+    });
+
+    if (tiers && tiers.length > 0) {
+      let applicablePercent = 0;
+      let tierMin = 0;
+      for (const tier of tiers) {
+        const min = Number(tier.minAmount);
+        if (subtotal >= min && tier.discountPercent > applicablePercent) {
+          applicablePercent = tier.discountPercent;
+          tierMin = min;
+        }
+      }
+
+      const discountAmount = Math.round((subtotal * applicablePercent) / 100);
+
+      return {
+        applicablePercent,
+        discountAmount,
+        tierLabel:
+          applicablePercent > 0
+            ? `Spend QR ${tierMin}+ and save ${applicablePercent}%`
+            : null,
+      };
+    }
+  } catch (error) {
+    console.warn("DB tier discount calculation failed, using fallback:", error);
   }
 
+  // Fallback default tiers
   let applicablePercent = 0;
   let tierMin = 0;
-  for (const tier of tiers) {
-    const min = parseFloat(tier.minAmount);
-    if (subtotal >= min && tier.discountPercent > applicablePercent) {
-      applicablePercent = tier.discountPercent;
-      tierMin = min;
+  for (const tier of DEFAULT_TIERS) {
+    if (subtotal >= tier.min) {
+      applicablePercent = tier.percent;
+      tierMin = tier.min;
     }
   }
-
   const discountAmount = Math.round((subtotal * applicablePercent) / 100);
-
   return {
     applicablePercent,
     discountAmount,
