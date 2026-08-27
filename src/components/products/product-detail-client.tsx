@@ -89,12 +89,34 @@ export function ProductDetailClient({
       .catch(() => {});
   }, [product.id]);
 
+  // Resolve model-specific SVG variant when user selects iPhone vs Samsung vs Pixel
+  const activeImages = (() => {
+    const rawImages = product.images.length > 0 ? product.images : ["/images/products/midnight-black.svg"];
+    const baseFirstImg = rawImages[0];
+    
+    // Extract base theme slug like "midnight-black", "gold-edge", "royal-blue", etc.
+    const match = baseFirstImg.match(/\/images\/products\/([a-z-]+?)(?:-samsung|-pixel|-angle|-front)?\.svg/);
+    const themeSlug = match ? match[1] : "midnight-black";
+
+    let modelMainImg = `/images/products/${themeSlug}.svg`;
+    if (selectedModel.brand === "Samsung" || selectedModel.slug.includes("samsung")) {
+      modelMainImg = `/images/products/${themeSlug}-samsung.svg`;
+    } else if (selectedModel.brand === "Google" || selectedModel.slug.includes("pixel")) {
+      modelMainImg = `/images/products/${themeSlug}-pixel.svg`;
+    }
+
+    const angleImg = `/images/products/${themeSlug}-angle.svg`;
+    const frontImg = `/images/products/${themeSlug}-front.svg`;
+
+    return [modelMainImg, angleImg, frontImg];
+  })();
+
   const handleAddToCart = (e?: React.MouseEvent) => {
     addItem(
       {
         productId: product.id,
         name: product.name,
-        image: product.images[0],
+        image: activeImages[0],
         price: parseFloat(product.price),
         comparePrice: product.comparePrice
           ? parseFloat(product.comparePrice)
@@ -113,7 +135,7 @@ export function ProductDetailClient({
 
     // Signature fly to cart animation
     const sourceEl = document.querySelector(".product-gallery-primary-img") as HTMLElement | null;
-    flyToCart(product.images[0], sourceEl, () => {
+    flyToCart(activeImages[0], sourceEl, () => {
       setOpenCart(true);
     });
 
@@ -130,7 +152,7 @@ export function ProductDetailClient({
         name={product.name}
         description={product.description || ""}
         price={product.price}
-        images={product.images}
+        images={activeImages}
         url={`https://casele.qa/shop/${modelSlug}/${productSlug}`}
       />
       <FAQSchema faqs={DEFAULT_FAQS} />
@@ -148,7 +170,7 @@ export function ProductDetailClient({
           {/* Left: Huge Sticky Product Gallery — moves with scroll till end of right section */}
           <div className="lg:col-span-7 xl:col-span-7 lg:sticky lg:top-24 self-start">
             <ProductGallery
-              images={product.images}
+              images={activeImages}
               alt={`${product.name} — ${selectedModel.name}`}
               badge={product.badge}
               discount={discount}

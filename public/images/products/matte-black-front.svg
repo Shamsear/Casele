@@ -1,48 +1,48 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 700" fill="none">
   <defs>
     <!-- Soft Contact Shadow -->
-    <filter id="frontShadow_midnight-black_front" x="50" y="580" width="400" height="110" filterUnits="userSpaceOnUse">
+    <filter id="frontShadow_matte-black_front" x="50" y="580" width="400" height="110" filterUnits="userSpaceOnUse">
       <feGaussianBlur stdDeviation="22" />
       <feColorMatrix type="matrix" values="0 0 0 0 0   0 0 0 0 0   0 0 0 0 0  0 0 0 0.32 0"/>
     </filter>
 
-    <linearGradient id="frontEdgeGrad_midnight-black_front" x1="100" y1="50" x2="400" y2="630" gradientUnits="userSpaceOnUse">
-      <stop offset="0%" stop-color="#38383E" />
-      <stop offset="100%" stop-color="#1A1A1C" />
+    <linearGradient id="frontEdgeGrad_matte-black_front" x1="100" y1="50" x2="400" y2="630" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#3F3F46" />
+      <stop offset="100%" stop-color="#18181B" />
     </linearGradient>
 
     <!-- OLED Screen Wallpaper with Luxury Gold/Obsidian Abstract Glow -->
-    <linearGradient id="screenWallpaper_midnight-black_front" x1="120" y1="80" x2="380" y2="600" gradientUnits="userSpaceOnUse">
+    <linearGradient id="screenWallpaper_matte-black_front" x1="120" y1="80" x2="380" y2="600" gradientUnits="userSpaceOnUse">
       <stop offset="0%" stop-color="#0F172A" />
       <stop offset="40%" stop-color="#020617" />
       <stop offset="70%" stop-color="#1E1B4B" />
       <stop offset="100%" stop-color="#020617" />
     </linearGradient>
 
-    <radialGradient id="screenGlow_midnight-black_front" cx="250" cy="320" r="140" gradientUnits="userSpaceOnUse">
-      <stop offset="0%" stop-color="#4B4B54" stop-opacity="0.35" />
-      <stop offset="100%" stop-color="#4B4B54" stop-opacity="0" />
+    <radialGradient id="screenGlow_matte-black_front" cx="250" cy="320" r="140" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#E11D48" stop-opacity="0.35" />
+      <stop offset="100%" stop-color="#E11D48" stop-opacity="0" />
     </radialGradient>
   </defs>
 
   <!-- Ground Drop Shadow -->
-  <ellipse cx="250" cy="625" rx="140" ry="24" fill="#000000" filter="url(#frontShadow_midnight-black_front)" />
+  <ellipse cx="250" cy="625" rx="140" ry="24" fill="#000000" filter="url(#frontShadow_matte-black_front)" />
 
   <!-- Outer Protective Bumper Lip (1.2mm Raised Screen Defense) -->
-  <rect x="96" y="56" width="308" height="568" rx="46" fill="url(#frontEdgeGrad_midnight-black_front)" stroke="#38383E" stroke-width="2"/>
+  <rect x="96" y="56" width="308" height="568" rx="46" fill="url(#frontEdgeGrad_matte-black_front)" stroke="#3F3F46" stroke-width="2"/>
 
   <!-- Left / Right Button Outlines -->
-  <rect x="93" y="145" width="4" height="28" rx="2" fill="#38383E"/>
-  <rect x="93" y="190" width="4" height="46" rx="2" fill="#38383E"/>
-  <rect x="93" y="245" width="4" height="46" rx="2" fill="#38383E"/>
-  <rect x="403" y="195" width="4" height="60" rx="2" fill="#38383E"/>
+  <rect x="93" y="145" width="4" height="28" rx="2" fill="#3F3F46"/>
+  <rect x="93" y="190" width="4" height="46" rx="2" fill="#3F3F46"/>
+  <rect x="93" y="245" width="4" height="46" rx="2" fill="#3F3F46"/>
+  <rect x="403" y="195" width="4" height="60" rx="2" fill="#3F3F46"/>
 
   <!-- Ultra-Slim Phone Chassis Bezel -->
   <rect x="103" y="63" width="294" height="554" rx="41" fill="#000000"/>
 
   <!-- OLED Ceramic Shield Screen -->
-  <rect x="108" y="68" width="284" height="544" rx="36" fill="url(#screenWallpaper_midnight-black_front)"/>
-  <rect x="108" y="68" width="284" height="544" rx="36" fill="url(#screenGlow_midnight-black_front)"/>
+  <rect x="108" y="68" width="284" height="544" rx="36" fill="url(#screenWallpaper_matte-black_front)"/>
+  <rect x="108" y="68" width="284" height="544" rx="36" fill="url(#screenGlow_matte-black_front)"/>
 
   <!-- Top Speaker Ear Piece Slit -->
   <rect x="225" y="75" width="50" height="3.5" rx="1.75" fill="#334155"/>
@@ -58,8 +58,8 @@
   <text x="250" y="305" text-anchor="middle" font-family="'Inter', sans-serif" font-size="13" font-weight="500" fill="#CBD5E1" opacity="0.9">Thursday, October 24</text>
 
   <!-- Lock Screen CASELÉ Crest Watermark -->
-  <circle cx="250" cy="420" r="32" stroke="#C5A869" stroke-width="1.5" fill="none" opacity="0.4"/>
-  <text x="250" y="426" text-anchor="middle" font-family="'Cinzel', serif" font-size="18" font-weight="700" fill="#C5A869" opacity="0.7">C</text>
+  <circle cx="250" cy="420" r="32" stroke="#F43F5E" stroke-width="1.5" fill="none" opacity="0.4"/>
+  <text x="250" y="426" text-anchor="middle" font-family="'Cinzel', serif" font-size="18" font-weight="700" fill="#F43F5E" opacity="0.7">C</text>
 
   <!-- Bottom Home Indicator Bar -->
   <rect x="180" y="592" width="140" height="4" rx="2" fill="#FFFFFF" opacity="0.7"/>
