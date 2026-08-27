@@ -56,8 +56,8 @@ export default function AboutPage() {
                 },
                 {
                   icon: Truck,
-                  title: "Doha Express Dispatch",
-                  desc: "Direct concierge delivery across Doha, Al Wakrah, Al Khor, and all municipalities with same-day routing.",
+                  title: "Qatar Concierge Delivery",
+                  desc: "Direct delivery across Doha, Al Wakrah, Al Khor, and all Qatar municipalities with precision door-to-door routing.",
                 },
                 {
                   icon: MessageSquare,
