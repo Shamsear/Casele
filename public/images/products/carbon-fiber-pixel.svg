@@ -1,34 +1,34 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 700" fill="none">
   <defs>
     <!-- Soft Contact Shadow -->
-    <filter id="groundShadow_carbon-fiber_back_pixel" x="50" y="580" width="400" height="110" filterUnits="userSpaceOnUse">
-      <feGaussianBlur stdDeviation="22" />
+    <filter id="groundShadow_carbon-fiber_back_pixel" x="70" y="580" width="360" height="110" filterUnits="userSpaceOnUse">
+      <feGaussianBlur stdDeviation="20" />
       <feColorMatrix type="matrix" values="0 0 0 0 0   0 0 0 0 0   0 0 0 0 0  0 0 0 0.35 0"/>
     </filter>
     
-    <filter id="camShadow_carbon-fiber_back_pixel" x="100" y="60" width="320" height="150" filterUnits="userSpaceOnUse">
-      <feDropShadow dx="0" dy="8" stdDeviation="10" flood-color="#000000" flood-opacity="0.45"/>
+    <filter id="camShadow_carbon-fiber_back_pixel" x="120" y="60" width="280" height="140" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#000000" flood-opacity="0.45"/>
     </filter>
 
     <!-- Linear Gradients -->
-    <linearGradient id="bodyGrad_carbon-fiber_back_pixel" x1="100" y1="50" x2="400" y2="630" gradientUnits="userSpaceOnUse">
+    <linearGradient id="bodyGrad_carbon-fiber_back_pixel" x1="120" y1="50" x2="380" y2="630" gradientUnits="userSpaceOnUse">
       <stop offset="0%" stop-color="#222226" />
       <stop offset="50%" stop-color="#161618" />
       <stop offset="100%" stop-color="#0C0C0E" />
     </linearGradient>
 
-    <linearGradient id="edgeGrad_carbon-fiber_back_pixel" x1="100" y1="50" x2="400" y2="630" gradientUnits="userSpaceOnUse">
+    <linearGradient id="edgeGrad_carbon-fiber_back_pixel" x1="120" y1="50" x2="380" y2="630" gradientUnits="userSpaceOnUse">
       <stop offset="0%" stop-color="#3A3A40" />
       <stop offset="100%" stop-color="#1A1A1D" />
     </linearGradient>
 
-    <linearGradient id="camGrad_carbon-fiber_back_pixel" x1="120" y1="70" x2="240" y2="190" gradientUnits="userSpaceOnUse">
+    <linearGradient id="camGrad_carbon-fiber_back_pixel" x1="140" y1="70" x2="250" y2="180" gradientUnits="userSpaceOnUse">
       <stop offset="0%" stop-color="#2A2A30" />
       <stop offset="100%" stop-color="#121214" />
     </linearGradient>
 
     <!-- Glass Glare Reflection -->
-    <linearGradient id="glareGrad_carbon-fiber_back_pixel" x1="100" y1="50" x2="350" y2="550" gradientUnits="userSpaceOnUse">
+    <linearGradient id="glareGrad_carbon-fiber_back_pixel" x1="120" y1="50" x2="350" y2="550" gradientUnits="userSpaceOnUse">
       <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.12" />
       <stop offset="35%" stop-color="#FFFFFF" stop-opacity="0.04" />
       <stop offset="70%" stop-color="#FFFFFF" stop-opacity="0" />
@@ -47,64 +47,64 @@
   </defs>
 
   <!-- Ground Drop Shadow -->
-  <ellipse cx="250" cy="625" rx="140" ry="24" fill="#000000" filter="url(#groundShadow_carbon-fiber_back_pixel)" />
+  <ellipse cx="250" cy="625" rx="125" ry="20" fill="#000000" filter="url(#groundShadow_carbon-fiber_back_pixel)" />
 
-  <!-- Outer Bumper Profile -->
-  <rect x="96" y="56" width="308" height="568" rx="42" fill="url(#edgeGrad_carbon-fiber_back_pixel)" stroke="#3A3A40" stroke-width="1.5"/>
+  <!-- Outer Bumper Profile (Slender phone silhouette) -->
+  <rect x="120" y="56" width="260" height="568" rx="40" fill="url(#edgeGrad_carbon-fiber_back_pixel)" stroke="#3A3A40" stroke-width="1.5"/>
 
   <!-- Left / Right Physical Buttons -->
   
   
-      <rect x="398" y="160" width="4" height="42" rx="2" fill="#3A3A40"/>
-      <rect x="398" y="215" width="4" height="60" rx="2" fill="#3A3A40"/>
+      <rect x="378" y="155" width="4" height="38" rx="2" fill="#3A3A40"/>
+      <rect x="378" y="205" width="4" height="54" rx="2" fill="#3A3A40"/>
     
 
   <!-- Inner Case Backplate -->
-  <rect x="102" y="62" width="296" height="556" rx="38" fill="url(#bodyGrad_carbon-fiber_back_pixel)"/>
+  <rect x="126" y="62" width="248" height="556" rx="36" fill="url(#bodyGrad_carbon-fiber_back_pixel)"/>
 
-  <rect x="102" y="62" width="296" height="556" rx="38" fill="url(#carbonPattern_carbon-fiber_back_pixel)"/>
+  <rect x="126" y="62" width="248" height="556" rx="36" fill="url(#carbonPattern_carbon-fiber_back_pixel)"/>
   
   
 
   
 
-  <!-- MagSafe Magnetic Core (Prominent for Clear, subtle for others) -->
+  <!-- MagSafe Magnetic Core -->
   <g opacity="0.12">
-    <circle cx="250" cy="350" r="64" stroke="#FFFFFF" stroke-width="2" stroke-dasharray="10 4" fill="none"/>
-    <circle cx="250" cy="350" r="56" stroke="#FFFFFF" stroke-width="1" fill="none" opacity="0.4"/>
-    <rect x="247" y="424" width="6" height="28" rx="3" fill="#FFFFFF"/>
+    <circle cx="250" cy="350" r="56" stroke="#FFFFFF" stroke-width="2" stroke-dasharray="10 4" fill="none"/>
+    <circle cx="250" cy="350" r="48" stroke="#FFFFFF" stroke-width="1" fill="none" opacity="0.4"/>
+    <rect x="247" y="415" width="6" height="24" rx="3" fill="#FFFFFF"/>
   </g>
 
   <!-- Specular Light Reflection Sweep -->
-  <path d="M104 64 C 180 64, 300 200, 396 480 L396 616 C 300 350, 180 180, 104 180 Z" fill="url(#glareGrad_carbon-fiber_back_pixel)"/>
+  <path d="M128 64 C 190 64, 280 200, 368 480 L368 616 C 280 350, 190 180, 128 180 Z" fill="url(#glareGrad_carbon-fiber_back_pixel)"/>
 
   <!-- Camera Module Plateau -->
   
       <g filter="url(#camShadow_carbon-fiber_back_pixel)">
         <!-- Full-width metallic camera bar -->
-        <rect x="96" y="110" width="308" height="74" rx="16" fill="url(#camGrad_carbon-fiber_back_pixel)" stroke="#3A3A40" stroke-width="1.5"/>
+        <rect x="118" y="105" width="264" height="66" rx="14" fill="url(#camGrad_carbon-fiber_back_pixel)" stroke="#3A3A40" stroke-width="1.5"/>
         
         <!-- Pill cutout for dual main lenses -->
-        <rect x="135" y="125" width="94" height="44" rx="22" fill="#0A0A0E" stroke="#27272A" stroke-width="1.5"/>
-        <circle cx="160" cy="147" r="16" fill="#14141C"/>
-        <circle cx="157" cy="144" r="4" fill="#3B82F6" opacity="0.6"/>
-        <circle cx="162" cy="145" r="2" fill="#FFFFFF" opacity="0.9"/>
+        <rect x="150" y="118" width="80" height="40" rx="20" fill="#0A0A0E" stroke="#27272A" stroke-width="1.5"/>
+        <circle cx="172" cy="138" r="14" fill="#14141C"/>
+        <circle cx="169" cy="135" r="3.5" fill="#3B82F6" opacity="0.6"/>
+        <circle cx="174" cy="136" r="1.5" fill="#FFFFFF" opacity="0.9"/>
 
-        <circle cx="205" cy="147" r="16" fill="#14141C"/>
-        <circle cx="202" cy="144" r="4" fill="#3B82F6" opacity="0.6"/>
-        <circle cx="207" cy="145" r="2" fill="#FFFFFF" opacity="0.9"/>
+        <circle cx="208" cy="138" r="14" fill="#14141C"/>
+        <circle cx="205" cy="135" r="3.5" fill="#3B82F6" opacity="0.6"/>
+        <circle cx="210" cy="136" r="1.5" fill="#FFFFFF" opacity="0.9"/>
 
         <!-- Separate Telephoto Lens -->
-        <circle cx="270" cy="147" r="16" fill="#0A0A0E" stroke="#27272A" stroke-width="1.5"/>
-        <circle cx="270" cy="147" r="11" fill="#14141C"/>
+        <circle cx="265" cy="138" r="14" fill="#0A0A0E" stroke="#27272A" stroke-width="1.5"/>
+        <circle cx="265" cy="138" r="9" fill="#14141C"/>
 
         <!-- Flash & Sensor -->
-        <circle cx="340" cy="138" r="6" fill="#F8FAFC" stroke="#94A3B8" stroke-width="1"/>
-        <circle cx="340" cy="158" r="4" fill="#050508"/>
+        <circle cx="330" cy="130" r="5.5" fill="#F8FAFC" stroke="#94A3B8" stroke-width="1"/>
+        <circle cx="330" cy="148" r="3.5" fill="#050508"/>
       </g>
     
 
   <!-- Luxury Brand Typography Engraving -->
-  <text x="250" y="525" text-anchor="middle" font-family="'Cinzel', 'Playfair Display', Georgia, serif" font-size="20" font-weight="700" fill="#A1A1AA" opacity="0.9" letter-spacing="4">CASELÉ</text>
-  <text x="250" y="545" text-anchor="middle" font-family="'Inter', sans-serif" font-size="9" font-weight="600" fill="#A1A1AA" opacity="0.65" letter-spacing="4">DOHA STUDIO</text>
+  <text x="250" y="525" text-anchor="middle" font-family="'Cinzel', 'Playfair Display', Georgia, serif" font-size="18" font-weight="700" fill="#A1A1AA" opacity="0.9" letter-spacing="4">CASELÉ</text>
+  <text x="250" y="543" text-anchor="middle" font-family="'Inter', sans-serif" font-size="8.5" font-weight="600" fill="#A1A1AA" opacity="0.65" letter-spacing="4">DOHA STUDIO</text>
 </svg>

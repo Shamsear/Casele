@@ -1,34 +1,34 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 700" fill="none">
   <defs>
     <!-- Soft Contact Shadow -->
-    <filter id="groundShadow_gold-edge_back_iphone" x="50" y="580" width="400" height="110" filterUnits="userSpaceOnUse">
-      <feGaussianBlur stdDeviation="22" />
+    <filter id="groundShadow_gold-edge_back_iphone" x="70" y="580" width="360" height="110" filterUnits="userSpaceOnUse">
+      <feGaussianBlur stdDeviation="20" />
       <feColorMatrix type="matrix" values="0 0 0 0 0   0 0 0 0 0   0 0 0 0 0  0 0 0 0.35 0"/>
     </filter>
     
-    <filter id="camShadow_gold-edge_back_iphone" x="100" y="60" width="320" height="150" filterUnits="userSpaceOnUse">
-      <feDropShadow dx="0" dy="8" stdDeviation="10" flood-color="#000000" flood-opacity="0.45"/>
+    <filter id="camShadow_gold-edge_back_iphone" x="120" y="60" width="280" height="140" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#000000" flood-opacity="0.45"/>
     </filter>
 
     <!-- Linear Gradients -->
-    <linearGradient id="bodyGrad_gold-edge_back_iphone" x1="100" y1="50" x2="400" y2="630" gradientUnits="userSpaceOnUse">
+    <linearGradient id="bodyGrad_gold-edge_back_iphone" x1="120" y1="50" x2="380" y2="630" gradientUnits="userSpaceOnUse">
       <stop offset="0%" stop-color="#18181A" />
       <stop offset="50%" stop-color="#0D0D0E" />
       <stop offset="100%" stop-color="#050506" />
     </linearGradient>
 
-    <linearGradient id="edgeGrad_gold-edge_back_iphone" x1="100" y1="50" x2="400" y2="630" gradientUnits="userSpaceOnUse">
+    <linearGradient id="edgeGrad_gold-edge_back_iphone" x1="120" y1="50" x2="380" y2="630" gradientUnits="userSpaceOnUse">
       <stop offset="0%" stop-color="#F5D77F" />
       <stop offset="100%" stop-color="#A88434" />
     </linearGradient>
 
-    <linearGradient id="camGrad_gold-edge_back_iphone" x1="120" y1="70" x2="240" y2="190" gradientUnits="userSpaceOnUse">
+    <linearGradient id="camGrad_gold-edge_back_iphone" x1="140" y1="70" x2="250" y2="180" gradientUnits="userSpaceOnUse">
       <stop offset="0%" stop-color="#E6C66E" />
       <stop offset="100%" stop-color="#99732B" />
     </linearGradient>
 
     <!-- Glass Glare Reflection -->
-    <linearGradient id="glareGrad_gold-edge_back_iphone" x1="100" y1="50" x2="350" y2="550" gradientUnits="userSpaceOnUse">
+    <linearGradient id="glareGrad_gold-edge_back_iphone" x1="120" y1="50" x2="350" y2="550" gradientUnits="userSpaceOnUse">
       <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.12" />
       <stop offset="35%" stop-color="#FFFFFF" stop-opacity="0.04" />
       <stop offset="70%" stop-color="#FFFFFF" stop-opacity="0" />
@@ -38,23 +38,23 @@
   </defs>
 
   <!-- Ground Drop Shadow -->
-  <ellipse cx="250" cy="625" rx="140" ry="24" fill="#000000" filter="url(#groundShadow_gold-edge_back_iphone)" />
+  <ellipse cx="250" cy="625" rx="125" ry="20" fill="#000000" filter="url(#groundShadow_gold-edge_back_iphone)" />
 
-  <!-- Outer Bumper Profile -->
-  <rect x="96" y="56" width="308" height="568" rx="46" fill="url(#edgeGrad_gold-edge_back_iphone)" stroke="#F5D77F" stroke-width="3"/>
+  <!-- Outer Bumper Profile (Slender phone silhouette) -->
+  <rect x="120" y="56" width="260" height="568" rx="44" fill="url(#edgeGrad_gold-edge_back_iphone)" stroke="#F5D77F" stroke-width="3"/>
 
   <!-- Left / Right Physical Buttons -->
   
-    <rect x="98" y="145" width="4" height="28" rx="2" fill="#F5D77F"/>
-    <rect x="98" y="190" width="4" height="46" rx="2" fill="#F5D77F"/>
-    <rect x="98" y="245" width="4" height="46" rx="2" fill="#F5D77F"/>
+    <rect x="118" y="145" width="4" height="26" rx="2" fill="#F5D77F"/>
+    <rect x="118" y="185" width="4" height="42" rx="2" fill="#F5D77F"/>
+    <rect x="118" y="235" width="4" height="42" rx="2" fill="#F5D77F"/>
   
   
-    <rect x="398" y="195" width="4" height="60" rx="2" fill="#F5D77F"/>
+    <rect x="378" y="190" width="4" height="54" rx="2" fill="#F5D77F"/>
   
 
   <!-- Inner Case Backplate -->
-  <rect x="102" y="62" width="296" height="556" rx="42" fill="url(#bodyGrad_gold-edge_back_iphone)"/>
+  <rect x="126" y="62" width="248" height="556" rx="40" fill="url(#bodyGrad_gold-edge_back_iphone)"/>
 
   
   
@@ -62,50 +62,50 @@
 
   
 
-  <!-- MagSafe Magnetic Core (Prominent for Clear, subtle for others) -->
+  <!-- MagSafe Magnetic Core -->
   <g opacity="0.12">
-    <circle cx="250" cy="350" r="64" stroke="#FFFFFF" stroke-width="2" stroke-dasharray="10 4" fill="none"/>
-    <circle cx="250" cy="350" r="56" stroke="#FFFFFF" stroke-width="1" fill="none" opacity="0.4"/>
-    <rect x="247" y="424" width="6" height="28" rx="3" fill="#FFFFFF"/>
+    <circle cx="250" cy="350" r="56" stroke="#FFFFFF" stroke-width="2" stroke-dasharray="10 4" fill="none"/>
+    <circle cx="250" cy="350" r="48" stroke="#FFFFFF" stroke-width="1" fill="none" opacity="0.4"/>
+    <rect x="247" y="415" width="6" height="24" rx="3" fill="#FFFFFF"/>
   </g>
 
   <!-- Specular Light Reflection Sweep -->
-  <path d="M104 64 C 180 64, 300 200, 396 480 L396 616 C 300 350, 180 180, 104 180 Z" fill="url(#glareGrad_gold-edge_back_iphone)"/>
+  <path d="M128 64 C 190 64, 280 200, 368 480 L368 616 C 280 350, 190 180, 128 180 Z" fill="url(#glareGrad_gold-edge_back_iphone)"/>
 
   <!-- Camera Module Plateau -->
   
       <g filter="url(#camShadow_gold-edge_back_iphone)">
-        <rect x="122" y="70" width="112" height="118" rx="30" fill="url(#camGrad_gold-edge_back_iphone)" stroke="#F5D77F" stroke-width="2.5"/>
+        <rect x="142" y="70" width="102" height="106" rx="26" fill="url(#camGrad_gold-edge_back_iphone)" stroke="#F5D77F" stroke-width="2.5"/>
         
         <!-- Lens 1 (Top Left) -->
-        <circle cx="156" cy="106" r="21" fill="#0A0A0E" stroke="#F5D77F" stroke-width="2.5"/>
-        <circle cx="156" cy="106" r="14" fill="#14141C"/>
-        <circle cx="156" cy="106" r="8" fill="#0A0A10"/>
-        <circle cx="153" cy="103" r="4" fill="#3B82F6" opacity="0.6"/>
-        <circle cx="158" cy="104" r="2" fill="#FFFFFF" opacity="0.9"/>
+        <circle cx="172" cy="102" r="19" fill="#0A0A0E" stroke="#F5D77F" stroke-width="2.5"/>
+        <circle cx="172" cy="102" r="12" fill="#14141C"/>
+        <circle cx="172" cy="102" r="7" fill="#0A0A10"/>
+        <circle cx="169" cy="99" r="3.5" fill="#3B82F6" opacity="0.6"/>
+        <circle cx="174" cy="100" r="1.5" fill="#FFFFFF" opacity="0.9"/>
 
         <!-- Lens 2 (Bottom Left) -->
-        <circle cx="156" cy="152" r="21" fill="#0A0A0E" stroke="#F5D77F" stroke-width="2.5"/>
-        <circle cx="156" cy="152" r="14" fill="#14141C"/>
-        <circle cx="156" cy="152" r="8" fill="#0A0A10"/>
-        <circle cx="153" cy="149" r="4" fill="#3B82F6" opacity="0.6"/>
-        <circle cx="158" cy="150" r="2" fill="#FFFFFF" opacity="0.9"/>
+        <circle cx="172" cy="144" r="19" fill="#0A0A0E" stroke="#F5D77F" stroke-width="2.5"/>
+        <circle cx="172" cy="144" r="12" fill="#14141C"/>
+        <circle cx="172" cy="144" r="7" fill="#0A0A10"/>
+        <circle cx="169" cy="141" r="3.5" fill="#3B82F6" opacity="0.6"/>
+        <circle cx="174" cy="142" r="1.5" fill="#FFFFFF" opacity="0.9"/>
 
         <!-- Lens 3 (Right Center) -->
-        <circle cx="202" cy="129" r="21" fill="#0A0A0E" stroke="#F5D77F" stroke-width="2.5"/>
-        <circle cx="202" cy="129" r="14" fill="#14141C"/>
-        <circle cx="202" cy="129" r="8" fill="#0A0A10"/>
-        <circle cx="199" cy="126" r="4" fill="#3B82F6" opacity="0.6"/>
-        <circle cx="204" cy="127" r="2" fill="#FFFFFF" opacity="0.9"/>
+        <circle cx="214" cy="123" r="19" fill="#0A0A0E" stroke="#F5D77F" stroke-width="2.5"/>
+        <circle cx="214" cy="123" r="12" fill="#14141C"/>
+        <circle cx="214" cy="123" r="7" fill="#0A0A10"/>
+        <circle cx="211" cy="120" r="3.5" fill="#3B82F6" opacity="0.6"/>
+        <circle cx="216" cy="121" r="1.5" fill="#FFFFFF" opacity="0.9"/>
 
         <!-- Flash & Sensor -->
-        <circle cx="202" cy="94" r="7" fill="#F8FAFC" stroke="#94A3B8" stroke-width="1.2"/>
-        <circle cx="202" cy="94" r="3" fill="#FEF08A"/>
-        <circle cx="202" cy="164" r="5" fill="#050508"/>
+        <circle cx="214" cy="92" r="6" fill="#F8FAFC" stroke="#94A3B8" stroke-width="1"/>
+        <circle cx="214" cy="92" r="2.5" fill="#FEF08A"/>
+        <circle cx="214" cy="154" r="4.5" fill="#050508"/>
       </g>
     
 
   <!-- Luxury Brand Typography Engraving -->
-  <text x="250" y="525" text-anchor="middle" font-family="'Cinzel', 'Playfair Display', Georgia, serif" font-size="20" font-weight="700" fill="#F3D684" opacity="0.9" letter-spacing="4">CASELÉ</text>
-  <text x="250" y="545" text-anchor="middle" font-family="'Inter', sans-serif" font-size="9" font-weight="600" fill="#F3D684" opacity="0.65" letter-spacing="4">DOHA STUDIO</text>
+  <text x="250" y="525" text-anchor="middle" font-family="'Cinzel', 'Playfair Display', Georgia, serif" font-size="18" font-weight="700" fill="#F3D684" opacity="0.9" letter-spacing="4">CASELÉ</text>
+  <text x="250" y="543" text-anchor="middle" font-family="'Inter', sans-serif" font-size="8.5" font-weight="600" fill="#F3D684" opacity="0.65" letter-spacing="4">DOHA STUDIO</text>
 </svg>
