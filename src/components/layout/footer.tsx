@@ -11,23 +11,22 @@ const INSTAGRAM_URL = "https://www.instagram.com/casele_premium_mobile_case?igsi
 export function Footer() {
   const { t } = useI18n();
   const [deliveryThreshold, setDeliveryThreshold] = useState(100);
-  const [freeDeliveryEnabled, setFreeDeliveryEnabled] = useState(true);
+  const [freeDeliveryEnabled, setFreeDeliveryEnabled] = useState(false);
 
   useEffect(() => {
-    fetch("/api/settings")
+    fetch("/api/admin/discounts/delivery-rule", { cache: "no-store" })
       .then((res) => res.json())
       .then((data) => {
-        if (data.settings) {
-          if (data.settings.free_delivery_enabled !== undefined) {
-            setFreeDeliveryEnabled(data.settings.free_delivery_enabled !== "false");
+        if (data.config) {
+          setFreeDeliveryEnabled(Boolean(data.config.isFreeDeliveryActive));
+          if (Number(data.config.freeThreshold) > 0) {
+            setDeliveryThreshold(Number(data.config.freeThreshold));
           }
-          if (data.settings.free_delivery_threshold) {
-            const val = Number(data.settings.free_delivery_threshold);
-            if (val > 0) setDeliveryThreshold(val);
-          }
+        } else {
+          setFreeDeliveryEnabled(false);
         }
       })
-      .catch(() => {});
+      .catch(() => setFreeDeliveryEnabled(false));
   }, []);
 
   const scrollToTop = useCallback(() => {

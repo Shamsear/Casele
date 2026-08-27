@@ -55,7 +55,7 @@ export function ProductDetailClient({
   const [openAccordion, setOpenAccordion] = useState<string | null>("specs");
   const [quickBuyOpen, setQuickBuyOpen] = useState(false);
   const [deliveryThreshold, setDeliveryThreshold] = useState(100);
-  const [freeDeliveryEnabled, setFreeDeliveryEnabled] = useState(true);
+  const [freeDeliveryEnabled, setFreeDeliveryEnabled] = useState(false);
   const [isAdded, setIsAdded] = useState(false);
 
   const addItem = useCartStore((s) => s.addItem);
@@ -70,20 +70,27 @@ export function ProductDetailClient({
   useEffect(() => {
     addRecentlyViewed(product.id);
 
-    fetch("/api/settings")
+    // 1. Fetch live delivery configuration
+    fetch("/api/admin/discounts/delivery-rule", { cache: "no-store" })
       .then((res) => res.json())
       .then((data) => {
-        if (data.settings) {
-          if (data.settings.whatsapp_number) {
-            setWhatsappNumber(data.settings.whatsapp_number);
+        if (data.config) {
+          setFreeDeliveryEnabled(Boolean(data.config.isFreeDeliveryActive));
+          if (Number(data.config.freeThreshold) > 0) {
+            setDeliveryThreshold(Number(data.config.freeThreshold));
           }
-          if (data.settings.free_delivery_enabled !== undefined) {
-            setFreeDeliveryEnabled(data.settings.free_delivery_enabled !== "false");
-          }
-          if (data.settings.free_delivery_threshold) {
-            const val = Number(data.settings.free_delivery_threshold);
-            if (val > 0) setDeliveryThreshold(val);
-          }
+        } else {
+          setFreeDeliveryEnabled(false);
+        }
+      })
+      .catch(() => setFreeDeliveryEnabled(false));
+
+    // 2. Fetch general store settings
+    fetch("/api/settings", { cache: "no-store" })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.settings?.whatsapp_number) {
+          setWhatsappNumber(data.settings.whatsapp_number);
         }
       })
       .catch(() => {});

@@ -30,7 +30,7 @@ export function CartDrawer() {
   const { formatPrice } = useI18n();
 
   const [deliveryThreshold, setDeliveryThreshold] = useState(100);
-  const [freeDeliveryEnabled, setFreeDeliveryEnabled] = useState(true);
+  const [freeDeliveryEnabled, setFreeDeliveryEnabled] = useState(false);
   const [tierDiscountsEnabled, setTierDiscountsEnabled] = useState(true);
   const [activeTiers, setActiveTiers] = useState<{ minAmount: number; discountPercent: number }[]>([]);
 
@@ -48,26 +48,19 @@ export function CartDrawer() {
       if (savedPhone) setCustomerPhone(savedPhone);
     }
 
-    fetch("/api/settings")
+    fetch("/api/settings", { cache: "no-store" })
       .then((res) => res.json())
       .then((data) => {
         if (data.settings?.whatsapp_number) {
           setWhatsappNumber(data.settings.whatsapp_number);
         }
-        if (data.settings?.free_delivery_enabled !== undefined) {
-          setFreeDeliveryEnabled(data.settings.free_delivery_enabled !== "false");
-        }
         if (data.settings?.tier_discounts_enabled !== undefined) {
           setTierDiscountsEnabled(data.settings.tier_discounts_enabled !== "false");
-        }
-        if (data.settings?.free_delivery_threshold) {
-          const val = Number(data.settings.free_delivery_threshold);
-          if (val > 0) setDeliveryThreshold(val);
         }
       })
       .catch(() => {});
 
-    fetch("/api/admin/discounts/delivery-rule")
+    fetch("/api/admin/discounts/delivery-rule", { cache: "no-store" })
       .then((res) => res.json())
       .then((data) => {
         if (data.config) {
@@ -75,11 +68,13 @@ export function CartDrawer() {
           if (Number(data.config.freeThreshold) > 0) {
             setDeliveryThreshold(Number(data.config.freeThreshold));
           }
+        } else {
+          setFreeDeliveryEnabled(false);
         }
       })
-      .catch(() => {});
+      .catch(() => setFreeDeliveryEnabled(false));
 
-    fetch("/api/admin/discounts/tiered")
+    fetch("/api/admin/discounts/tiered", { cache: "no-store" })
       .then((res) => res.json())
       .then((data) => {
         if (Array.isArray(data.tiers)) {

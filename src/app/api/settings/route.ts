@@ -11,12 +11,19 @@ export const fetchCache = "force-no-store";
 export async function GET(request: NextRequest) {
   try {
     const settings = await prisma.setting.findMany();
+    const deliveryConfig = await prisma.deliveryConfig.findFirst();
     
     // Convert array to object
     const settingsObj: Record<string, string> = {};
     settings.forEach((s) => {
       settingsObj[s.key] = s.value;
     });
+
+    if (deliveryConfig) {
+      settingsObj["free_delivery_enabled"] = String(deliveryConfig.isFreeDeliveryActive);
+      settingsObj["free_delivery_threshold"] = String(deliveryConfig.freeThreshold);
+      settingsObj["express_delivery_fee"] = String(deliveryConfig.expressFee);
+    }
 
     return NextResponse.json(
       { settings: settingsObj },

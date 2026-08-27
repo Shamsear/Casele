@@ -44,10 +44,10 @@ export function HomePageClient({
   const [heroSubtitle, setHeroSubtitle] = useState("Artistry in Armor.");
   const [heroDescription, setHeroDescription] = useState("Every silhouette is machined with aerospace-grade composites and tactile metallic accents. Hand-finished in Qatar for discerning device owners.");
   const [deliveryThreshold, setDeliveryThreshold] = useState(100);
-  const [freeDeliveryEnabled, setFreeDeliveryEnabled] = useState(true);
+  const [freeDeliveryEnabled, setFreeDeliveryEnabled] = useState(false);
 
   useEffect(() => {
-    fetch("/api/settings")
+    fetch("/api/settings", { cache: "no-store" })
       .then((res) => res.json())
       .then((data) => {
         if (data.settings) {
@@ -55,16 +55,23 @@ export function HomePageClient({
           if (data.settings.hero_title) setHeroTitle(data.settings.hero_title);
           if (data.settings.hero_subtitle) setHeroSubtitle(data.settings.hero_subtitle);
           if (data.settings.hero_description) setHeroDescription(data.settings.hero_description);
-          if (data.settings.free_delivery_enabled !== undefined) {
-            setFreeDeliveryEnabled(data.settings.free_delivery_enabled !== "false");
-          }
-          if (data.settings.free_delivery_threshold) {
-            const val = Number(data.settings.free_delivery_threshold);
-            if (val > 0) setDeliveryThreshold(val);
-          }
         }
       })
       .catch(() => {});
+
+    fetch("/api/admin/discounts/delivery-rule", { cache: "no-store" })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.config) {
+          setFreeDeliveryEnabled(Boolean(data.config.isFreeDeliveryActive));
+          if (Number(data.config.freeThreshold) > 0) {
+            setDeliveryThreshold(Number(data.config.freeThreshold));
+          }
+        } else {
+          setFreeDeliveryEnabled(false);
+        }
+      })
+      .catch(() => setFreeDeliveryEnabled(false));
   }, []);
 
   return (
