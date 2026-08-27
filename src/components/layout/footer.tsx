@@ -41,14 +41,20 @@ export function Footer() {
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
             <div className="flex items-center gap-3.5">
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white border border-neutral-200/80 text-neutral-950 shadow-xs">
-                <Truck className="h-5 w-5" />
+                {freeDeliveryEnabled && deliveryThreshold > 0 ? (
+                  <Truck className="h-5 w-5" />
+                ) : (
+                  <ShieldCheck className="h-5 w-5" />
+                )}
               </div>
               <div>
-                <p className="text-xs font-semibold uppercase tracking-wider text-neutral-950">Doha Express Dispatch</p>
+                <p className="text-xs font-semibold uppercase tracking-wider text-neutral-950">
+                  {freeDeliveryEnabled && deliveryThreshold > 0 ? "Complimentary Delivery" : "Hand-Finished in Qatar"}
+                </p>
                 <p className="text-[11px] text-neutral-500 mt-0.5">
                   {freeDeliveryEnabled && deliveryThreshold > 0
-                    ? `Complimentary delivery over QR ${deliveryThreshold}`
-                    : "Express courier dispatch across Qatar"}
+                    ? `Orders over QR ${deliveryThreshold}`
+                    : "Machined luxury device protection"}
                 </p>
               </div>
             </div>

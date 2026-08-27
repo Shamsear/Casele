@@ -374,11 +374,11 @@ export function ProductDetailClient({
                     <Plus className="h-4 w-4" />
                   </button>
                 </div>
-                <span className="text-xs font-medium text-neutral-500">
-                  {freeDeliveryEnabled && deliveryThreshold > 0
-                    ? `Includes free Qatar delivery over QR ${deliveryThreshold}`
-                    : "Express Qatar Same-Day Dispatch"}
-                </span>
+                {freeDeliveryEnabled && deliveryThreshold > 0 && (
+                  <span className="text-xs font-medium text-neutral-500">
+                    Includes free Qatar delivery over QR {deliveryThreshold}
+                  </span>
+                )}
               </div>
             </div>
 
