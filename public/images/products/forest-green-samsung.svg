@@ -46,7 +46,7 @@
   <!-- Ground Drop Shadow -->
   <ellipse cx="250" cy="625" rx="125" ry="20" fill="#000000" filter="url(#groundShadow_forest-green_back_samsung)" />
 
-  <!-- Outer Bumper Profile (Slender phone silhouette) -->
+  <!-- Outer Bumper Profile -->
   <rect x="120" y="56" width="260" height="568" rx="24" fill="url(#edgeGrad_forest-green_back_samsung)" stroke="#C5A869" stroke-width="1.5"/>
 
   <!-- Left / Right Physical Buttons -->

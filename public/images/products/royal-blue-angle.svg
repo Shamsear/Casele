@@ -1,24 +1,24 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 700" fill="none">
   <defs>
-    <filter id="angleShadow_royal-blue_angle" x="60" y="540" width="380" height="140" filterUnits="userSpaceOnUse">
+    <filter id="angleShadow_royal-blue_angle_iphone" x="60" y="540" width="380" height="140" filterUnits="userSpaceOnUse">
       <feGaussianBlur stdDeviation="22" />
       <feColorMatrix type="matrix" values="0 0 0 0 0   0 0 0 0 0   0 0 0 0 0  0 0 0 0.38 0"/>
     </filter>
 
-    <linearGradient id="bodyAngleGrad_royal-blue_angle" x1="140" y1="80" x2="360" y2="600" gradientUnits="userSpaceOnUse">
+    <linearGradient id="bodyAngleGrad_royal-blue_angle_iphone" x1="140" y1="80" x2="360" y2="600" gradientUnits="userSpaceOnUse">
       <stop offset="0%" stop-color="#142850" />
       <stop offset="50%" stop-color="#0C1B3A" />
       <stop offset="100%" stop-color="#070F22" />
     </linearGradient>
 
-    <linearGradient id="rimGrad_royal-blue_angle" x1="120" y1="80" x2="380" y2="600" gradientUnits="userSpaceOnUse">
+    <linearGradient id="rimGrad_royal-blue_angle_iphone" x1="120" y1="80" x2="380" y2="600" gradientUnits="userSpaceOnUse">
       <stop offset="0%" stop-color="#27498F" />
       <stop offset="100%" stop-color="#0D1E40" />
     </linearGradient>
   </defs>
 
   <!-- Realistic Ground Ambient Shadow -->
-  <ellipse cx="255" cy="615" rx="140" ry="24" fill="#000000" filter="url(#angleShadow_royal-blue_angle)" transform="rotate(-6 255 615)"/>
+  <ellipse cx="255" cy="615" rx="140" ry="24" fill="#000000" filter="url(#angleShadow_royal-blue_angle_iphone)" transform="rotate(-6 255 615)"/>
 
   <!-- Slender 3D Angled Phone (Width 240px x Height 550px, ratio 1:2.3) -->
   <g transform="translate(250, 335) rotate(-8) skewX(-3) scale(0.95) translate(-250, -335)">
@@ -26,7 +26,7 @@
     <rect x="122" y="66" width="256" height="558" rx="40" fill="#050507" stroke="#0D1E40" stroke-width="1"/>
     
     <!-- Outer Metallic Rim -->
-    <rect x="128" y="60" width="250" height="554" rx="38" fill="url(#rimGrad_royal-blue_angle)" stroke="#27498F" stroke-width="2"/>
+    <rect x="128" y="60" width="250" height="554" rx="38" fill="url(#rimGrad_royal-blue_angle_iphone)" stroke="#27498F" stroke-width="2"/>
     
     <!-- Tactile Side Buttons in 3D -->
     <rect x="122" y="150" width="6" height="28" rx="2" fill="#27498F"/>
@@ -34,25 +34,27 @@
     <rect x="122" y="250" width="6" height="44" rx="2" fill="#27498F"/>
 
     <!-- Case Face -->
-    <rect x="134" y="66" width="238" height="542" rx="34" fill="url(#bodyAngleGrad_royal-blue_angle)"/>
+    <rect x="134" y="66" width="238" height="542" rx="34" fill="url(#bodyAngleGrad_royal-blue_angle_iphone)"/>
 
-    <!-- Camera Plateau in Perspective -->
-    <g>
-      <rect x="150" y="74" width="96" height="100" rx="24" fill="#1C3668" stroke="#27498F" stroke-width="1.8"/>
-      
-      <!-- 3 Lenses -->
-      <circle cx="178" cy="104" r="17" fill="#0A0A0E" stroke="#27498F" stroke-width="2.2"/>
-      <circle cx="178" cy="104" r="10" fill="#14141C"/>
-      <circle cx="175" cy="101" r="3.5" fill="#3B82F6" opacity="0.7"/>
+    <!-- Camera Module in 3D Perspective -->
+    
+      <g>
+        <rect x="150" y="74" width="96" height="100" rx="24" fill="#1C3668" stroke="#27498F" stroke-width="1.8"/>
+        
+        <!-- 3 Lenses in isometric perspective -->
+        <circle cx="178" cy="104" r="17" fill="#0A0A0E" stroke="#27498F" stroke-width="2.2"/>
+        <circle cx="178" cy="104" r="10" fill="#14141C"/>
+        <circle cx="175" cy="101" r="3.5" fill="#3B82F6" opacity="0.7"/>
 
-      <circle cx="178" cy="144" r="17" fill="#0A0A0E" stroke="#27498F" stroke-width="2.2"/>
-      <circle cx="178" cy="144" r="10" fill="#14141C"/>
-      <circle cx="175" cy="141" r="3.5" fill="#3B82F6" opacity="0.7"/>
+        <circle cx="178" cy="144" r="17" fill="#0A0A0E" stroke="#27498F" stroke-width="2.2"/>
+        <circle cx="178" cy="144" r="10" fill="#14141C"/>
+        <circle cx="175" cy="141" r="3.5" fill="#3B82F6" opacity="0.7"/>
 
-      <circle cx="218" cy="124" r="17" fill="#0A0A0E" stroke="#27498F" stroke-width="2.2"/>
-      <circle cx="218" cy="124" r="10" fill="#14141C"/>
-      <circle cx="215" cy="121" r="3.5" fill="#3B82F6" opacity="0.7"/>
-    </g>
+        <circle cx="218" cy="124" r="17" fill="#0A0A0E" stroke="#27498F" stroke-width="2.2"/>
+        <circle cx="218" cy="124" r="10" fill="#14141C"/>
+        <circle cx="215" cy="121" r="3.5" fill="#3B82F6" opacity="0.7"/>
+      </g>
+    
 
     <!-- MagSafe Ring in Perspective -->
     <ellipse cx="253" cy="350" rx="50" ry="56" stroke="#FFFFFF" stroke-width="1.5" stroke-dasharray="8 4" fill="none" opacity="0.15"/>

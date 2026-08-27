@@ -99,14 +99,18 @@ export function ProductDetailClient({
     const themeSlug = match ? match[1] : "midnight-black";
 
     let modelMainImg = `/images/products/${themeSlug}.svg`;
+    let angleImg = `/images/products/${themeSlug}-angle.svg`;
+    let frontImg = `/images/products/${themeSlug}-front.svg`;
+
     if (selectedModel.brand === "Samsung" || selectedModel.slug.includes("samsung")) {
       modelMainImg = `/images/products/${themeSlug}-samsung.svg`;
+      angleImg = `/images/products/${themeSlug}-angle-samsung.svg`;
+      frontImg = `/images/products/${themeSlug}-front-samsung.svg`;
     } else if (selectedModel.brand === "Google" || selectedModel.slug.includes("pixel")) {
       modelMainImg = `/images/products/${themeSlug}-pixel.svg`;
+      angleImg = `/images/products/${themeSlug}-angle-pixel.svg`;
+      frontImg = `/images/products/${themeSlug}-front-pixel.svg`;
     }
-
-    const angleImg = `/images/products/${themeSlug}-angle.svg`;
-    const frontImg = `/images/products/${themeSlug}-front.svg`;
 
     return [modelMainImg, angleImg, frontImg];
   })();

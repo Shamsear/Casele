@@ -40,7 +40,7 @@
   <!-- Ground Drop Shadow -->
   <ellipse cx="250" cy="625" rx="125" ry="20" fill="#000000" filter="url(#groundShadow_gold-edge_back_pixel)" />
 
-  <!-- Outer Bumper Profile (Slender phone silhouette) -->
+  <!-- Outer Bumper Profile -->
   <rect x="120" y="56" width="260" height="568" rx="40" fill="url(#edgeGrad_gold-edge_back_pixel)" stroke="#F5D77F" stroke-width="3"/>
 
   <!-- Left / Right Physical Buttons -->
