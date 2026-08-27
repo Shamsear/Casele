@@ -10,7 +10,6 @@
       <feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#000000" flood-opacity="0.45"/>
     </filter>
 
-    <!-- Linear Gradients -->
     <linearGradient id="bodyGrad_matte-black_back_iphone" x1="120" y1="50" x2="380" y2="630" gradientUnits="userSpaceOnUse">
       <stop offset="0%" stop-color="#18181A" />
       <stop offset="50%" stop-color="#101011" />
@@ -27,7 +26,6 @@
       <stop offset="100%" stop-color="#09090B" />
     </linearGradient>
 
-    <!-- Glass Glare Reflection -->
     <linearGradient id="glareGrad_matte-black_back_iphone" x1="120" y1="50" x2="350" y2="550" gradientUnits="userSpaceOnUse">
       <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.12" />
       <stop offset="35%" stop-color="#FFFFFF" stop-opacity="0.04" />
@@ -36,8 +34,8 @@
 
     
       <pattern id="armorHex_matte-black_back_iphone" width="18" height="31.18" patternUnits="userSpaceOnUse">
-        <path d="M9 0 L18 5.2 L18 15.6 L9 20.8 L0 15.6 L0 5.2 Z" fill="none" stroke="#27272A" stroke-width="0.8" opacity="0.45"/>
-        <path d="M0 31.18 L9 26 L18 31.18" fill="none" stroke="#27272A" stroke-width="0.8" opacity="0.45"/>
+        <path d="M9 0 L18 5.2 L18 15.6 L9 20.8 L0 15.6 L0 5.2 Z" fill="none" stroke="#2E2E34" stroke-width="0.9" opacity="0.55"/>
+        <path d="M0 31.18 L9 26 L18 31.18" fill="none" stroke="#2E2E34" stroke-width="0.9" opacity="0.55"/>
       </pattern>
     
   </defs>
@@ -58,7 +56,7 @@
     <rect x="378" y="190" width="4" height="54" rx="2" fill="#3F3F46"/>
   
 
-  <!-- Inner Case Backplate -->
+  <!-- Inner Case Backplate with Texture -->
   <rect x="126" y="62" width="248" height="556" rx="40" fill="url(#bodyGrad_matte-black_back_iphone)"/>
 
   
@@ -68,7 +66,7 @@
   
 
   <!-- MagSafe Magnetic Core -->
-  <g opacity="0.12">
+  <g opacity="0.15">
     <circle cx="250" cy="350" r="56" stroke="#FFFFFF" stroke-width="2" stroke-dasharray="10 4" fill="none"/>
     <circle cx="250" cy="350" r="48" stroke="#FFFFFF" stroke-width="1" fill="none" opacity="0.4"/>
     <rect x="247" y="415" width="6" height="24" rx="3" fill="#FFFFFF"/>

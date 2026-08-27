@@ -10,7 +10,6 @@
       <feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#000000" flood-opacity="0.45"/>
     </filter>
 
-    <!-- Linear Gradients -->
     <linearGradient id="bodyGrad_carbon-fiber_back_iphone" x1="120" y1="50" x2="380" y2="630" gradientUnits="userSpaceOnUse">
       <stop offset="0%" stop-color="#222226" />
       <stop offset="50%" stop-color="#161618" />
@@ -27,7 +26,6 @@
       <stop offset="100%" stop-color="#121214" />
     </linearGradient>
 
-    <!-- Glass Glare Reflection -->
     <linearGradient id="glareGrad_carbon-fiber_back_iphone" x1="120" y1="50" x2="350" y2="550" gradientUnits="userSpaceOnUse">
       <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.12" />
       <stop offset="35%" stop-color="#FFFFFF" stop-opacity="0.04" />
@@ -37,11 +35,11 @@
     
       <pattern id="carbonPattern_carbon-fiber_back_iphone" width="12" height="12" patternUnits="userSpaceOnUse">
         <rect width="12" height="12" fill="#161618"/>
-        <path d="M0 0 L6 6 L0 12 Z" fill="#2A2A30" opacity="0.6"/>
-        <path d="M6 6 L12 0 L12 12 Z" fill="#141416" opacity="0.8"/>
-        <path d="M0 6 L6 0 L12 6 L6 12 Z" fill="#1E1E22" opacity="0.7"/>
-        <line x1="0" y1="0" x2="12" y2="12" stroke="#383842" stroke-width="0.5" opacity="0.3"/>
-        <line x1="12" y1="0" x2="0" y2="12" stroke="#0A0A0C" stroke-width="0.5" opacity="0.5"/>
+        <path d="M0 0 L6 6 L0 12 Z" fill="#2E2E36" opacity="0.7"/>
+        <path d="M6 6 L12 0 L12 12 Z" fill="#101013" opacity="0.85"/>
+        <path d="M0 6 L6 0 L12 6 L6 12 Z" fill="#202026" opacity="0.75"/>
+        <line x1="0" y1="0" x2="12" y2="12" stroke="#484856" stroke-width="0.6" opacity="0.4"/>
+        <line x1="12" y1="0" x2="0" y2="12" stroke="#050508" stroke-width="0.6" opacity="0.6"/>
       </pattern>
     
   </defs>
@@ -62,7 +60,7 @@
     <rect x="378" y="190" width="4" height="54" rx="2" fill="#3A3A40"/>
   
 
-  <!-- Inner Case Backplate -->
+  <!-- Inner Case Backplate with Texture -->
   <rect x="126" y="62" width="248" height="556" rx="40" fill="url(#bodyGrad_carbon-fiber_back_iphone)"/>
 
   <rect x="126" y="62" width="248" height="556" rx="40" fill="url(#carbonPattern_carbon-fiber_back_iphone)"/>
@@ -72,7 +70,7 @@
   
 
   <!-- MagSafe Magnetic Core -->
-  <g opacity="0.12">
+  <g opacity="0.15">
     <circle cx="250" cy="350" r="56" stroke="#FFFFFF" stroke-width="2" stroke-dasharray="10 4" fill="none"/>
     <circle cx="250" cy="350" r="48" stroke="#FFFFFF" stroke-width="1" fill="none" opacity="0.4"/>
     <rect x="247" y="415" width="6" height="24" rx="3" fill="#FFFFFF"/>

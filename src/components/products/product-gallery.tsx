@@ -226,9 +226,9 @@ export function ProductGallery({ images, alt, badge, discount }: ProductGalleryP
         )}
       </div>
 
-      {/* Minimal Floating Thumbnails Row */}
+      {/* Minimal Floating Thumbnails Row — No container boxes */}
       {hasMultiple && (
-        <div className="flex items-center gap-3 overflow-x-auto pb-2 scrollbar-none">
+        <div className="flex items-center gap-4 overflow-x-auto pb-2 scrollbar-none">
           {allImages.map((image, index) => (
             <button
               key={index}
@@ -237,18 +237,26 @@ export function ProductGallery({ images, alt, badge, discount }: ProductGalleryP
                 setActiveIndex(index);
               }}
               className={cn(
-                "relative h-20 w-20 sm:h-24 sm:w-24 shrink-0 overflow-hidden rounded-xl transition-all cursor-pointer",
+                "group relative flex flex-col items-center gap-1.5 shrink-0 transition-all cursor-pointer",
                 activeIndex === index
-                  ? "ring-2 ring-neutral-950 scale-105 shadow-sm opacity-100"
-                  : "opacity-60 hover:opacity-100 hover:scale-102"
+                  ? "opacity-100 scale-105"
+                  : "opacity-40 hover:opacity-80 hover:scale-102"
               )}
             >
-              <Image
-                src={image}
-                alt={`${alt} thumbnail ${index + 1}`}
-                fill
-                className="object-contain p-1"
-                sizes="100px"
+              <div className="relative h-20 w-16 sm:h-24 sm:w-20">
+                <Image
+                  src={image}
+                  alt={`${alt} thumbnail ${index + 1}`}
+                  fill
+                  className="object-contain drop-shadow-md"
+                  sizes="80px"
+                />
+              </div>
+              <span
+                className={cn(
+                  "h-1 rounded-full transition-all duration-300",
+                  activeIndex === index ? "w-6 bg-[#C5A869]" : "w-1.5 bg-transparent group-hover:bg-neutral-300"
+                )}
               />
             </button>
           ))}

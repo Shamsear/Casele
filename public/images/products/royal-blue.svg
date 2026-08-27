@@ -10,24 +10,22 @@
       <feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#000000" flood-opacity="0.45"/>
     </filter>
 
-    <!-- Linear Gradients -->
     <linearGradient id="bodyGrad_royal-blue_back_iphone" x1="120" y1="50" x2="380" y2="630" gradientUnits="userSpaceOnUse">
-      <stop offset="0%" stop-color="#142850" />
-      <stop offset="50%" stop-color="#0C1B3A" />
+      <stop offset="0%" stop-color="#183266" />
+      <stop offset="50%" stop-color="#0E1E40" />
       <stop offset="100%" stop-color="#070F22" />
     </linearGradient>
 
     <linearGradient id="edgeGrad_royal-blue_back_iphone" x1="120" y1="50" x2="380" y2="630" gradientUnits="userSpaceOnUse">
-      <stop offset="0%" stop-color="#27498F" />
+      <stop offset="0%" stop-color="#2B52A3" />
       <stop offset="100%" stop-color="#0D1E40" />
     </linearGradient>
 
     <linearGradient id="camGrad_royal-blue_back_iphone" x1="140" y1="70" x2="250" y2="180" gradientUnits="userSpaceOnUse">
-      <stop offset="0%" stop-color="#1C3668" />
+      <stop offset="0%" stop-color="#203E7A" />
       <stop offset="100%" stop-color="#0A1730" />
     </linearGradient>
 
-    <!-- Glass Glare Reflection -->
     <linearGradient id="glareGrad_royal-blue_back_iphone" x1="120" y1="50" x2="350" y2="550" gradientUnits="userSpaceOnUse">
       <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.12" />
       <stop offset="35%" stop-color="#FFFFFF" stop-opacity="0.04" />
@@ -41,19 +39,19 @@
   <ellipse cx="250" cy="625" rx="125" ry="20" fill="#000000" filter="url(#groundShadow_royal-blue_back_iphone)" />
 
   <!-- Outer Bumper Profile -->
-  <rect x="120" y="56" width="260" height="568" rx="44" fill="url(#edgeGrad_royal-blue_back_iphone)" stroke="#27498F" stroke-width="1.5"/>
+  <rect x="120" y="56" width="260" height="568" rx="44" fill="url(#edgeGrad_royal-blue_back_iphone)" stroke="#2B52A3" stroke-width="1.5"/>
 
   <!-- Left / Right Physical Buttons -->
   
-    <rect x="118" y="145" width="4" height="26" rx="2" fill="#27498F"/>
-    <rect x="118" y="185" width="4" height="42" rx="2" fill="#27498F"/>
-    <rect x="118" y="235" width="4" height="42" rx="2" fill="#27498F"/>
+    <rect x="118" y="145" width="4" height="26" rx="2" fill="#2B52A3"/>
+    <rect x="118" y="185" width="4" height="42" rx="2" fill="#2B52A3"/>
+    <rect x="118" y="235" width="4" height="42" rx="2" fill="#2B52A3"/>
   
   
-    <rect x="378" y="190" width="4" height="54" rx="2" fill="#27498F"/>
+    <rect x="378" y="190" width="4" height="54" rx="2" fill="#2B52A3"/>
   
 
-  <!-- Inner Case Backplate -->
+  <!-- Inner Case Backplate with Texture -->
   <rect x="126" y="62" width="248" height="556" rx="40" fill="url(#bodyGrad_royal-blue_back_iphone)"/>
 
   
@@ -63,7 +61,7 @@
   
 
   <!-- MagSafe Magnetic Core -->
-  <g opacity="0.12">
+  <g opacity="0.15">
     <circle cx="250" cy="350" r="56" stroke="#FFFFFF" stroke-width="2" stroke-dasharray="10 4" fill="none"/>
     <circle cx="250" cy="350" r="48" stroke="#FFFFFF" stroke-width="1" fill="none" opacity="0.4"/>
     <rect x="247" y="415" width="6" height="24" rx="3" fill="#FFFFFF"/>
@@ -75,24 +73,24 @@
   <!-- Camera Module Plateau -->
   
       <g filter="url(#camShadow_royal-blue_back_iphone)">
-        <rect x="142" y="70" width="102" height="106" rx="26" fill="url(#camGrad_royal-blue_back_iphone)" stroke="#27498F" stroke-width="1.2"/>
+        <rect x="142" y="70" width="102" height="106" rx="26" fill="url(#camGrad_royal-blue_back_iphone)" stroke="#2B52A3" stroke-width="1.2"/>
         
         <!-- Lens 1 (Top Left) -->
-        <circle cx="172" cy="102" r="19" fill="#0A0A0E" stroke="#27498F" stroke-width="2.5"/>
+        <circle cx="172" cy="102" r="19" fill="#0A0A0E" stroke="#2B52A3" stroke-width="2.5"/>
         <circle cx="172" cy="102" r="12" fill="#14141C"/>
         <circle cx="172" cy="102" r="7" fill="#0A0A10"/>
         <circle cx="169" cy="99" r="3.5" fill="#3B82F6" opacity="0.6"/>
         <circle cx="174" cy="100" r="1.5" fill="#FFFFFF" opacity="0.9"/>
 
         <!-- Lens 2 (Bottom Left) -->
-        <circle cx="172" cy="144" r="19" fill="#0A0A0E" stroke="#27498F" stroke-width="2.5"/>
+        <circle cx="172" cy="144" r="19" fill="#0A0A0E" stroke="#2B52A3" stroke-width="2.5"/>
         <circle cx="172" cy="144" r="12" fill="#14141C"/>
         <circle cx="172" cy="144" r="7" fill="#0A0A10"/>
         <circle cx="169" cy="141" r="3.5" fill="#3B82F6" opacity="0.6"/>
         <circle cx="174" cy="142" r="1.5" fill="#FFFFFF" opacity="0.9"/>
 
         <!-- Lens 3 (Right Center) -->
-        <circle cx="214" cy="123" r="19" fill="#0A0A0E" stroke="#27498F" stroke-width="2.5"/>
+        <circle cx="214" cy="123" r="19" fill="#0A0A0E" stroke="#2B52A3" stroke-width="2.5"/>
         <circle cx="214" cy="123" r="12" fill="#14141C"/>
         <circle cx="214" cy="123" r="7" fill="#0A0A10"/>
         <circle cx="211" cy="120" r="3.5" fill="#3B82F6" opacity="0.6"/>

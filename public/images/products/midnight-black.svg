@@ -10,7 +10,6 @@
       <feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#000000" flood-opacity="0.45"/>
     </filter>
 
-    <!-- Linear Gradients -->
     <linearGradient id="bodyGrad_midnight-black_back_iphone" x1="120" y1="50" x2="380" y2="630" gradientUnits="userSpaceOnUse">
       <stop offset="0%" stop-color="#1E1E22" />
       <stop offset="50%" stop-color="#121214" />
@@ -27,7 +26,6 @@
       <stop offset="100%" stop-color="#0E0E10" />
     </linearGradient>
 
-    <!-- Glass Glare Reflection -->
     <linearGradient id="glareGrad_midnight-black_back_iphone" x1="120" y1="50" x2="350" y2="550" gradientUnits="userSpaceOnUse">
       <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.12" />
       <stop offset="35%" stop-color="#FFFFFF" stop-opacity="0.04" />
@@ -53,7 +51,7 @@
     <rect x="378" y="190" width="4" height="54" rx="2" fill="#38383E"/>
   
 
-  <!-- Inner Case Backplate -->
+  <!-- Inner Case Backplate with Texture -->
   <rect x="126" y="62" width="248" height="556" rx="40" fill="url(#bodyGrad_midnight-black_back_iphone)"/>
 
   
@@ -63,7 +61,7 @@
   
 
   <!-- MagSafe Magnetic Core -->
-  <g opacity="0.12">
+  <g opacity="0.15">
     <circle cx="250" cy="350" r="56" stroke="#FFFFFF" stroke-width="2" stroke-dasharray="10 4" fill="none"/>
     <circle cx="250" cy="350" r="48" stroke="#FFFFFF" stroke-width="1" fill="none" opacity="0.4"/>
     <rect x="247" y="415" width="6" height="24" rx="3" fill="#FFFFFF"/>

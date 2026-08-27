@@ -11,23 +11,21 @@
       <stop offset="100%" stop-color="#CBD5E1" />
     </linearGradient>
 
-    <!-- Interior Microfiber Cushion Bed Gradient -->
+    <!-- Deep Luxury Velvet / Microfiber Bed Gradient -->
     <linearGradient id="microfiberBed_clear-crystal_front_samsung" x1="130" y1="60" x2="370" y2="620" gradientUnits="userSpaceOnUse">
-      <stop offset="0%" stop-color="#F1F5F9" />
-      <stop offset="50%" stop-color="#121214" />
-      <stop offset="100%" stop-color="#09090A" />
+      <stop offset="0%" stop-color="#E2E8F0" />
+      <stop offset="60%" stop-color="#CBD5E1" />
+      <stop offset="100%" stop-color="#050507" />
     </linearGradient>
 
-    <!-- Microfiber Diamond Embossed Texture Pattern -->
+    <!-- Microfiber Diamond Pattern -->
     <pattern id="microfiberPattern_clear-crystal_front_samsung" width="16" height="16" patternUnits="userSpaceOnUse">
-      <path d="M8 0 L16 8 L8 16 L0 8 Z" fill="none" stroke="#E2E8F0" stroke-width="0.6" opacity="0.35"/>
+      <path d="M8 0 L16 8 L8 16 L0 8 Z" fill="none" stroke="#94A3B8" stroke-width="0.75" opacity="0.45"/>
     </pattern>
 
     <!-- 100% Transparent Camera Cutout Mask -->
     <mask id="cameraCutoutMask_clear-crystal_front_samsung">
-      <!-- Everything white is visible -->
       <rect x="0" y="0" width="500" height="700" fill="#FFFFFF"/>
-      <!-- The camera cutout shape is black -> 100% transparent hole -->
       <rect x="148" y="76" width="76" height="135" rx="18" fill="#000000"/>
     </mask>
   </defs>
@@ -51,36 +49,36 @@
     <rect x="128" y="64" width="244" height="552" rx="14" fill="url(#microfiberPattern_clear-crystal_front_samsung)"/>
 
     <!-- 4 Corner Air-Cushion Shock Deflection Pockets -->
-    <path d="M136 84 C 136 74, 146 68, 158 68" stroke="#F8FAFC" stroke-width="2" stroke-linecap="round" fill="none" opacity="0.5"/>
-    <path d="M364 84 C 364 74, 354 68, 342 68" stroke="#F8FAFC" stroke-width="2" stroke-linecap="round" fill="none" opacity="0.5"/>
-    <path d="M136 596 C 136 606, 146 612, 158 612" stroke="#F8FAFC" stroke-width="2" stroke-linecap="round" fill="none" opacity="0.5"/>
-    <path d="M364 596 C 364 606, 354 612, 342 612" stroke="#F8FAFC" stroke-width="2" stroke-linecap="round" fill="none" opacity="0.5"/>
+    <path d="M136 84 C 136 74, 146 68, 158 68" stroke="#F8FAFC" stroke-width="2.2" stroke-linecap="round" fill="none" opacity="0.6"/>
+    <path d="M364 84 C 364 74, 354 68, 342 68" stroke="#F8FAFC" stroke-width="2.2" stroke-linecap="round" fill="none" opacity="0.6"/>
+    <path d="M136 596 C 136 606, 146 612, 158 612" stroke="#F8FAFC" stroke-width="2.2" stroke-linecap="round" fill="none" opacity="0.6"/>
+    <path d="M364 596 C 364 606, 354 612, 342 612" stroke="#F8FAFC" stroke-width="2.2" stroke-linecap="round" fill="none" opacity="0.6"/>
 
     <!-- MagSafe Magnetic Array Stamped in Microfiber Bed -->
-    <g opacity="0.25">
+    <g opacity="0.35">
       <circle cx="250" cy="350" r="54" stroke="#0F172A" stroke-width="2" stroke-dasharray="8 4" fill="none"/>
       <rect x="247" y="414" width="6" height="22" rx="3" fill="#0F172A"/>
     </g>
 
     <!-- Luxury Gold/Metallic Hot-Stamped Interior Branding -->
-    <circle cx="250" cy="350" r="28" stroke="#0F172A" stroke-width="1.2" fill="none" opacity="0.5"/>
-    <text x="250" y="356" text-anchor="middle" font-family="'Cinzel', serif" font-size="18" font-weight="700" fill="#0F172A" opacity="0.85">C</text>
+    <circle cx="250" cy="350" r="28" stroke="#0F172A" stroke-width="1.5" fill="none" opacity="0.6"/>
+    <text x="250" y="357" text-anchor="middle" font-family="'Cinzel', serif" font-size="20" font-weight="700" fill="#0F172A" opacity="0.9">C</text>
     
-    <text x="250" y="465" text-anchor="middle" font-family="'Cinzel', serif" font-size="14" font-weight="700" fill="#0F172A" opacity="0.8" letter-spacing="3">CASELÉ</text>
-    <text x="250" y="482" text-anchor="middle" font-family="'Inter', sans-serif" font-size="8" font-weight="600" fill="#0F172A" opacity="0.5" letter-spacing="2">CRAFTED FOR LUXURY • DOHA</text>
-    <text x="250" y="496" text-anchor="middle" font-family="'Inter', sans-serif" font-size="7.5" font-weight="500" fill="#0F172A" opacity="0.4" letter-spacing="1.5">AEROSPACE COMPOSITE SHIELD</text>
+    <text x="250" y="465" text-anchor="middle" font-family="'Cinzel', serif" font-size="14" font-weight="700" fill="#0F172A" opacity="0.85" letter-spacing="3">CASELÉ</text>
+    <text x="250" y="482" text-anchor="middle" font-family="'Inter', sans-serif" font-size="8" font-weight="600" fill="#0F172A" opacity="0.6" letter-spacing="2">CRAFTED FOR LUXURY • DOHA</text>
+    <text x="250" y="496" text-anchor="middle" font-family="'Inter', sans-serif" font-size="7.5" font-weight="500" fill="#0F172A" opacity="0.5" letter-spacing="1.5">AEROSPACE COMPOSITE SHIELD</text>
 
     <!-- Precision Speaker & Charging Port Cutouts at Bottom -->
-    <rect x="235" y="608" width="30" height="4" rx="2" fill="#000000" opacity="0.8"/>
-    <circle cx="205" cy="610" r="2" fill="#000000" opacity="0.8"/>
-    <circle cx="215" cy="610" r="2" fill="#000000" opacity="0.8"/>
-    <circle cx="285" cy="610" r="2" fill="#000000" opacity="0.8"/>
-    <circle cx="295" cy="610" r="2" fill="#000000" opacity="0.8"/>
+    <rect x="235" y="608" width="30" height="4" rx="2" fill="#000000" opacity="0.9"/>
+    <circle cx="205" cy="610" r="2" fill="#000000" opacity="0.9"/>
+    <circle cx="215" cy="610" r="2" fill="#000000" opacity="0.9"/>
+    <circle cx="285" cy="610" r="2" fill="#000000" opacity="0.9"/>
+    <circle cx="295" cy="610" r="2" fill="#000000" opacity="0.9"/>
   </g>
 
   <!-- Raised Metallic Rim Around Camera Cutout Hole -->
   
       <rect x="148" y="76" width="76" height="135" rx="18" fill="none" stroke="#F8FAFC" stroke-width="2.5"/>
-      <rect x="145" y="73" width="82" height="141" rx="21" fill="none" stroke="#000000" stroke-width="1.2" opacity="0.6"/>
+      <rect x="145" y="73" width="82" height="141" rx="21" fill="none" stroke="#000000" stroke-width="1.5" opacity="0.8"/>
     
 </svg>
