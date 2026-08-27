@@ -88,7 +88,7 @@ export function Footer() {
           <div className="md:col-span-5 space-y-4">
             <Logo size="md" showLocation={true} />
             <p className="text-xs leading-relaxed text-neutral-600 max-w-sm">
-              CASELÉ is Doha&apos;s premier mobile atelier. We design high-calibre protective enclosures tailored to contemporary flagships.
+              CASELÉ is Doha&apos;s premier luxury phone case studio. We design high-calibre protective enclosures tailored to contemporary flagships.
             </p>
             <div className="flex items-center gap-2.5 pt-2">
               <a

@@ -295,7 +295,7 @@ export function HomePageClient({
                     Hand-Inspected in Qatar
                   </h3>
                   <p className="mt-1 text-xs text-neutral-500 leading-relaxed">
-                    Every piece undergoes tactile and microscopic inspection in our Doha atelier before luxury delivery.
+                    Every piece undergoes tactile and microscopic inspection in our Doha studio before luxury dispatch.
                   </p>
                 </div>
               </div>

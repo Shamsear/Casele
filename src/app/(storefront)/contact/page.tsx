@@ -4,7 +4,7 @@ import { MessageSquare, Mail, MapPin, ArrowRight } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Contact Concierge",
-  description: `Contact ${SITE.name} Doha atelier — WhatsApp concierge, Instagram, email inquiries, and atelier information in Qatar.`,
+  description: `Contact ${SITE.name} Doha concierge — WhatsApp concierge, Instagram, and email inquiries in Qatar.`,
 };
 
 export default function ContactPage() {
@@ -13,7 +13,7 @@ export default function ContactPage() {
       <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
         <div className="text-center space-y-3 mb-12">
           <span className="text-[11px] font-bold text-[#A88B4D] tracking-widest uppercase block">
-            Atelier Concierge
+            Client Concierge
           </span>
           <h1 className="font-display text-4xl sm:text-6xl font-normal text-neutral-950">
             Contact Us
