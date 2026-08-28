@@ -182,9 +182,9 @@ export function ProductGallery({ images, alt, badge, discount }: ProductGalleryP
               goToPrev();
             }}
             aria-label="Previous Image"
-            className="absolute left-3 top-1/2 -translate-y-1/2 z-20 flex h-11 w-11 items-center justify-center rounded-full bg-white/85 backdrop-blur-md text-neutral-900 transition-all hover:bg-white hover:scale-110 active:scale-95 opacity-0 group-hover:opacity-100 shadow-lg cursor-pointer"
+            className="absolute left-3 top-1/2 -translate-y-1/2 z-20 flex h-10 w-10 sm:h-11 sm:w-11 items-center justify-center rounded-full bg-white/90 backdrop-blur-md text-neutral-900 transition-all hover:bg-white hover:scale-110 active:scale-95 opacity-80 sm:opacity-0 sm:group-hover:opacity-100 shadow-md cursor-pointer"
           >
-            <ChevronLeft className="w-5 h-5" />
+            <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5" />
           </button>
         )}
 
@@ -196,9 +196,9 @@ export function ProductGallery({ images, alt, badge, discount }: ProductGalleryP
               goToNext();
             }}
             aria-label="Next Image"
-            className="absolute right-3 top-1/2 -translate-y-1/2 z-20 flex h-11 w-11 items-center justify-center rounded-full bg-white/85 backdrop-blur-md text-neutral-900 transition-all hover:bg-white hover:scale-110 active:scale-95 opacity-0 group-hover:opacity-100 shadow-lg cursor-pointer"
+            className="absolute right-3 top-1/2 -translate-y-1/2 z-20 flex h-10 w-10 sm:h-11 sm:w-11 items-center justify-center rounded-full bg-white/90 backdrop-blur-md text-neutral-900 transition-all hover:bg-white hover:scale-110 active:scale-95 opacity-80 sm:opacity-0 sm:group-hover:opacity-100 shadow-md cursor-pointer"
           >
-            <ChevronRight className="w-5 h-5" />
+            <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5" />
           </button>
         )}
 
@@ -228,7 +228,7 @@ export function ProductGallery({ images, alt, badge, discount }: ProductGalleryP
 
       {/* Minimal Floating Thumbnails Row — No container boxes */}
       {hasMultiple && (
-        <div className="flex items-center gap-4 overflow-x-auto pb-2 scrollbar-none">
+        <div className="flex items-center gap-3 sm:gap-4 overflow-x-auto pb-2 scrollbar-none px-1">
           {allImages.map((image, index) => (
             <button
               key={index}

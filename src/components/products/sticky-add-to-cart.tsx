@@ -120,7 +120,7 @@ export function StickyAddToCart({
   return (
     <>
       {/* ═══ Floating Compact Pill Bar with Fully Rounded Corners ═══ */}
-      <div className="fixed bottom-5 sm:bottom-6 inset-x-0 mx-auto max-w-xl w-[calc(100%-2rem)] z-40 rounded-full bg-white/95 backdrop-blur-2xl border border-neutral-200/90 px-3 sm:px-4 py-2 sm:py-2.5 shadow-[0_15px_40px_-5px_rgba(0,0,0,0.18)] transition-all duration-300 animate-slide-up flex items-center justify-between gap-2.5 sm:gap-4 select-none">
+      <div className="fixed bottom-[calc(4rem+env(safe-area-inset-bottom,0px)+10px)] md:bottom-6 inset-x-0 mx-auto max-w-xl w-[calc(100%-1.5rem)] sm:w-[calc(100%-2rem)] z-40 rounded-full bg-white/95 backdrop-blur-2xl border border-neutral-200/90 px-3 sm:px-4 py-2 sm:py-2.5 shadow-[0_15px_40px_-5px_rgba(0,0,0,0.18)] transition-all duration-300 animate-slide-up flex items-center justify-between gap-2 sm:gap-4 select-none">
         {/* Left: Product Thumbnail & Specifications */}
         <div className="flex items-center gap-2 sm:gap-3 min-w-0">
           <div className="sticky-thumb-img relative h-9 w-9 sm:h-10 sm:w-10 flex-shrink-0 overflow-hidden rounded-full bg-neutral-50 border border-neutral-200/80">

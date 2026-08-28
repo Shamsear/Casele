@@ -139,7 +139,7 @@ export function CartDrawer() {
     <>
       {/* Backdrop */}
       <div
-        className={`fixed inset-0 z-50 bg-neutral-950/40 backdrop-blur-xs transition-opacity duration-300 ${
+        className={`fixed inset-0 z-[70] bg-neutral-950/40 backdrop-blur-xs transition-opacity duration-300 ${
           isOpen ? "opacity-100" : "pointer-events-none opacity-0"
         }`}
         onClick={() => setOpen(false)}
@@ -147,7 +147,7 @@ export function CartDrawer() {
 
       {/* Slide-Over Drawer */}
       <div
-        className={`fixed right-0 top-0 z-50 flex h-full w-full max-w-md flex-col bg-white border-l border-neutral-200/80 shadow-2xl transition-all duration-300 ease-out text-neutral-950 ${
+        className={`fixed right-0 top-0 z-[70] flex h-full w-full max-w-md flex-col bg-white border-l border-neutral-200/80 shadow-2xl transition-all duration-300 ease-out text-neutral-950 ${
           isOpen ? "translate-x-0 opacity-100 visible pointer-events-auto" : "translate-x-full opacity-0 invisible pointer-events-none"
         }`}
       >
@@ -294,7 +294,7 @@ export function CartDrawer() {
 
         {/* Footer with totals and WhatsApp button */}
         {items.length > 0 && (
-          <div className="border-t border-neutral-200/80 bg-neutral-50/50 px-6 py-4 space-y-4">
+          <div className="border-t border-neutral-200/80 bg-neutral-50/50 px-6 pt-4 pb-[calc(1.25rem+env(safe-area-inset-bottom,0px))] space-y-4">
             {/* Price Breakdown */}
             <div className="space-y-1.5 text-xs">
               <div className="flex justify-between text-neutral-600">

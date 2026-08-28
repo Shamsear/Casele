@@ -80,8 +80,8 @@ export function QuickBuyModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-neutral-950/50 backdrop-blur-xs p-4 animate-fade-in">
-      <div className="relative w-full max-w-md rounded-3xl border border-neutral-200 bg-white p-6 sm:p-7 shadow-2xl space-y-5 animate-scale-in text-neutral-950">
+    <div className="fixed inset-0 z-[80] flex items-center justify-center bg-neutral-950/50 backdrop-blur-xs p-3 sm:p-4 animate-fade-in">
+      <div className="relative w-full max-w-md max-h-[92vh] overflow-y-auto rounded-3xl border border-neutral-200 bg-white p-5 sm:p-7 shadow-2xl space-y-5 animate-scale-in text-neutral-950">
         {/* Close Button */}
         <button
           type="button"
